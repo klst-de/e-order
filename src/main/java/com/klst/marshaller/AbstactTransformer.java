@@ -23,14 +23,17 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
-//import com.klst.einvoice.ubl.GenericInvoice;
-// TODO in jaxb-ri com.sun.xml.bind.marshaller.NamespacePrefixMapper ohne internal
-// Discouraged access: The type 'NamespacePrefixMapper' is not API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
+/* in java 1.8 'NamespacePrefixMapper' is not in API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
+ * to compile in eclipse define access rule.
+ * 
+ * Proposal JEP-320(http://openjdk.java.net/jeps/320) to remove the Java EE and CORBA modules from the JDK.
+ * In Java SE 11, the module has been removed. To use JAX-WS and JAXB you need to add them to your project as separate libraries.
+ * 
+ * @see https://jesperdj.com/2018/09/30/jaxb-on-java-9-10-11-and-beyond/
+ */
+//TODO add JAXB in a separate lib
 import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 
-//import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
-//import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
-//import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 
 @Named
@@ -56,17 +59,16 @@ public abstract class AbstactTransformer {
 	
 	// ctor
 	protected AbstactTransformer(String contentPath, AbstactTransformer instance) {
-		LOG.fine("ctor "+contentPath + " SINGLETON:"+instance);
+		LOG.fine("contentPath:"+contentPath);
 		if(instance==null) try {
 			this.jaxbContext = newInstance(contentPath);
-			LOG.finer(jaxbContext.toString());
+			LOG.finer("jaxbContext:\n"+jaxbContext.toString()); // displays path and Classes known to context
 			instance = this;
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.JAXB_INSTANTIATE_ERROR, ex);
 		} else {
 			this.jaxbContext = instance.jaxbContext;
 		}
-		LOG.fine("ctor >>>>>>>>>>>>>>>>>>"+instance.toString());
 	}
 
 	public boolean isValid(File xmlfile) {
@@ -75,7 +77,7 @@ public abstract class AbstactTransformer {
 			Source xmlFile = new StreamSource(xmlfile);
 			Validator validator = this.getSchemaValidator(); // throws SAXException, Exception
 			validator.validate(xmlFile);
-			LOG.info("validate against "+resource+" passed.");
+			LOG.config("validate against "+resource+" passed.");
 		} catch (SAXException ex) {
 			LOG.warning("validate against "+resource+" failed, SAXException: "+ex.getMessage());
 			return false;
@@ -104,12 +106,6 @@ public abstract class AbstactTransformer {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(16000);
 		try {
 			Marshaller marshaller = createMarshaller();
-			// TODO : siehe 5.3.3. Marshalling a non-element in file:///C:/proj/jaxb-ri/docs/ch03.html#marshalling
-//			if(document instanceof GenericInvoice<?>) {
-//				marshaller.marshal(((GenericInvoice)document).get(), outputStream);
-//			} else if(document instanceof CrossIndustryInvoiceType) {
-//				marshaller.marshal((CrossIndustryInvoiceType)document, outputStream);
-//			}
 			marshaller.marshal((SCRDMCCBDACIOMessageStructureType)document, outputStream);
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.MARSHALLING_ERROR, ex);
@@ -120,10 +116,10 @@ public abstract class AbstactTransformer {
 	abstract String getResource();
 	
 	Validator getSchemaValidator(String resource) throws SAXException {
-		LOG.info("resource:"+resource + " Class:"+this.getClass());
+		LOG.fine("resource:"+resource + " Class:"+this.getClass());
 		URL schemaURL = this.getClass().getResource(resource);
 		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		LOG.info("schemaURL:"+schemaURL);
+		LOG.finer("schemaURL:"+schemaURL);
 		Schema schema = sf.newSchema(schemaURL);
 		return schema.newValidator();
 	}
