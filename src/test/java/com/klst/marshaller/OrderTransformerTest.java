@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.xml.sax.SAXException;
 
-import com.klst.einvoice.unece.uncefact.CrossIndustryOrder;
+import com.klst.eorder.impl.CrossIndustryOrder;
 
 import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 
