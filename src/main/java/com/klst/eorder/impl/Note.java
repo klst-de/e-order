@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.eorder.OrderNote;
+import com.klst.eorder.OrderNoteFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.NoteType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;
@@ -13,7 +14,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;
  * 
  * also implements BG-25.BT-127 0..n IncludedNote.Content
  */
-public class Note extends NoteType implements OrderNote {
+public class Note extends NoteType implements OrderNote, OrderNoteFactory {
 
 	@Override // Factory
 	public OrderNote createNote(String subjectCode, String content) {
@@ -26,9 +27,8 @@ public class Note extends NoteType implements OrderNote {
 		return create(null, content);
 	}
 
-	static List<Note> getNotes(List<NoteType> list) {
-//		List<NoteType> list = doc.getIncludedNote();
-		List<Note> result = new ArrayList<Note>(list.size());
+	static List<OrderNote> getNotes(List<NoteType> list) {
+		List<OrderNote> result = new ArrayList<OrderNote>(list.size());
 		list.forEach(note -> {
 			result.add(Note.create(note));
 		});

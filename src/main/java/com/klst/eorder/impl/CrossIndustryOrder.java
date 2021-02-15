@@ -4,12 +4,16 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.reflection.CopyCtor;
+import com.klst.eorder.BG1_OrderNote;
+import com.klst.eorder.BG2_ProcessControl;
+import com.klst.eorder.OrderNote;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 
-public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType {
+public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType 
+	implements BG1_OrderNote, BG2_ProcessControl {
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryOrder.class.getName());
 	
@@ -98,12 +102,23 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType {
 	// TODO ram:CopyIndicator , ram:PurposeCode , ram:RequestedResponseTypeCode , 
 	
 	//ram:IncludedNote
-//	@Override
-	public List<Note> getNotes() {
+	@Override // factory
+	public OrderNote createNote(String subjectCode, String content) {
 		// delegieren:
-//		super.getExchangedDocument().getIncludedNote(); // List<NoteType> 
-		return Note.getNotes(super.getExchangedDocument().getIncludedNote());
+		return Note.create(subjectCode, content);
 	}
+
+	@Override // setter
+	public void addNote(OrderNote note) {
+		super.getExchangedDocument().getIncludedNote().add((Note)note);
+	}
+
+	@Override // getter
+	public List<OrderNote> getOrderNotes() {
+		// delegieren:
+		return Note.getNotes(super.getExchangedDocument().getIncludedNote());
+	}	
+
 
 /*
 	<rsm:SupplyChainTradeTransaction>
@@ -147,7 +162,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType {
 		stringBuilder.append(" [ID:").append(getId());
 		stringBuilder.append(", Name:").append(getName());
 		stringBuilder.append(", TypeCode:").append(getTypeCode());
-		getNotes().forEach(note -> {
+		getOrderNotes().forEach(note -> {
 			stringBuilder.append(", note:").append(note);
 		});
 		
@@ -158,6 +173,5 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType {
 		stringBuilder.append("]");
 		return stringBuilder.toString();
 	}
-
 
 }
