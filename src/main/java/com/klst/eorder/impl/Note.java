@@ -85,7 +85,7 @@ public class Note extends NoteType implements OrderNote, OrderNoteFactory {
 
 	void setNote(String content) {
 		if(content==null) return; // defensiv, sollte nicht vorkommen
-		super.getContent().setValue(content);
+		super.setContent(Text.create(content));
 	}
 
 }
