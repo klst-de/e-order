@@ -11,7 +11,8 @@ import java.util.Map;
  * 
  * @see https://jesperdj.com/2018/09/30/jaxb-on-java-9-10-11-and-beyond/
  */
-import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
+//import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 //@see https://www.intertech.com/Blog/jaxb-tutorial-customized-namespace-prefixes-example-using-namespaceprefixmapper/
 //@see http://hwellmann.blogspot.com/2011/03/jaxb-marshalling-with-custom-namespace.html
@@ -27,7 +28,7 @@ import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 public class CioNamespacePrefixMapper extends NamespacePrefixMapper {
 
 	/**
-	 * REQUIREMENTS SPECIFICATION MAPPING for Cross Industry Invoice (CII)
+	 * REQUIREMENTS SPECIFICATION MAPPING for Cross Industry Order (CIO)
 	 * <p>
 	 * CIO is based on Supply Chain REFERENCE DATA MODEL (SCRDM)
 	 */

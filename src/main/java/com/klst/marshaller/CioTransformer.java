@@ -5,7 +5,8 @@ import java.io.InputStream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
+//import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 
