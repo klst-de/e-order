@@ -3,7 +3,7 @@ package com.klst.eorder.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.eorder.Rounding;
+import com.klst.edoc.api.Rounding;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.QuantityType;
 

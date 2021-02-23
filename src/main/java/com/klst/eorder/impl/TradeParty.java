@@ -3,14 +3,14 @@ package com.klst.eorder.impl;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.reflection.CopyCtor;
-import com.klst.eorder.BusinessParty;
-import com.klst.eorder.BusinessPartyAddress;
-import com.klst.eorder.BusinessPartyContact;
-import com.klst.eorder.BusinessPartyFactory;
-import com.klst.eorder.IContact;
-import com.klst.eorder.Identifier;
-import com.klst.eorder.PostalAddress;
+import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.BusinessPartyAddress;
+import com.klst.edoc.api.BusinessPartyContact;
+import com.klst.edoc.api.BusinessPartyFactory;
+import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.PostalAddress;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TaxRegistrationType;
@@ -66,6 +66,15 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 	 * 
 	 * @see BusinessPartyFactory
 	 */
+/*
+weitere Namen:
+BT-29 ++ 0..n Seller identifier ( mit Schema )         / Kennung des Verkäufers
+BT-30 ++ 0..1 Seller legal registration identifier     / Kennung der rechtlichen Registrierung des Verkäufers
+BT-31 ++ 0..1 Seller VAT identifier                    / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
+BT-32 ++ 0..1 Seller tax registration identifier       / Steuernummer des Verkäufers
+BT-33 ++ 0..1 Seller additional legal information      / weitere rechtliche Informationen, wie z. B. Aktienkapital
+BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
+ */
 	private TradeParty(String registrationName, String businessName, PostalAddress address, IContact contact) {
 		super();
 		setRegistrationName(registrationName);
@@ -80,8 +89,8 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 		stringBuilder.append(getRegistrationName()==null ? "null" : getRegistrationName());
 		stringBuilder.append(", BusinessName:");
 		stringBuilder.append(getBusinessName()==null ? "null" : getBusinessName());
-//		stringBuilder.append(", Id:");
-//		stringBuilder.append(getId()==null ? "null" : getId());
+		stringBuilder.append(", Id:");
+		stringBuilder.append(getIdentifier()==null ? "null" : getIdentifier());
 		
 		stringBuilder.append(", Address:");
 		stringBuilder.append(getAddress()==null ? "null" : getAddress());
@@ -135,11 +144,11 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 /*
 			<ram:SellerTradeParty>
 				<ram:ID>SUPPLIER_ID_321654</ram:ID>                                         <!-- Identifier
-				<ram:GlobalID schemeID="0088">123654879</ram:GlobalID>                      <!-- CompanyLegalForm
-				<ram:Name>SELLER_NAME</ram:Name>                                            <!-- RegistrationName
+				<ram:GlobalID schemeID="0088">123654879</ram:GlobalID>                      <!--BT-29 Identifier
+				<ram:Name>SELLER_NAME</ram:Name>                                            <!--BT-27 RegistrationName
 				<ram:SpecifiedLegalOrganization>
 					<ram:ID schemeID="0002">123456789</ram:ID>                              <!-- CompanyId
-					<ram:TradingBusinessName>SELLER_TRADING_NAME</ram:TradingBusinessName>  <!-- BusinessName
+					<ram:TradingBusinessName>SELLER_TRADING_NAME</ram:TradingBusinessName>  <!--BT-28 BusinessName
 				</ram:SpecifiedLegalOrganization>
 				<ram:DefinedTradeContact>
 					<ram:PersonName>SELLER_CONTACT_NAME</ram:PersonName>
@@ -168,22 +177,23 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 			</ram:SellerTradeParty>
 
  */
+	// (registration)Name BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
 	@Override
 	public String getRegistrationName() {
 		return super.getName()==null ? null : getName().getValue();
 	}
-
+	// nicht public, da im ctor
 	void setRegistrationName(String name) {
 		if(name==null) return;
 		super.setName(Text.create(name));
 	}
 
+	// businessName       BT-28 0..1 Handelsname des Verkäufers / Seller trading name
 	@Override
 	public String getBusinessName() {
 		TextType text = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getTradingBusinessName();
 		return text==null ? null : text.getValue();
 	}
-
 	@Override
 	public void setBusinessName(String name) {
 		if(name==null) return;
@@ -193,20 +203,25 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 		getSpecifiedLegalOrganization().setTradingBusinessName(Text.create(name));
 	}
 
+	// BT-29 ++ 0..n Seller identifier ( mit Schema )         / Kennung des Verkäufers
 	@Override
-	public Identifier getIdentifier() {
-		return super.getID()==null ? null : new ID(getID());
+	public Identifier getIdentifier() { // holt nur den ersten
+		List<IDType> idList = super.getGlobalID();
+		return idList.isEmpty() ? null : new ID(idList.get(0));
 	}
 	public String getId() {
-		return super.getID()==null ? null : getID().getValue();
+		Identifier id = getIdentifier();
+		return id==null ? null : id.getContent();
 	}
 
 	@Override
 	public void setId(String name, String schemeID) {
 		if(name==null) return;
-		super.setID(new ID(name, schemeID));
+		super.getGlobalID().add(new ID(name, schemeID));
 	}
-
+	// TODO addIdentifier
+	
+	// BT-30 ++ 0..1 Seller legal registration identifier     / Kennung der rechtlichen Registrierung des Verkäufers
 	@Override
 	public String getCompanyId() {
 		IDType id = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getID();
@@ -217,7 +232,6 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 		IDType id = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getID();
 		return id==null ? null : new ID(id.getValue(), id.getSchemeID());
 	}
-
 	@Override
 	public void setCompanyId(String name, String schemeID) {
 		if(name==null) return;
@@ -227,17 +241,10 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 		getSpecifiedLegalOrganization().setID(new ID(name, schemeID));
 	}
 
+	// BT-31 ++ 0..1 Seller VAT identifier                    / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
 	@Override
 	public Identifier getTaxRegistrationIdentifier() {
 		return super.getSpecifiedTaxRegistration()==null ? null : new ID(getSpecifiedTaxRegistration().getID());
-		
-//		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
-//		List<Identifier> result = new ArrayList<Identifier>(taxRegistrationList.size());
-//		if(taxRegistrationList.isEmpty()) return result;
-//		taxRegistrationList.forEach(taxRegistration -> {
-//			result.add(new ID(taxRegistration.getID()));
-//		});
-//		return result;
 	}
 	
 	@Override
@@ -247,35 +254,24 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 			setSpecifiedTaxRegistration(new TaxRegistrationType());
 		}
 		getSpecifiedTaxRegistration().setID(new ID(name, schemeID));
-		
-//		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
-//		TaxRegistrationType taxRegistration = new TaxRegistrationType();
-//		taxRegistration.setID(new ID(name, schemeID));
-//		taxRegistrationList.add(taxRegistration);
 	}
-
-	@Override // 0..1 also genügt der erste
+	
+	// BT-33 ++ 0..1 Seller additional legal information      / weitere rechtliche Informationen, wie z. B. Aktienkapital
+	// nicht in reusableaggregatebusinessinformationentity._103.TradePartyType
+	@Override
 	public String getCompanyLegalForm() {
-		List<IDType> idList = super.getGlobalID();
-		return idList.isEmpty() ? null : idList.get(0).getValue();
-//		List<TextType> textList = super.getDescription();
-//		return textList.isEmpty() ? null : textList.get(0).getValue();
+		LOG.warning("not defined");
+		return null;
 	}
-
 	@Override
 	public void setCompanyLegalForm(String name) {
-		if(name==null) return;
-//		super.getDescription().add(Text.create(name));
-		super.getGlobalID().add(new ID(name));
+		LOG.warning("not defined");
 	}
 
-	@Override // 0..1 also genügt der erste
+	// BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
+	@Override
 	public Identifier getUriUniversalCommunication() {
 		return super.getURIUniversalCommunication()==null ? null : new ID(getURIUniversalCommunication().getURIID());
-		
-//		List<UniversalCommunicationType> uriList = super.getURIUniversalCommunication();
-//		if(uriList.isEmpty()) return null;
-//		return new ID(uriList.get(0).getURIID().getValue(), uriList.get(0).getURIID().getSchemeID()); 
 	}
 
 	@Override
@@ -285,9 +281,6 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 			setURIUniversalCommunication(new UniversalCommunicationType());
 		}
 		getURIUniversalCommunication().setURIID(new ID(name, schemeID));
-//		UniversalCommunicationType universalCommunicationType = new UniversalCommunicationType();
-//		universalCommunicationType.setURIID(new ID(name, schemeID));
-//		super.getURIUniversalCommunication().add(universalCommunicationType);
 	}
 
 }

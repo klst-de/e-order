@@ -1,6 +1,6 @@
 package com.klst.eorder.impl;
 
-import com.klst.eorder.Identifier;
+import com.klst.edoc.api.Identifier;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
 
@@ -30,7 +30,7 @@ public class ID extends IDType implements Identifier /*, Reference*/ {
 	}
 	
 	public String toString() {
-		return "["+(super.getSchemeID()==null? "":",SchemeID="+getSchemeID())
+		return "["+(super.getSchemeID()==null ? "" : "SchemeID="+getSchemeID()+", ")
 			+"\""+super.getValue()+"\"]";
 	}
 

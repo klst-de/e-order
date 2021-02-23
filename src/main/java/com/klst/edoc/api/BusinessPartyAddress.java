@@ -1,4 +1,4 @@
-package com.klst.eorder;
+package com.klst.edoc.api;
 
 /**
  * SELLER or BUYER POSTAL ADDRESS, used in BG12_SellerTaxRepresentativeAddress too

@@ -1,6 +1,6 @@
 package com.klst.eorder.impl;
 
-import com.klst.einvoice.reflection.CopyCtor;
+import com.klst.ebXml.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
 

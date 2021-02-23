@@ -1,4 +1,4 @@
-package com.klst.eorder;
+package com.klst.edoc.api;
 
 /**
  * BG-6 , BG-9 CONTACT

@@ -3,7 +3,7 @@ package com.klst.eorder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.klst.einvoice.reflection.CopyCtor;
+import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.eorder.OrderNote;
 import com.klst.eorder.OrderNoteFactory;
 

@@ -1,4 +1,4 @@
-package com.klst.eorder;
+package com.klst.edoc.api;
 
 /**
  * BG-5 , BG-8 , BG-12 : POSTAL ADDRESS

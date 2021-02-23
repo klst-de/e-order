@@ -1,7 +1,7 @@
 package com.klst.eorder.impl;
 
-import com.klst.einvoice.reflection.CopyCtor;
-import com.klst.eorder.IContact;
+import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.edoc.api.IContact;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.UniversalCommunicationType;

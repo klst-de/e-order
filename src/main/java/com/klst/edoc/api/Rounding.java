@@ -1,4 +1,4 @@
-package com.klst.eorder;
+package com.klst.edoc.api;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -1,7 +1,7 @@
 package com.klst.eorder.impl;
 
-import com.klst.einvoice.reflection.CopyCtor;
-import com.klst.eorder.PostalAddress;
+import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.edoc.api.PostalAddress;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._103.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAddressType;
