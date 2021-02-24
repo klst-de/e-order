@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.ebXml.reflection.CopyCtor;
-import com.klst.eorder.OrderNote;
-import com.klst.eorder.OrderNoteFactory;
+import com.klst.eorder.api.OrderNote;
+import com.klst.eorder.api.OrderNoteFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.NoteType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;

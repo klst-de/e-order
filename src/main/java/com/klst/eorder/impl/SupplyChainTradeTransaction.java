@@ -44,4 +44,12 @@ public class SupplyChainTradeTransaction extends SupplyChainTradeTransactionType
 		return HeaderTradeAgreement.create(getApplicableHeaderTradeAgreement());
 	}
 
+	public HeaderTradeDelivery createtHeaderTradeDelivery() {
+		return HeaderTradeDelivery.create(getApplicableHeaderTradeDelivery());
+	}
+	
+	public HeaderTradeSettlement createtHeaderTradeSettlement() {
+		return HeaderTradeSettlement.create(getApplicableHeaderTradeSettlement());
+	}
+	
 }

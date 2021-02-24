@@ -1,4 +1,4 @@
-package com.klst.eorder;
+package com.klst.eorder.api;
 
 import java.util.List;
 

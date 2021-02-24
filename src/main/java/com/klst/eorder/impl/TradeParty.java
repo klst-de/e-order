@@ -11,6 +11,7 @@ import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.eorder.api.ShipTo;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TaxRegistrationType;

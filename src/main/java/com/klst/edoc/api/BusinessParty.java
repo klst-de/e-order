@@ -1,7 +1,5 @@
 package com.klst.edoc.api;
 
-import java.util.List;
-
 /**
  * A common interface for
  * 

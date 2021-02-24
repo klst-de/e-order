@@ -1,9 +1,9 @@
 package com.klst.eorder.impl;
 
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.edoc.api.BusinessParty;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeAgreementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePartyType;
 
 public class HeaderTradeAgreement extends HeaderTradeAgreementType {
 
@@ -30,8 +30,29 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType {
 		}
 	}
 
-	public TradeParty getSeller() {
-		TradePartyType sellerParty = super.getSellerTradeParty();
-		return sellerParty==null ? null : TradeParty.create(sellerParty);
+	// BT-10 0..1 Buyer reference
+	public void setBT10_BuyerReference(String reference) {
+		if(reference==null) return;
+		super.setBuyerReference(Text.create(reference));
 	}
+	public String getBuyerReferenceValue() {
+		return super.getBuyerReference()==null ? null : getBuyerReference().getValue();	
+	}
+
+	public void setSeller(BusinessParty party) {
+		if(party==null) return;
+		super.setSellerTradeParty((TradeParty)party);
+	}
+	public BusinessParty getSeller() {
+		return super.getSellerTradeParty()==null ? null : TradeParty.create(super.getSellerTradeParty());
+	}
+	
+	public void setBuyer(BusinessParty party) {
+		if(party==null) return;
+		super.setBuyerTradeParty((TradeParty)party);
+	}
+	public BusinessParty getBuyer() {
+		return super.getBuyerTradeParty()==null ? null : TradeParty.create(super.getBuyerTradeParty());
+	}
+	
 }

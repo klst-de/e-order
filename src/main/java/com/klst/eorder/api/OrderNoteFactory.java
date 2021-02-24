@@ -1,4 +1,4 @@
-package com.klst.eorder;
+package com.klst.eorder.api;
 
 /**
  * abstract-factory, aka Kit for BG-1 ORDER NOTE

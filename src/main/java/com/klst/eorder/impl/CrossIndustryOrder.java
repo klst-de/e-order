@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.CopyCtor;
-import com.klst.eorder.BG1_OrderNote;
-import com.klst.eorder.BG2_ProcessControl;
-import com.klst.eorder.OrderNote;
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.eorder.api.BG2_ProcessControl;
+import com.klst.eorder.api.CoreOrder;
+import com.klst.eorder.api.OrderNote;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 
@@ -20,12 +23,19 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 
 public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType 
-	implements BG1_OrderNote, BG2_ProcessControl {
+	implements CoreOrder {
+
+	// factory
+	public static CoreOrder getFactory() {
+		return new CrossIndustryOrder(null);
+	}
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryOrder.class.getName());
 	
-	SupplyChainTradeTransaction supplyChainTradeTransaction;
+	SupplyChainTradeTransaction supplyChainTradeTransaction; 
 	HeaderTradeAgreement applicableHeaderTradeAgreement;
+	HeaderTradeDelivery applicableHeaderTradeDelivery; // <ram:ApplicableHeaderTradeDelivery>
+	HeaderTradeSettlement applicableHeaderTradeSettlement; // <ram:ApplicableHeaderTradeSettlement>
 	
 	public CrossIndustryOrder(SCRDMCCBDACIOMessageStructureType doc) {
 		super();
@@ -33,30 +43,19 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 			CopyCtor.invokeCopy(this, doc);
 //			LOG.info("copy ctor:"+this); // toString liefert hier NPE wg.getLines
 		}
-//		if(super.getSupplyChainTradeTransaction()==null) {
-//			supplyChainTradeTransaction = SupplyChainTradeTransaction.create();
-//			applicableHeaderTradeAgreement = HeaderTradeAgreement.create();
-//			super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
-//		} else {
-//			supplyChainTradeTransaction = SupplyChainTradeTransaction.create(getSupplyChainTradeTransaction());
-//			applicableHeaderTradeAgreement = supplyChainTradeTransaction.getHeaderTradeAgreement();	
-//		}
+
 		supplyChainTradeTransaction = SupplyChainTradeTransaction.create(super.getSupplyChainTradeTransaction());
 		applicableHeaderTradeAgreement = supplyChainTradeTransaction.createtHeaderTradeAgreement();
-		LOG.info("copy ctor:"+this);
-/*
+		applicableHeaderTradeDelivery = supplyChainTradeTransaction.createtHeaderTradeDelivery();
+		applicableHeaderTradeSettlement = supplyChainTradeTransaction.createtHeaderTradeSettlement();
 		if(super.getSupplyChainTradeTransaction()==null) {
-			applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create();
-			applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create();
-			super.setSupplyChainTradeTransaction(new SupplyChainTradeTransactionType());
-		} else {
-			applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
-			applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery());
+			super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
+			supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(applicableHeaderTradeAgreement);
+			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
+			supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		}
-		getSupplyChainTradeTransaction().setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
-		getSupplyChainTradeTransaction().setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 
- */
+		LOG.info("copy ctor:"+this);
 	}
 
 	/**
@@ -71,8 +70,11 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	 * @see BG2_ProcessControl#getCustomization()
 	 * @see BG2_ProcessControl#getProcessType()
 	 */
-//	public CoreInvoice createInvoice(String profile, String processType, DocumentNameCode code);
-	public static CrossIndustryOrder createOrder(String profile, String processType, DocumentNameCode code) {
+	@Override
+	public CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
+		return create(profile, processType, code);
+	}
+	public static CrossIndustryOrder create(String profile, String processType, DocumentNameCode code) {
 		return new CrossIndustryOrder(profile, processType, code);
 	}
 
@@ -149,44 +151,48 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	</rsm:ExchangedDocument>
  */
 	// Invoice number BT-1 Identifier (mandatory) - A unique identification of the Invoice.
-//	@Override
+	@Override
 	public void setId(String id) {
 		super.getExchangedDocument().setID(new ID(id)); // No identification scheme is to be used.
 	}
 	
-//	@Override
+	@Override
 	public String getId() {
 		return super.getExchangedDocument().getID().getValue();
-	}
-
-	public String getName() { // ExchangedDocument.Name wird in einvoice nicht verwendet
-		return super.getExchangedDocument().getName().getValue();
-	}
-	
-//	@Override
-	public String getTypeCode() {
-		return super.getExchangedDocument().getTypeCode().getValue();
-	}
-	public DocumentNameCode getDocumentCode() {
-		return DocumentNameCode.valueOf(super.getExchangedDocument().getTypeCode());
 	}
 
 	/* Document issue date, BT-2  Date (mandatory) 
 	 * Das Datum, an dem der Beleg ausgestellt wurde.
 	 */
-//	@Override
+	@Override
 	public void setIssueDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		super.getExchangedDocument().setIssueDateTime(dateTime);
 	}
 
-//	@Override
+	@Override
 	public Timestamp getIssueDateAsTimestamp() {
 		DateTimeType dateTime = super.getExchangedDocument().getIssueDateTime();
 		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 
-	// TODO ram:CopyIndicator , ram:PurposeCode , ram:RequestedResponseTypeCode , 
+	// ExchangedDocument.Name wird in einvoice nicht verwendet
+	public String getName() {
+		return super.getExchangedDocument().getName().getValue();
+	}
+	
+//	@Override // für toString
+	private String getTypeCode() {
+		return super.getExchangedDocument().getTypeCode().getValue();
+	}
+	@Override
+	public DocumentNameCode getDocumentCode() {
+		return DocumentNameCode.valueOf(super.getExchangedDocument().getTypeCode());
+	}
+
+	// TODO ram:CopyIndicator 
+	//    , ram:PurposeCode 
+	//    , ram:RequestedResponseTypeCode , 
 	
 	//ram:IncludedNote
 	@Override // factory
@@ -206,7 +212,76 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return Note.getNotes(super.getExchangedDocument().getIncludedNote());
 	}	
 
+	// BT-5 + 1..1 Invoice currency code
+	@Override
+	public void setDocumentCurrency(String isoCurrencyCode) {
+		// delegieren:
+		applicableHeaderTradeSettlement.setDocumentCurrency(isoCurrencyCode);
+	}
 
+	@Override
+	public String getDocumentCurrency() {
+		return applicableHeaderTradeSettlement.getDocumentCurrency();
+	}
+
+	// BT-10
+	public void setBuyerReference(String reference) {
+		applicableHeaderTradeAgreement.setBT10_BuyerReference(reference);
+	}
+	public String getBuyerReferenceValue() {
+		return applicableHeaderTradeAgreement.getBuyerReferenceValue();
+	}
+	
+
+	// BG-4 + 1..1 SELLER @see BG4_Seller
+	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+		BusinessParty party = createParty(name, address, contact);
+		party.setCompanyId(companyId);
+		party.setCompanyLegalForm(companyLegalForm);
+		setSeller(party);		
+	}
+	public void setSeller(BusinessParty party) {
+		applicableHeaderTradeAgreement.setSeller(party);
+	}
+	public BusinessParty getSeller() {
+		return applicableHeaderTradeAgreement.getSeller();
+	}
+
+	// BG-7 + 1..1 BUYER @see BG7_Buyer
+	public void setBuyer(String name, PostalAddress address, IContact contact) {
+		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
+		setBuyer(party);
+	}
+	public void setBuyer(BusinessParty party) {
+		applicableHeaderTradeAgreement.setBuyer(party);
+	}
+	public BusinessParty getBuyer() {
+		return applicableHeaderTradeAgreement.getBuyer();
+	}
+
+	public void setShipToParty(String name, PostalAddress address, IContact contact) {
+		BusinessParty party = createParty(name, address, contact);
+		setShipToParty(party);
+	}
+	public void setShipToParty(BusinessParty party) {
+		applicableHeaderTradeDelivery.setShipToParty(party);
+	}
+	public BusinessParty getShipToParty() {
+		return applicableHeaderTradeDelivery.getShipToParty();
+	}
+
+	public void setShipFromParty(String name, PostalAddress address, IContact contact) {
+		BusinessParty party = createParty(name, address, contact);
+		setShipFromParty(party);
+	}
+	public void setShipFromParty(BusinessParty party) {
+		applicableHeaderTradeDelivery.setShipFromParty(party);
+	}
+	public BusinessParty getShipFromParty() {
+		return applicableHeaderTradeDelivery.getShipFromParty();
+	}
+
+// TODO
 /*
 	<rsm:SupplyChainTradeTransaction>
 		<ram:IncludedSupplyChainTradeLineItem>
@@ -244,10 +319,6 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return this.supplyChainTradeTransaction.getLines();
 	}
 
-	public TradeParty getSeller() {
-		return this.applicableHeaderTradeAgreement.getSeller();
-	}
-	
 	public String toString() {
 		if(super.getExchangedDocumentContext()==null) {
 			LOG.warning("***noch nicht initialisiert**");
@@ -286,6 +357,25 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		stringBuilder.append(super.getSupplyChainTradeTransaction()==null ? "null" : getSupplyChainTradeTransaction());
 		stringBuilder.append("]");
 		return stringBuilder.toString();
+	}
+
+	// ----------------- factories to delegate
+	@Override
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+		TradeParty factory = TradeParty.create();
+		return factory.createParty(name, tradingName, address, contact); 
+	}
+
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		TradeParty factory = TradeParty.create();
+		return factory.createAddress(countryCode, postalCode, city);
+	}
+
+	@Override
+	public IContact createContact(String contactName, String contactTel, String contactMail) {
+		TradeParty factory = TradeParty.create();
+		return factory.createContact(contactName, contactTel, contactMail);
 	}
 
 }
