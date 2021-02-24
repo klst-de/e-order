@@ -94,10 +94,12 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	}
 
 	private void setCity(String city) {
+		if(city==null) return;
 		super.setCityName(Text.create(city));
 	}
 
 	private void setPostCode(String postCode) {
+		if(postCode==null) return;
 		CodeType postcode = new CodeType();
 		postcode.setValue(postCode);
 		this.setPostcodeCode(postcode);
