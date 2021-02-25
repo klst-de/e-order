@@ -8,6 +8,7 @@ import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.api.Reference;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderNote;
@@ -232,6 +233,13 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return applicableHeaderTradeAgreement.getBuyerReferenceValue();
 	}
 	
+	// BT-19 + 0..1 Buyer accounting reference
+	public void setBuyerAccountingReference(Reference textReference) {
+		applicableHeaderTradeSettlement.setBuyerAccountingReference(textReference);
+	}
+	public Reference getBuyerAccountingReference() {
+		return applicableHeaderTradeSettlement.getBuyerAccountingReference();
+	}
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller
 	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {

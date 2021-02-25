@@ -8,6 +8,7 @@ import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.IContactFactory;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.PostalAddressFactory;
+import com.klst.edoc.api.Reference;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 
@@ -128,6 +129,22 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	// TODO:
 	// BT-11, (Projektname BT-11-0)
 	// ...
+	
+	/**
+	 * Buyer accounting reference
+	 * <p>
+	 * A textual value that specifies where to book the relevant data into the Buyer's financial accounts.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-19
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R2, R4
+	 * 
+	 * @param textReference
+	 */
+	// BT-19 + 0..1 Buyer accounting reference
+	public void setBuyerAccountingReference(Reference textReference);
+	public Reference getBuyerAccountingReference();
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller
 	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm);

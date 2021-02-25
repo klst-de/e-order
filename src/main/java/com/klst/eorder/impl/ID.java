@@ -1,6 +1,7 @@
 package com.klst.eorder.impl;
 
 import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.Reference;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
 
@@ -12,7 +13,7 @@ Scheme identifier         : Conditional 	String         | GLN
 Scheme version identifier : Conditional 	String         | 1.0          // nicht in unqualifieddatatype._103
  
  */
-public class ID extends IDType implements Identifier /*, Reference*/ {
+public class ID extends IDType implements Identifier, Reference {
 
 	public ID(String content, String schemeID) {
 		super();

@@ -14,6 +14,7 @@ import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.impl.CrossIndustryOrder;
+import com.klst.eorder.impl.ID;
 import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.TradeContact;
 import com.klst.eorder.impl.TradeParty;
@@ -78,10 +79,13 @@ public class OrderTest {
 		seller.addId("123456789", "0088");
 		seller.setCompanyId("123456789", "0002");
 //		seller.setCompanyLegalForm("SUPPLIER_ID_321654"); // not defined
+		seller.setUriUniversalCommunication("sales@seller.com<", "EM");
 		seller.setVATRegistrationId("FR 32 123 456 789");
 		order.setSeller(seller);
 		
 		order.setBuyer("Buyer", address, icontact); // OK
+		
+		order.setBuyerAccountingReference(new ID("BUYER_ACCOUNT_REF"));
 		
 		transformer = cioTransformer;
 		object = order;
