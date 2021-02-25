@@ -216,11 +216,20 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	}
 
 	@Override
-	public void setId(String name, String schemeID) {
+	public void addId(String name, String schemeID) {
 		if(name==null) return;
-		super.getGlobalID().add(new ID(name, schemeID));
+		if(schemeID==null) {
+			super.setID(new ID(name));
+		} else {
+			super.getGlobalID().add(new ID(name, schemeID));
+		}
 	}
-	// TODO addIdentifier
+	@Override
+	public void setId(String name, String schemeID) {
+		addId(name, schemeID);
+//		if(name==null) return;
+//		super.getGlobalID().add(new ID(name, schemeID));
+	}
 	
 	// BT-30 ++ 0..1 Seller legal registration identifier     / Kennung der rechtlichen Registrierung des Verkäufers
 	@Override

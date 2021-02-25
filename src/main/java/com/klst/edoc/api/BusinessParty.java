@@ -47,6 +47,7 @@ public interface BusinessParty extends BusinessPartyFactory {
 	public String getId(); // kleingeschrieben, nicht ID!
 	public Identifier getIdentifier();
 
+	public void addId(String name, String schemeID); // wg. 1..n
 	public void setId(String name, String schemeID);
 	default void setId(String name) {
 		setId(name, null);
