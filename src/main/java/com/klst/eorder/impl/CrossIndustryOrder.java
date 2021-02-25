@@ -370,20 +370,17 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	// ----------------- factories to delegate
 	@Override
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
-		TradeParty factory = TradeParty.create();
-		return factory.createParty(name, tradingName, address, contact); 
+		return TradeParty.create(name, tradingName, address, contact); 
 	}
 
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		TradeParty factory = TradeParty.create();
-		return factory.createAddress(countryCode, postalCode, city);
+		return TradeAddress.create(countryCode, postalCode, city);
 	}
 
 	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {
-		TradeParty factory = TradeParty.create();
-		return factory.createContact(contactName, contactTel, contactMail);
+		return TradeContact.create(contactName, contactTel, contactMail);
 	}
 
 }
