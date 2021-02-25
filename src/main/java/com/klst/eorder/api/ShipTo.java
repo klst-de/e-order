@@ -1,11 +1,10 @@
 package com.klst.eorder.api;
 
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.BusinessPartyAddress;
-import com.klst.edoc.api.BusinessPartyContact;
+import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.PostalAddress;
 
 /*
-
 			<ram:ShipToTradeParty>
 				<ram:ID>SHIP_TO_ID</ram:ID>
 				<ram:GlobalID schemeID="0088">5897546912</ram:GlobalID>
@@ -32,10 +31,11 @@ import com.klst.edoc.api.BusinessPartyContact;
 					<ram:URIID schemeID="EM">delivery@buyer.com</ram:URIID>
 				</ram:URIUniversalCommunication>
 			</ram:ShipToTradeParty>
-
-
  */
-//public interface ShipTo extends BusinessParty, ShipToPostalAddress, ShipToContact {
-public interface ShipTo extends BusinessParty, BusinessPartyAddress, BusinessPartyContact {
+public interface ShipTo {
+
+	public void setShipToParty(String name, PostalAddress address, IContact contact);
+	public void setShipToParty(BusinessParty party);
+	public BusinessParty getShipToParty();
 
 }

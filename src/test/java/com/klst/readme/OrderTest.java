@@ -90,6 +90,8 @@ public class OrderTest {
 		
 		order.setBuyerAccountingReference(new ID("BUYER_ACCOUNT_REF"));
 		
+		order.setShipFromParty("SHIP_FROM_NAME", order.createAddress("FR", "75003", "SHIP_FROM_CITY"), contact);
+		
 		transformer = cioTransformer;
 		object = order;
 		commercialOrderTest();
