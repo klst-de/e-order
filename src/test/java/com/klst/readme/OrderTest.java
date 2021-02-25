@@ -12,6 +12,7 @@ import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.api.BG2_ProcessControl;
+import com.klst.eorder.api.IContactExt;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.impl.CrossIndustryOrder;
 import com.klst.eorder.impl.ID;
@@ -51,7 +52,9 @@ public class OrderTest {
 		order.addNote( order.createNote("AAI", "Content of Note") );
 		
 		IContact contact = TradeContact.create().createContact(null, null, null);
-		LOG.info("contact:"+contact);
+		IContactExt contactExt = (IContactExt)contact;
+		contactExt.setContactDepartment("dept");
+		LOG.info("contact:"+contactExt);
 //		java.lang.IllegalArgumentException: No enum constant un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType.XX
 //		PostalAddress postalAddress = TradeAddress.create().createAddress("XX", "123", "City");
 //		java.lang.NullPointerException: Name is null // meint countryCode
