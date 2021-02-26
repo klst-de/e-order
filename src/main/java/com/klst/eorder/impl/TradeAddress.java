@@ -1,7 +1,10 @@
 package com.klst.eorder.impl;
 
+import java.util.logging.Logger;
+
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.readme.OrderTest;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._103.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAddressType;
@@ -33,6 +36,8 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 			return new TradeAddress(object); 
 		}
 	}
+
+	private static final Logger LOG = Logger.getLogger(TradeAddress.class.getName());
 
 	// copy ctor
 	private TradeAddress(TradeAddressType address) {
@@ -116,10 +121,15 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		this.setCountrySubDivisionName(region);
 	}
 
-	private void setCountryCode(String countryCode) { // TODO auch mit enum
-		CountryIDType countryID = new CountryIDType();
-		countryID.setValue(ISOTwoletterCountryCodeContentType.fromValue(countryCode));
-		super.setCountryID(countryID);
+	private void setCountryCode(String countryCode) {
+		try {
+			CountryIDType countryID = new CountryIDType();
+			countryID.setValue(ISOTwoletterCountryCodeContentType.fromValue(countryCode));
+			super.setCountryID(countryID);
+		} catch (Exception e) {
+//			LOG.warning("Invalid countryCode "+countryCode);
+			throw new IllegalArgumentException("Invalid countryCode "+countryCode);
+		}
 	}
 
 	@Override
