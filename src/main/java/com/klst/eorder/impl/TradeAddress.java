@@ -80,16 +80,19 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 
 	@Override
 	public void setAddressLine1(String addressLine) {
+		if(addressLine==null) return;
 		super.setLineOne(Text.create(addressLine));
 	}
 
 	@Override
 	public void setAddressLine2(String addressLine) {
+		if(addressLine==null) return;
 		super.setLineTwo(Text.create(addressLine));
 	}
 
 	@Override
 	public void setAddressLine3(String addressLine) {
+		if(addressLine==null) return;
 		super.setLineThree(Text.create(addressLine));
 	}
 
@@ -107,6 +110,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 
 	@Override
 	public void setCountrySubdivision(String countrySubdivision) {
+		if(countrySubdivision==null) return;
 		TextType region = new TextType();
 		region.setValue(countrySubdivision);
 		this.setCountrySubDivisionName(region);
