@@ -2,10 +2,13 @@ package com.klst.eorder.impl;
 
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.eorder.api.BG7_Buyer;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeAgreementType;
 
-public class HeaderTradeAgreement extends HeaderTradeAgreementType {
+public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG7_Buyer {
 
 	// factory
 	static HeaderTradeAgreement create() {
@@ -47,12 +50,19 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType {
 		return super.getSellerTradeParty()==null ? null : TradeParty.create(super.getSellerTradeParty());
 	}
 	
+	@Override
+	public void setBuyer(String name, PostalAddress address, IContact contact) {
+		BusinessParty party = TradeParty.create(name, null, address, contact);
+		setBuyer(party);
+	}
+	@Override
 	public void setBuyer(BusinessParty party) {
 		if(party==null) return;
 		super.setBuyerTradeParty((TradeParty)party);
 	}
+	@Override
 	public BusinessParty getBuyer() {
 		return super.getBuyerTradeParty()==null ? null : TradeParty.create(super.getBuyerTradeParty());
 	}
-	
+
 }
