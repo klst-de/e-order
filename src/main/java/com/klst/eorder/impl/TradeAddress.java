@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.PostalAddress;
-import com.klst.readme.OrderTest;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._103.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAddressType;
@@ -127,7 +126,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 			countryID.setValue(ISOTwoletterCountryCodeContentType.fromValue(countryCode));
 			super.setCountryID(countryID);
 		} catch (Exception e) {
-//			LOG.warning("Invalid countryCode "+countryCode);
+			LOG.warning("Invalid countryCode "+countryCode);
 			throw new IllegalArgumentException("Invalid countryCode "+countryCode);
 		}
 	}

@@ -4,11 +4,9 @@ import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.Reference;
 
 import un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31.ISO3AlphaCurrencyCodeContentType;
-import un.unece.uncefact.data.standard.qualifieddatatype._103.CountryIDType;
 import un.unece.uncefact.data.standard.qualifieddatatype._103.CurrencyCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAccountingAccountType;
-import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
 
 public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 
@@ -37,10 +35,15 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 	// TODO mit ISO3AlphaCurrencyCodeContentType
 	public void setDocumentCurrency(String isoCurrencyCode) {
 		if(isoCurrencyCode==null) return;
-		if(super.getOrderCurrencyCode()==null) {
-			setOrderCurrencyCode(new CurrencyCodeType());
+		try {
+			if(super.getOrderCurrencyCode()==null) {
+				setOrderCurrencyCode(new CurrencyCodeType());
+			}
+			getOrderCurrencyCode().setValue(ISO3AlphaCurrencyCodeContentType.fromValue(isoCurrencyCode));
+		} catch (Exception e) {
+//			LOG.warning("Invalid currencyCode "+isoCurrencyCode);
+			throw new IllegalArgumentException("Invalid currencyCode "+isoCurrencyCode);
 		}
-		getOrderCurrencyCode().setValue(ISO3AlphaCurrencyCodeContentType.fromValue(isoCurrencyCode));
 	}
 	public String getDocumentCurrency() {
 		// ISO3AlphaCurrencyCodeContentType
