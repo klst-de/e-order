@@ -4,11 +4,12 @@ import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeAgreementType;
 
-public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG7_Buyer {
+public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG4_Seller, BG7_Buyer {
 
 	// factory
 	static HeaderTradeAgreement create() {
@@ -42,6 +43,14 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 		return super.getBuyerReference()==null ? null : getBuyerReference().getValue();	
 	}
 
+	// BG-4 + 1..1 SELLER @see BG4_Seller
+	@Override
+	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+		BusinessParty party = TradeParty.create(name, null, address, contact);
+		party.setCompanyId(companyId);
+		party.setCompanyLegalForm(companyLegalForm);
+		setSeller(party);
+	}
 	public void setSeller(BusinessParty party) {
 		if(party==null) return;
 		super.setSellerTradeParty((TradeParty)party);
@@ -50,6 +59,7 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 		return super.getSellerTradeParty()==null ? null : TradeParty.create(super.getSellerTradeParty());
 	}
 	
+	// BG-7 + 1..1 BUYER @see BG7_Buyer
 	@Override
 	public void setBuyer(String name, PostalAddress address, IContact contact) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);

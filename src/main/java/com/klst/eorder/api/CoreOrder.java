@@ -12,7 +12,8 @@ import com.klst.edoc.api.Reference;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 
-public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl,
+public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
+	ShipTo, ShipFrom,
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 
 	/**
@@ -147,21 +148,8 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public Reference getBuyerAccountingReference();
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm);
-	public void setSeller(BusinessParty party);
-	public BusinessParty getSeller();
-
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
-	public void setBuyer(String name, PostalAddress address, IContact contact);
-	public void setBuyer(BusinessParty party);
-	public BusinessParty getBuyer();
-	
-	public void setShipToParty(String name, PostalAddress address, IContact contact);
-	public void setShipToParty(BusinessParty party);
-	public BusinessParty getShipToParty();
-
-	public void setShipFromParty(String name, PostalAddress address, IContact contact);
-	public void setShipFromParty(BusinessParty party);
-	public BusinessParty getShipFromParty();
+	// ShipToParty @see ShipTo
+	// ShipFromParty @see ShipFrom
 
 }
