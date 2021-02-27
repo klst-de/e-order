@@ -3,6 +3,7 @@ package com.klst.eorder.impl;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.PostalAddress;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._103.CountryIDType;
@@ -84,8 +85,10 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 
 	@Override
 	public void setAddressLine1(String addressLine) {
-		if(addressLine==null) return;
-		super.setLineOne(Text.create(addressLine));
+//		if(addressLine==null) return;
+//		super.setLineOne(Text.create(addressLine));
+		// alternativ:
+		Mapper.set(this, "lineOne", addressLine);
 	}
 
 	@Override
@@ -106,25 +109,31 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	}
 
 	private void setPostCode(String postCode) {
-		if(postCode==null) return;
-		CodeType postcode = new CodeType();
-		postcode.setValue(postCode);
-		this.setPostcodeCode(postcode);
+//		if(postCode==null) return;
+//		CodeType postcode = new CodeType();
+//		postcode.setValue(postCode);
+//		this.setPostcodeCode(postcode);
+		// alternativ:
+		Mapper.set(this, "postcodeCode", postCode);
 	}
 
 	@Override
 	public void setCountrySubdivision(String countrySubdivision) {
-		if(countrySubdivision==null) return;
-		TextType region = new TextType();
-		region.setValue(countrySubdivision);
-		this.setCountrySubDivisionName(region);
+//		if(countrySubdivision==null) return;
+//		TextType region = new TextType();
+//		region.setValue(countrySubdivision);
+//		this.setCountrySubDivisionName(region);
+		// alternativ:
+		Mapper.set(this, "countrySubDivisionName", countrySubdivision);
 	}
 
 	private void setCountryCode(String countryCode) {
 		try {
-			CountryIDType countryID = new CountryIDType();
-			countryID.setValue(ISOTwoletterCountryCodeContentType.fromValue(countryCode));
-			super.setCountryID(countryID);
+//			CountryIDType countryID = new CountryIDType();
+//			countryID.setValue(ISOTwoletterCountryCodeContentType.fromValue(countryCode));
+//			super.setCountryID(countryID);
+			// alternativ:
+			Mapper.set(this, "countryID", ISOTwoletterCountryCodeContentType.fromValue(countryCode));
 		} catch (Exception e) {
 			LOG.warning("Invalid countryCode "+countryCode);
 			throw new IllegalArgumentException("Invalid countryCode "+countryCode);
