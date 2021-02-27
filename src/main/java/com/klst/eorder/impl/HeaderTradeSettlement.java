@@ -1,12 +1,11 @@
 package com.klst.eorder.impl;
 
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.Reference;
 
 import un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31.ISO3AlphaCurrencyCodeContentType;
-import un.unece.uncefact.data.standard.qualifieddatatype._103.CurrencyCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeSettlementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAccountingAccountType;
 
 public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 
@@ -32,15 +31,15 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 	}
 
 	// BT-5 + 1..1 Invoice currency code
-	// TODO mit ISO3AlphaCurrencyCodeContentType
 	public void setDocumentCurrency(String isoCurrencyCode) {
 		if(isoCurrencyCode==null) return;
 		try {
-			if(super.getOrderCurrencyCode()==null) {
-				setOrderCurrencyCode(new CurrencyCodeType());
-			}
-			getOrderCurrencyCode().setValue(ISO3AlphaCurrencyCodeContentType.fromValue(isoCurrencyCode));
-		} catch (Exception e) {
+//			if(super.getOrderCurrencyCode()==null) {
+//				setOrderCurrencyCode(new CurrencyCodeType());
+//			}
+//			getOrderCurrencyCode().setValue(ISO3AlphaCurrencyCodeContentType.fromValue(isoCurrencyCode));
+			Mapper.set(this, "orderCurrencyCode", ISO3AlphaCurrencyCodeContentType.fromValue(isoCurrencyCode));
+		} catch (IllegalArgumentException e) {
 //			LOG.warning("Invalid currencyCode "+isoCurrencyCode);
 			throw new IllegalArgumentException("Invalid currencyCode "+isoCurrencyCode);
 		}
@@ -52,11 +51,12 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 
 	// BT-19 + 0..1 Buyer accounting reference
 	public void setBuyerAccountingReference(Reference textReference) {
-		if(textReference==null) return;
-		if(super.getReceivableSpecifiedTradeAccountingAccount()==null) {
-			setReceivableSpecifiedTradeAccountingAccount(new TradeAccountingAccountType());
-		}
-		getReceivableSpecifiedTradeAccountingAccount().setID((ID)textReference);
+//		if(textReference==null) return;
+//		if(super.getReceivableSpecifiedTradeAccountingAccount()==null) {
+//			setReceivableSpecifiedTradeAccountingAccount(new TradeAccountingAccountType());
+//		}
+//		getReceivableSpecifiedTradeAccountingAccount().setID((ID)textReference);
+		Mapper.set(this, "receivableSpecifiedTradeAccountingAccount", textReference);
 	}
 	public Reference getBuyerAccountingReference() {
 		return getReceivableSpecifiedTradeAccountingAccount()==null ? null : new ID(getReceivableSpecifiedTradeAccountingAccount().getID());
