@@ -226,68 +226,101 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	}
 
 	// BT-10
+	@Override
 	public void setBuyerReference(String reference) {
 		applicableHeaderTradeAgreement.setBT10_BuyerReference(reference);
 	}
+	@Override
 	public String getBuyerReferenceValue() {
 		return applicableHeaderTradeAgreement.getBuyerReferenceValue();
 	}
 	
 	// BT-19 + 0..1 Buyer accounting reference
+	@Override
 	public void setBuyerAccountingReference(Reference textReference) {
 		applicableHeaderTradeSettlement.setBuyerAccountingReference(textReference);
 	}
+	@Override
 	public Reference getBuyerAccountingReference() {
 		return applicableHeaderTradeSettlement.getBuyerAccountingReference();
 	}
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller
+	@Override
 	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		BusinessParty party = createParty(name, address, contact);
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
 		setSeller(party);		
 	}
+	@Override
 	public void setSeller(BusinessParty party) {
 		applicableHeaderTradeAgreement.setSeller(party);
 	}
+	@Override
 	public BusinessParty getSeller() {
 		return applicableHeaderTradeAgreement.getSeller();
 	}
 
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
+	@Override
 	public void setBuyer(String name, PostalAddress address, IContact contact) {
 		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
 		setBuyer(party);
 	}
+	@Override
 	public void setBuyer(BusinessParty party) {
 		applicableHeaderTradeAgreement.setBuyer(party);
 	}
+	@Override
 	public BusinessParty getBuyer() {
 		return applicableHeaderTradeAgreement.getBuyer();
 	}
 
+	@Override
 	public void setShipToParty(String name, PostalAddress address, IContact contact) {
 		BusinessParty party = createParty(name, address, contact);
 		setShipToParty(party);
 	}
+	@Override
 	public void setShipToParty(BusinessParty party) {
 		applicableHeaderTradeDelivery.setShipToParty(party);
 	}
+	@Override
 	public BusinessParty getShipToParty() {
 		return applicableHeaderTradeDelivery.getShipToParty();
 	}
 
+	@Override
 	public void setShipFromParty(String name, PostalAddress address, IContact contact) {
 		BusinessParty party = createParty(name, address, contact);
 		setShipFromParty(party);
 	}
+	@Override
 	public void setShipFromParty(BusinessParty party) {
 		applicableHeaderTradeDelivery.setShipFromParty(party);
 	}
+	@Override
 	public BusinessParty getShipFromParty() {
 		return applicableHeaderTradeDelivery.getShipFromParty();
 	}
+
+	@Override
+	public void setDeliveryTerms(String deliveryType, String functionCode) {
+		applicableHeaderTradeAgreement.setDeliveryType(deliveryType);
+		applicableHeaderTradeAgreement.setDeliveryFunctionCode(functionCode);
+	}
+	@Override
+	public String getDeliveryType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String getDeliveryFunctionCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 // TODO
 /*

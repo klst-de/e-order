@@ -1,13 +1,18 @@
 package com.klst.eorder.impl;
 
+import java.lang.reflect.Field;
+
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
 
+import un.unece.uncefact.data.standard.qualifieddatatype._103.DeliveryTermsFunctionCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeAgreementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeDeliveryTermsType;
 
 public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG4_Seller, BG7_Buyer {
 
@@ -73,6 +78,16 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	@Override
 	public BusinessParty getBuyer() {
 		return super.getBuyerTradeParty()==null ? null : TradeParty.create(super.getBuyerTradeParty());
+	}
+
+	private static final String FIELD_applicableTradeDeliveryTerms = "applicableTradeDeliveryTerms";
+	void setDeliveryType(String deliveryType) {
+		Mapper.newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, deliveryType);
+		Mapper.set(getApplicableTradeDeliveryTerms(), "deliveryTypeCode", deliveryType);
+	}
+	void setDeliveryFunctionCode(String functionCode) {
+		Mapper.newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, functionCode);
+		Mapper.set(getApplicableTradeDeliveryTerms(), "functionCode", functionCode);
 	}
 
 }

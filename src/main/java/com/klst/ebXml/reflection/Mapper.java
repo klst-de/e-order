@@ -11,12 +11,17 @@ public class Mapper {
 
 	private static final Logger LOG = Logger.getLogger(Mapper.class.getName());
 
-	public static void set(Object obj, String fieldName, Object value) {
-		if(value==null) return;
+	public static Field newFieldInstance(Object obj, String fieldName, Object value) {
+		if(value==null) return null;
 		Field field = null; // declared field in obj super
 		Class<?> fieldType = null;
 		try {
-			field = obj.getClass().getSuperclass().getDeclaredField(fieldName);
+			// das .getSuperclass() ist notwendig, weil die Attribute in super <className>Type sind
+			if(obj.getClass().getSimpleName().endsWith("Type")) {
+				field = obj.getClass().getDeclaredField(fieldName);
+			} else {
+				field = obj.getClass().getSuperclass().getDeclaredField(fieldName);
+			}
 			field.setAccessible(true);
 			if(field.get(obj)==null) {
 				fieldType = field.getType();
@@ -25,8 +30,14 @@ public class Mapper {
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | InstantiationException e) {
 			LOG.warning(obj.getClass().getSimpleName() +"."+fieldName + ": Exception:"+e);
 			e.printStackTrace();
-			return;
+			return null;
 		}
+		return field;
+	}
+	
+	public static void set(Field field, Object obj, String fieldName, Object value) {
+		if(value==null) return;
+		Class<?> fieldType = field.getType();
 		
 		String methodName = "setValue";
 		try { // "setValue" existiert ? ==> ausführen
@@ -41,8 +52,7 @@ public class Mapper {
 			e.printStackTrace();
 			return;
 		}
-		
-		
+				
 		methodName = "setID";
 		try { // "setID" existiert ? ==> ausführen: .setID((ID)value)
 			// mit IDType ist der Mapper an unqualifieddatatype._103 gebunden
@@ -58,5 +68,10 @@ public class Mapper {
 			return;
 		}
 	}
-	
+
+	public static void set(Object obj, String fieldName, Object value) {
+		Field field = newFieldInstance(obj, fieldName, value);
+		set(field, obj, fieldName, value);
+	}
+
 }

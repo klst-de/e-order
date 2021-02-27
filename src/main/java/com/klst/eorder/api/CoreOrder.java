@@ -152,4 +152,38 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	// ShipToParty @see ShipTo
 	// ShipFromParty @see ShipFrom
 
+	// nicht in CII: 0..1 DELIVERY TERMS, Doku Zeile 505 : ram:ApplicableTradeDeliveryTerms
+/*
+DELIVERY CODE:
+To be chosen from the entries in UNTDID 4053 + INCOTERMS List 
+1 : Delivery arranged by the supplier (Indicates that the supplier will arrange delivery of the goods).
+2 : Delivery arranged by logistic service provider (Code indicating that the logistic service provider has arranged the delivery of goods).
+CFR : Cost and Freight (insert named port of destination)
+CIF : Cost, Insurance and Freight (insert named port of destination)
+CIP : Carriage and Insurance Paid to (insert named place of destination)   
+CPT : Carriage Paid To (insert named place of destination)
+DAP : Delivered At Place (insert named place of destination)
+DAT : Delivered At Terminal (insert named terminal at port or place of destination)
+DDP : Delivered Duty Paid (insert named place of destination)
+EXW : Ex Works (insert named place of delivery)
+FAS : Free Alongside Ship (insert named port of shipment)
+FCA : Free Carrier (insert named place of delivery)
+FOB : Free On Board (insert named port of shipment)
+
+DELIVERY MODE:
+To be chosen from the entries in UNTDID 4055
+4 Collected by Customer
+7 Delivered by the supplier
+
+example:
+			<ram:ApplicableTradeDeliveryTerms>                      <!-- nicht in CII -->
+				<ram:DeliveryTypeCode>FCA</ram:DeliveryTypeCode>
+				<ram:FunctionCode>7</ram:FunctionCode>
+			</ram:ApplicableTradeDeliveryTerms>
+
+ */
+	public void setDeliveryTerms(String deliveryType, String functionCode);
+	public String getDeliveryType();
+	public String getDeliveryFunctionCode();
+
 }
