@@ -235,6 +235,26 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return applicableHeaderTradeAgreement.getBuyerReferenceValue();
 	}
 	
+	// BT-12 + 0..1 Contract reference
+	@Override
+	public void setContractReference(String id) {
+		applicableHeaderTradeAgreement.setContractReference(id);	
+	}
+	@Override
+	public String getContractReference() {
+		return applicableHeaderTradeAgreement.getContractReference();	
+	}
+
+	// BT-13 + 0..1 Purchase order reference
+	@Override
+	public void setPurchaseOrderReference(String id) {
+		applicableHeaderTradeAgreement.setPurchaseOrderReference(id);	
+	}
+	@Override
+	public String getPurchaseOrderReference() {
+		return applicableHeaderTradeAgreement.getPurchaseOrderReference();	
+	}
+
 	// BT-19 + 0..1 Buyer accounting reference
 	@Override
 	public void setBuyerAccountingReference(Reference textReference) {
@@ -312,17 +332,59 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	}
 	@Override
 	public String getDeliveryType() {
-		// TODO Auto-generated method stub
-		return null;
+		return applicableHeaderTradeAgreement.getDeliveryType();
 	}
 	@Override
 	public String getDeliveryFunctionCode() {
-		// TODO Auto-generated method stub
-		return null;
+		return applicableHeaderTradeAgreement.getDeliveryFunctionCode();
 	}
 
+	@Override
+	public void setQuotationReference(String id) {
+		applicableHeaderTradeAgreement.setQuotationReference(id);
+	}
+	@Override
+	public String getQuotationReference() {
+		return applicableHeaderTradeAgreement.getQuotationReference();
+	}
+
+	@Override
+	public void setBlanketOrderReference(String id) {
+		applicableHeaderTradeAgreement.setBlanketOrderReference(id);
+	}
+	@Override
+	public String getBlanketOrderReference() {
+		return applicableHeaderTradeAgreement.getBlanketOrderReference();
+	}
+
+	@Override
+	public void setPreviousOrderReference(String id) {
+		applicableHeaderTradeAgreement.setPreviousOrderReference(id);
+	}
+
+	@Override
+	public String getPreviousOrderReference() {
+		return applicableHeaderTradeAgreement.getPreviousOrderReference();
+	}
 
 // TODO
+//<ram:QuotationReferencedDocument>                      <!-- Angebot nicht in CII -->
+//	<ram:IssuerAssignedID>QUOT_125487</ram:IssuerAssignedID>
+//</ram:QuotationReferencedDocument>
+/*
+			<ram:BlanketOrderReferencedDocument>                   <!-- Rahmenauftrag nicht in CII -->
+				<ram:IssuerAssignedID>BLANKET_ORDER_ID</ram:IssuerAssignedID>
+			</ram:BlanketOrderReferencedDocument>
+--------------
+			<ram:PreviousOrderChangeReferencedDocument>
+				<ram:IssuerAssignedID>PREV_ORDER_C_ID</ram:IssuerAssignedID>
+			</ram:PreviousOrderChangeReferencedDocument>
+------------
+			<ram:PreviousOrderResponseReferencedDocument>
+				<ram:IssuerAssignedID>PREV_ORDER_R_ID</ram:IssuerAssignedID>
+			</ram:PreviousOrderResponseReferencedDocument>
+
+ */
 /*
 	<rsm:SupplyChainTradeTransaction>
 		<ram:IncludedSupplyChainTradeLineItem>

@@ -2,11 +2,8 @@ package com.klst.eorder.api;
 
 import java.sql.Timestamp;
 
-import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.BusinessPartyFactory;
-import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.IContactFactory;
-import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.PostalAddressFactory;
 import com.klst.edoc.api.Reference;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -130,7 +127,40 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	// TODO:
 	// BT-11, (Projektname BT-11-0)
 	// ...
-	
+
+	/**
+	 * Contract reference
+	 * <p>
+	 * The identification of a contract. 
+	 * The contract identifier should be unique in the context of the specific trading relationship and for a defined time period.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-12
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R7
+	 * 
+	 * @param Document reference
+	 */
+	// Eine eindeutige Bezeichnung des Vertrages (z. B. Vertragsnummer).
+	public void setContractReference(String id);
+	public String getContractReference();
+
+	/**
+	 * Purchase order reference
+	 * <p>
+	 * An identifier of a referenced purchase order, issued by the Buyer. 
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-13
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R5, R56
+	 * 
+	 * @param Document reference
+	 */
+	// Eine vom Erwerber ausgegebene Kennung für eine referenzierte Bestellung.
+	public void setPurchaseOrderReference(String id);
+	public String getPurchaseOrderReference();
+
 	/**
 	 * Buyer accounting reference
 	 * <p>
@@ -153,7 +183,13 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	// ShipFromParty @see ShipFrom
 
 	// nicht in CII: 0..1 DELIVERY TERMS, Doku Zeile 505 : ram:ApplicableTradeDeliveryTerms
+	// Added in CIO
 /*
+Added in CIO
+Delivery type code (used for incoterms) and the relevant location. They might be needed. 
+The Incoterms rules provide specific guidance to individuals participating in the import and export of global trade 
+on a daily basis.
+
 DELIVERY CODE:
 To be chosen from the entries in UNTDID 4053 + INCOTERMS List 
 1 : Delivery arranged by the supplier (Indicates that the supplier will arrange delivery of the goods).
@@ -185,5 +221,33 @@ example:
 	public void setDeliveryTerms(String deliveryType, String functionCode);
 	public String getDeliveryType();
 	public String getDeliveryFunctionCode();
+
+	// nicht in CII: 0..1 QUOTATION REFERENCE, Doku Zeile 522 Angebot ref: ram:QuotationReferencedDocument
+/*
+Quotation Reference ID
+An Identifier of a Quotation, issued by the Seller.
+ */
+	public void setQuotationReference(String id);
+	public String getQuotationReference();
+
+	// nicht in CII: 0..1 BLANKET ORDER REFERENCE, Doku Zeile 561 Rahmenauftrag ref: ram:BlanketOrderReferencedDocument
+/*
+Blanket Order number ID
+The identification of a Blanket Order, issued by the Buyer or the Buyer Requisitioner.
+ */
+	public void setBlanketOrderReference(String id);
+	public String getBlanketOrderReference();
+
+	// nicht in CII: 0..1 PREVIOUS ORDER REFERENCE, Doku Zeile 566 : ram:PreviousOrderReferencedDocument (ohne Beispiel)
+/*
+Previous Order Reference in case the Buyer decides to raise a new ORDER to replace a prvious one
+
+Previous Order Reference ID
+The identification of a the Previous Order Document, issued by the Buyer or the Buyer Requisitioner.
+In case the Buyer wants to raise a new PURCHASE ORDER with a new Puchase Order Reference ID, 
+it can refer to the previous one with this ID
+ */
+	public void setPreviousOrderReference(String id);
+	public String getPreviousOrderReference();
 
 }
