@@ -367,24 +367,6 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return applicableHeaderTradeAgreement.getPreviousOrderReference();
 	}
 
-// TODO
-//<ram:QuotationReferencedDocument>                      <!-- Angebot nicht in CII -->
-//	<ram:IssuerAssignedID>QUOT_125487</ram:IssuerAssignedID>
-//</ram:QuotationReferencedDocument>
-/*
-			<ram:BlanketOrderReferencedDocument>                   <!-- Rahmenauftrag nicht in CII -->
-				<ram:IssuerAssignedID>BLANKET_ORDER_ID</ram:IssuerAssignedID>
-			</ram:BlanketOrderReferencedDocument>
---------------
-			<ram:PreviousOrderChangeReferencedDocument>
-				<ram:IssuerAssignedID>PREV_ORDER_C_ID</ram:IssuerAssignedID>
-			</ram:PreviousOrderChangeReferencedDocument>
-------------
-			<ram:PreviousOrderResponseReferencedDocument>
-				<ram:IssuerAssignedID>PREV_ORDER_R_ID</ram:IssuerAssignedID>
-			</ram:PreviousOrderResponseReferencedDocument>
-
- */
 /*
 	<rsm:SupplyChainTradeTransaction>
 		<ram:IncludedSupplyChainTradeLineItem>
