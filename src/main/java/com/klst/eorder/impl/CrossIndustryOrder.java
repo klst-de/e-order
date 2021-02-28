@@ -367,6 +367,34 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return applicableHeaderTradeAgreement.getPreviousOrderReference();
 	}
 
+	@Override
+	public void setPreviousOrderChangeReference(String id) {
+		if(getDocumentCode()==DocumentNameCode.Order) {
+			LOG.warning("An Order (Document Type Code BT-3 = 220) MUST NOT contain a Previous Order Change Referenced Document");
+		} else {
+			applicableHeaderTradeAgreement.setPreviousOrderChangeReference(id);
+		}
+	}
+
+	@Override
+	public String getPreviousOrderChangeReference() {
+		return applicableHeaderTradeAgreement.getPreviousOrderChangeReference();
+	}
+
+	@Override
+	public void setPreviousOrderResponseReference(String id) {
+		if(getDocumentCode()==DocumentNameCode.Order) {
+			LOG.warning("An Order (Document Type Code BT-3 = 220) MUST NOT contain a Previous Order Response Referenced Document");
+		} else {
+			applicableHeaderTradeAgreement.setPreviousOrderResponseReference(id);
+		}
+	}
+
+	@Override
+	public String getPreviousOrderResponseReference() {
+		return applicableHeaderTradeAgreement.getPreviousOrderResponseReference();
+	}
+	
 /*
 	<rsm:SupplyChainTradeTransaction>
 		<ram:IncludedSupplyChainTradeLineItem>

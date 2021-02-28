@@ -144,24 +144,24 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 		return getPreviousOrderReferencedDocument().getIssuerAssignedID()==null ? null : getPreviousOrderReferencedDocument().getIssuerAssignedID().getValue();
 	}
 
-	// in Doc Zeile 571 : N (not in CIO)
-//	void setPreviousOrderChangeReference(String id) {
-//		Mapper.newFieldInstance(this, "previousOrderChangeReferencedDocument", id);
-//		Mapper.set(getPreviousOrderChangeReferencedDocument(), FIELD_issuerAssignedID, id);
-//	}
-//	String getPreviousOrderChangeReference() {
-//		if(getPreviousOrderChangeReferencedDocument()==null) return null;
-//		return getPreviousOrderChangeReferencedDocument().getIssuerAssignedID()==null ? null : getPreviousOrderChangeReferencedDocument().getIssuerAssignedID().getValue();
-//	}
+	// in Doc Zeile 571 : N (not in CIO/220)
+	void setPreviousOrderChangeReference(String id) {
+		Mapper.newFieldInstance(this, "previousOrderChangeReferencedDocument", id);
+		Mapper.set(getPreviousOrderChangeReferencedDocument(), FIELD_issuerAssignedID, id);
+	}
+	String getPreviousOrderChangeReference() {
+		if(getPreviousOrderChangeReferencedDocument()==null) return null;
+		return getPreviousOrderChangeReferencedDocument().getIssuerAssignedID()==null ? null : getPreviousOrderChangeReferencedDocument().getIssuerAssignedID().getValue();
+	}
 	
-	// in Doc Zeile 576 : N (not in CIO)
-//	void setPreviousOrderResponseReference(String id) {
-//		Mapper.newFieldInstance(this, "previousOrderResponseReferencedDocument", id);
-//		Mapper.set(getPreviousOrderResponseReferencedDocument(), FIELD_issuerAssignedID, id);
-//	}
-//	String getPreviousOrderResponseReference() {
-//		if(getPreviousOrderResponseReferencedDocument()==null) return null;
-//		return getPreviousOrderResponseReferencedDocument().getIssuerAssignedID()==null ? null : getPreviousOrderResponseReferencedDocument().getIssuerAssignedID().getValue();
-//	}
+	// in Doc Zeile 576 : N (not in CIO/220)
+	void setPreviousOrderResponseReference(String id) {
+		Mapper.newFieldInstance(this, "previousOrderResponseReferencedDocument", id);
+		Mapper.set(getPreviousOrderResponseReferencedDocument(), FIELD_issuerAssignedID, id);
+	}
+	String getPreviousOrderResponseReference() {
+		if(getPreviousOrderResponseReferencedDocument()==null) return null;
+		return getPreviousOrderResponseReferencedDocument().getIssuerAssignedID()==null ? null : getPreviousOrderResponseReferencedDocument().getIssuerAssignedID().getValue();
+	}
 
 }

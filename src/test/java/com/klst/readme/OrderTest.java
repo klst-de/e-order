@@ -92,6 +92,11 @@ public class OrderTest {
 		
 		order.setShipFromParty("SHIP_FROM_NAME", order.createAddress("FR", "75003", "SHIP_FROM_CITY"), contact);
 		
+		order.setDeliveryTerms("FCA", "7");
+		order.setPurchaseOrderReference("PO123456789");
+		order.setContractReference("CONTRACT_2020-25987");
+		order.setPreviousOrderResponseReference("PREV_ORDER_R_ID");
+		
 		transformer = cioTransformer;
 		object = order;
 		commercialOrderTest();

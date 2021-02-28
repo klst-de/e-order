@@ -250,4 +250,24 @@ it can refer to the previous one with this ID
 	public void setPreviousOrderReference(String id);
 	public String getPreviousOrderReference();
 
+	// nicht in CII: 0..1 PREVIOUS ORDER CHANGE REFERENCED DOCUMENT, Doku Zeile 571
+/*
+An Order (Document Type Code BT-3 = 220) MUST NOT contain a Previous Order Change Referenced Document
+
+Previous Order CHANGE Referenced Document ID
+The identification of a the Previous Order Change Document, issued by the Buyer or the Buyer Requisitioner.
+ */
+	public void setPreviousOrderChangeReference(String id);
+	public String getPreviousOrderChangeReference();
+
+	// nicht in CII: 0..1 PREVIOUS ORDER RESPONSE REFERENCED DOCUMENT, Doku Zeile 576
+/*
+An Order (Document Type Code BT-3 = 220) MUST NOT contain a Previous Order Response Referenced Document
+
+Previous Order RESPONSE Referenced Document ID
+The identification of a the Previous Order Response Document, issued by the Seller.
+ */
+	public void setPreviousOrderResponseReference(String id);
+	public String getPreviousOrderResponseReference();
+
 }
