@@ -5,7 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.QuantityType;
 
 public class Mapper {
 
@@ -39,7 +41,7 @@ public class Mapper {
 		if(value==null) return;
 		Class<?> fieldType = field.getType();
 		
-		String methodName = "setValue";
+		String methodName = "setValue"; // setValue(String value)
 		try { // "setValue" existiert ? ==> ausführen
 			Method setValue = fieldType.getDeclaredMethod(methodName, value.getClass());	
 			setValue.invoke(field.get(obj), value.getClass().cast(value));
@@ -53,19 +55,73 @@ public class Mapper {
 			return;
 		}
 				
-		methodName = "setID";
+		methodName = "setID"; // setID(IDType id)
 		try { // "setID" existiert ? ==> ausführen: .setID((ID)value)
 			// mit IDType ist der Mapper an unqualifieddatatype._103 gebunden
-			Method setValue = fieldType.getDeclaredMethod(methodName, IDType.class);	
-			setValue.invoke(field.get(obj), IDType.class.cast(value));
+			Method setID = fieldType.getDeclaredMethod(methodName, IDType.class);	
+			setID.invoke(field.get(obj), IDType.class.cast(value));
 			return;
 		} catch (NoSuchMethodException e) {
 			LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-			e.printStackTrace();
+//			e.printStackTrace();
 		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 			LOG.warning(obj.getClass().getSimpleName() +"."+fieldName + ": Exception:"+e);
 			e.printStackTrace();
 			return;
+		}
+		
+//		LOG.warning(obj.getClass().getSimpleName() + " / " + value.getClass().getSimpleName());
+//		value.getClass()
+//		obj.getClass()
+		if(value instanceof QuantityType && value.getClass()!=QuantityType.class) {
+			// value is instance of a subclass of QuantityType, but not QuantityType itself
+			// mögliche Methoden: setRequestedQuantity / setAgreedQuantity / setBasisQuantity
+			methodName = "setRequestedQuantity"; 
+			try {
+				Method setter = obj.getClass().getDeclaredMethod(methodName, QuantityType.class);
+				setter.invoke(obj, QuantityType.class.cast(value));
+			} catch (NoSuchMethodException e) {
+				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+//				e.printStackTrace();
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+			methodName = "setBasisQuantity"; 
+			try {
+				Method setter = obj.getClass().getDeclaredMethod(methodName, QuantityType.class);
+				setter.invoke(obj, QuantityType.class.cast(value));
+			} catch (NoSuchMethodException e) {
+				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+//				e.printStackTrace();
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if(value instanceof AmountType && value.getClass()!=AmountType.class) {
+			// value is instance of a subclass of AmountType, but not AmountType itself
+			// mögliche Methoden: setLineTotalAmount / setChargeAmount
+			try {
+				Method setter = obj.getClass().getDeclaredMethod("setLineTotalAmount", AmountType.class);
+				setter.invoke(obj, AmountType.class.cast(value));
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if(value instanceof AmountType && value.getClass()!=AmountType.class) {
+			// value is instance of a subclass of AmountType, but not AmountType itself
+			// mögliche Methoden: setLineTotalAmount / setChargeAmount
+			try {
+				Method setter = obj.getClass().getDeclaredMethod("setChargeAmount", AmountType.class);
+				setter.invoke(obj, AmountType.class.cast(value));
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
