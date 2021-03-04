@@ -3,7 +3,8 @@ package com.klst.eorder.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.edoc.api.Rounding;
+import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.edoc.api.IQuantity;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.QuantityType;
 
@@ -20,33 +21,50 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._103.QuantityType;
  * This is a "decimal" type with 4 digits maximum after the decimal point, without a thousand separator, and with the ". " as a decimal separator. 
  * Example 10000.3454
  * 
- * <br>The unit of measure that applies to the invoiced quantity.
- * The quantity of items (goods or services) that is charged in the Invoice line.
+ * <br>The unit of measure that applies to the ordered or invoiced quantity.
+ * The quantity of items (goods or services) that is charged in the Order/Invoice line.
  * 
  */
-public class Quantity extends QuantityType implements Rounding {
+public class Quantity extends QuantityType implements IQuantity {
+
+	@Override
+	public IQuantity createQuantity(String unitCode, BigDecimal quantity) {
+		return create(unitCode, quantity);
+	}
+
+	static Quantity create(String unitCode, BigDecimal quantity) {
+		return new Quantity(unitCode, quantity);
+	}
 
 	// in EN 16931-1:2017/A1:2019 + AC:2020 entfällt die Einschränkung:
 	//  „Typ repräsentiert eine Fließkommazahl ohne Limitierung der Anzahl an Nachkommastellen.“ 
 	public static final int SCALE = 4;
 	
-	Quantity() {
-		super();
+	static Quantity create() {
+		return new Quantity(null); 
+	}
+	// copy factory
+	static Quantity create(QuantityType object) {
+		if(object instanceof QuantityType && object.getClass()!=QuantityType.class) {
+			// object is instance of a subclass of QuantityType, but not QuantityType itself
+			return (Quantity)object;
+		} else {
+			return new Quantity(object); 
+		}
 	}
 
-	public Quantity(BigDecimal quantity) {
-		this(null, quantity);
+	// copy ctor
+	private Quantity(QuantityType object) {
+		super();
+		if(object!=null) {
+			CopyCtor.invokeCopy(this, object);
+		}
 	}
 
 	public Quantity(String unitCode, BigDecimal quantity) {
-		this();
-		this.setUnitCode(unitCode);
-		this.setValue(quantity);
-	}
-
-	void copyTo(QuantityType quantity) {
-		quantity.setUnitCode(this.getUnitCode());
-		quantity.setValue(this.getValue(RoundingMode.HALF_UP));
+		super();
+		super.setUnitCode(unitCode);
+		super.setValue(quantity.setScale(SCALE, RoundingMode.HALF_UP));
 	}
 
 	@Override
@@ -58,4 +76,5 @@ public class Quantity extends QuantityType implements Rounding {
 	public String toString() {
 		return getValue(RoundingMode.HALF_UP) + (getUnitCode()==null ? "" : getUnitCode());
 	}
+
 }
