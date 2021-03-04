@@ -25,6 +25,8 @@ public interface IQuantity extends IQuantityFactory, Rounding {
 	// implements Rounding
 	public BigDecimal getValue(RoundingMode roundingMode);
 
+	public String getUnitCode();
+	
 	default BigDecimal getValue() {
 		return getValue(RoundingMode.HALF_UP);
 	}

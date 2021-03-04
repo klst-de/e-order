@@ -36,6 +36,7 @@ public class OrderTest {
 	private static final Logger LOG = Logger.getLogger(OrderTest.class.getName());
 
 	static final String EUR = "EUR";
+	static final String C62 = "C62";
 
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
@@ -123,6 +124,7 @@ public class OrderTest {
 		assertEquals(1, line.getNotes().size());
 		assertEquals(line.getLineTotalAmount().getValue()
 				, line.getQuantity().getValue().multiply(line.getUnitPriceAmount().getValue()).setScale(2, RoundingMode.HALF_UP));
+		assertEquals(C62, line.getQuantity().getUnitCode());
 		
 		order.addLine("2"
 				, new Quantity("C62", new BigDecimal(10))
