@@ -6,11 +6,14 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
+import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
@@ -420,14 +423,20 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		</ram:ApplicableHeaderTradeSettlement>
 
  */
-	public List<SupplyChainTradeLineItem> getLines() {
-//		List<SupplyChainTradeLineItemType> lines = super.getSupplyChainTradeTransaction().getIncludedSupplyChainTradeLineItem();
-//		List<SupplyChainTradeLineItem> resultLines = new ArrayList<SupplyChainTradeLineItem>(lines.size());
-//		lines.forEach(line -> {
-//			resultLines.add(SupplyChainTradeLineItem.create(line));
-//		});
-//		return resultLines;
-		
+	// BG-25 1..n ORDER LINE
+	@Override
+	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
+			IAmount priceAmount, String itemName) {
+		// delegieren:
+		return SupplyChainTradeLineItem.create(id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
+	}
+
+	@Override
+	public void addLine(OrderLine line) {
+		this.supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add((SupplyChainTradeLineItem)line);
+	}
+
+	public List<OrderLine> getLines() {
 		// delegieren:
 		return this.supplyChainTradeTransaction.getLines();
 	}

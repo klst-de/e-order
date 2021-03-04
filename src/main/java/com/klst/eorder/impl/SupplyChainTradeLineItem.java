@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.Mapper;
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IQuantity;
+import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.DocumentLineDocumentType;
@@ -12,24 +16,60 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeProductType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.AmountType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.QuantityType;
 
+/*
+BG-25 + 1..n INVOICE LINE
+BT-126 ++ 1..1 Invoice line identifier
+BT-127 ++ 0..1 Invoice line note
+BT-128 ++ 0..1 Invoice line object identifier
+          0..1 Scheme identifier
+BT-129 ++ 1..1 Invoiced quantity
+BT-130 ++ 1..1 Invoiced quantity unit of measure code
+BT-131 ++ 1..1 Invoice line net amount
+BT-132 ++ 0..1 Referenced purchase order line reference
+BT-133 ++ 0..1 Invoice line Buyer accounting reference
+
+BG-26 ++ 0..1 INVOICE LINE PERIOD
+...
+BG-27 ++ 0..n INVOICE LINE ALLOWANCES
+...
+BG-28 ++ 0..n INVOICE LINE CHARGES
+...
+BG-29 ++ 1..1 PRICE DETAILS               ------> ram:SpecifiedLineTradeAgreement 
+BT-146 +++ 1..1 Item net price                                ram:NetPriceProductTradePrice ram:ChargeAmount
+BT-147 +++ 0..1 Item price discount
+BT-148 +++ 0..1 Item gross price
+BT-149 +++ 0..1 Item price base quantity                      ram:NetPriceProductTradePrice ram:BasisQuantity
+BT-150 +++ 0..1 Item price base quantity unit of measure code ram:NetPriceProductTradePrice ram:BasisQuantity
+
+BG-30 ++ 1..1 LINE VAT INFORMATION
+...
+BG-31 ++ 1..1 ITEM INFORMATION            ------> ram:SpecifiedTradeProduct
+...
+BG-32 +++ 0..n ITEM ATTRIBUTES
+
+ */
 /**
  * BG-25 ORDER LINE
  * <p>
- * A group of business terms providing information on individual Order line.
+ * A group of business terms providing information on individual order line.
  * <p>
  * Similar to EN16931 business group BG-25
  */
-public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType {
+public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType implements OrderLine {
 
-//	static CoreOrderLine createOrderLine(String id, Quantity quantity, Amount lineTotalAmount, 
-//			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-//		return new SupplyChainTradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
-//	}
+	@Override
+	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount,
+			IAmount priceAmount, String itemName) {
+		// gehen die casts ungestraft???????? TODO
+		return create(id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
+	}
+
+	static SupplyChainTradeLineItem create(String id, Quantity quantity, Amount lineTotalAmount, 
+			UnitPriceAmount priceAmount, String itemName) {
+		return new SupplyChainTradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName);
+	}
 
 	// copy factory
 	static SupplyChainTradeLineItem create(SupplyChainTradeLineItemType object) {
@@ -43,6 +83,9 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType {
 
 	private static final Logger LOG = Logger.getLogger(SupplyChainTradeLineItem.class.getName());
 
+//	ram:AssociatedDocumentLineDocument in super:
+//	protected DocumentLineDocumentType associatedDocumentLineDocument;
+	
 	// copy ctor
 	private SupplyChainTradeLineItem(SupplyChainTradeLineItemType line) {
 		super();
@@ -55,20 +98,17 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType {
 //		} else {
 //			tradeTax = TradeTax.create(specifiedLineTradeSettlement.getApplicableTradeTax().get(0));
 //		}
+//		applicableHeaderTradeAgreement = supplyChainTradeTransaction.createtHeaderTradeAgreement();
+
 	}
 
 	private SupplyChainTradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName) {
 //			, TaxCategoryCode codeEnum, BigDecimal percent) {
 		super.setAssociatedDocumentLineDocument(new DocumentLineDocumentType()); // mit id
 		super.setSpecifiedLineTradeAgreement(new LineTradeAgreementType()); // mit setUnitPriceAmount
-		super.setSpecifiedTradeProduct(new TradeProductType()); // mit ItemName
-//		associatedDocumentLineDocument = new DocumentLineDocumentType();
-//		specifiedTradeProduct = new TradeProductType();
-//		specifiedLineTradeAgreement = new LineTradeAgreementType(); 
-//		specifiedLineTradeDelivery = new LineTradeDeliveryType(); // 0..1, aber BT-129 ist mandatory 
-//		specifiedLineTradeSettlement = new LineTradeSettlementType();
-//		
-//		init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		super.setSpecifiedLineTradeDelivery(new LineTradeDeliveryType()); // mit quantity
+		super.setSpecifiedLineTradeSettlement(new LineTradeSettlementType());
+// optional		super.setSpecifiedTradeProduct(new TradeProductType()); // mit ItemName
 		setId(id);
 		setQuantity(quantity);
 		setLineTotalAmount(lineTotalAmount);
@@ -94,7 +134,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType {
 /*
 		<ram:IncludedSupplyChainTradeLineItem>
 			<ram:AssociatedDocumentLineDocument>
-				<ram:LineID>1</ram:LineID>
+				<ram:LineID>1</ram:LineID>                                    <!-- BG.25.BT-126 1..1
 				<ram:IncludedNote>
 					<ram:Content>Content of Note</ram:Content>
 					<ram:SubjectCode>AAI</ram:SubjectCode>
@@ -104,7 +144,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType {
 				<ram:GlobalID schemeID="0160">1234567890123</ram:GlobalID>
 				<ram:SellerAssignedID>987654321</ram:SellerAssignedID>
 				<ram:BuyerAssignedID>654987321</ram:BuyerAssignedID>
-				<ram:Name>Product Name</ram:Name>
+				<ram:Name>Product Name</ram:Name>                             <!-- BG-31.BT-153 0..1
 			</ram:SpecifiedTradeProduct>
 			<ram:SpecifiedLineTradeAgreement>
 				<ram:BuyerOrderReferencedDocument>
@@ -122,26 +162,29 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType {
 				<ram:PartialDeliveryAllowedIndicator>
 					<udt:Indicator>true</udt:Indicator>
 				</ram:PartialDeliveryAllowedIndicator>
-				<ram:RequestedQuantity unitCode="C62">6</ram:RequestedQuantity>
+				<ram:RequestedQuantity unitCode="C62">6</ram:RequestedQuantity> <!-- BT-129+BT-130 1..1
 			</ram:SpecifiedLineTradeDelivery>
 			<ram:SpecifiedLineTradeSettlement>
 				<ram:SpecifiedTradeSettlementLineMonetarySummation>
-					<ram:LineTotalAmount>60.00</ram:LineTotalAmount>
+					<ram:LineTotalAmount>60.00</ram:LineTotalAmount>            <!-- BT-131 1..1
 				</ram:SpecifiedTradeSettlementLineMonetarySummation>
 			</ram:SpecifiedLineTradeSettlement>
 		</ram:IncludedSupplyChainTradeLineItem>
  */
-	// BG.25.BT-126
+	// BG.25.BT-126 1..1
+	@Override
 	public String getId() {
 		return super.getAssociatedDocumentLineDocument().getLineID().getValue();
 	}
-	public void setId(String id) {		
-		super.getAssociatedDocumentLineDocument().setLineID(new ID(id));
+	void setId(String id) {
+//		super.getAssociatedDocumentLineDocument().setLineID(new ID(id));
+		Mapper.newFieldInstance(this, "associatedDocumentLineDocument", id);
+		Mapper.set(getAssociatedDocumentLineDocument(), "lineID", id);
 	}
 
 	//ram:IncludedNote
 //	@Override // BT-127 0..1 Freitext zur Rechnungsposition 
-	// - also nur maximal 1 Note, dann brauch man keine factory und kein add, sondern nur set/get
+	// - also nur maximal 1 Note, dann braucht man keine factory und kein add, sondern nur set/get
 	// - und ohne subjectCode
 	public void setNote(String text) {
 		if(text==null) return; // optional
@@ -153,50 +196,91 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType {
 		}
 	}
 
-//	@Override // getter
-//	public List<OrderNote> getOrderNotes() {
-	public String getNote() {
-		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument();
+	@Override // getter
+	public List<OrderNote> getNotes() {
+		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument(); // TODO wie in CrossIndustryOrder
 		if(dld==null) return null;
-		if(dld.getIncludedNote().isEmpty()) return null;
-		List<OrderNote> list = Note.getNotes(dld.getIncludedNote());
-		return list.get(0).getNote();
-	}	
+		// delegieren:
+		return Note.getNotes(dld.getIncludedNote());
 
-	// BT-128 ++ 0..1 Objektkennung
+	}
+//	public String getNote() {
+//		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument();
+//		if(dld==null) return null;
+//		if(dld.getIncludedNote().isEmpty()) return null;
+//		List<OrderNote> list = Note.getNotes(dld.getIncludedNote());
+//		return list.get(0).getNote();
+//	}	
+
+	@Override
+	public OrderNote createNote(String subjectCode, String content) {
+		return Note.create(subjectCode, content);
+	}
+
+	public void addNote(OrderNote note) {
+		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument(); // TODO wie in CrossIndustryOrder
+		dld.getIncludedNote().add((Note)note);
+	}
+	
+	// BT-128 ++ 0..1 Objektkennung // (OBJECT IDENTIFIER FOR INVOICE LINE) Zeile 154
+	public void setLineObjectID(String id, String schemeID, String schemeCode) {
+//		/rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedLineTradeAgreement
+//		/ram:AdditionalReferencedDocument
+		LineTradeAgreementType lta = super.getSpecifiedLineTradeAgreement(); // TODO wie in CrossIndustryOrder
+		// in lta gibt es kein ram:AdditionalReferencedDocument
+// TODO
+//		Mapper.newFieldInstance(this, "specifiedLineTradeAgreement", id);
+//		Mapper.set(getSpecifiedLineTradeAgreement(), "????", id);
+//	    "buyerOrderReferencedDocument",
+//	    "netPriceProductTradePrice",
+//	    "blanketOrderReferencedDocument"
+
+	}
 	
 	// BT-129 ++ 1..1 in Rechnung gestellte Menge
 	// BT-129+BT-130
 	// ram:SpecifiedLineTradeDelivery + ram:RequestedQuantity
+//	/rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedLineTradeDelivery
+
 	void setQuantity(Quantity quantity) { 
-		QuantityType qt = new QuantityType();
-		quantity.copyTo(qt);
-		if(super.getSpecifiedLineTradeDelivery()==null) super.setSpecifiedLineTradeDelivery(new LineTradeDeliveryType());
-		super.getSpecifiedLineTradeDelivery().setRequestedQuantity(qt);
+//		QuantityType qt = new QuantityType();
+//		quantity.copyTo(qt);
+//		if(super.getSpecifiedLineTradeDelivery()==null) super.setSpecifiedLineTradeDelivery(new LineTradeDeliveryType());
+//		super.getSpecifiedLineTradeDelivery().setRequestedQuantity(qt);
+		
+//		Mapper.newFieldInstance(this, "specifiedLineTradeDelivery", quantity);
+//		Mapper.set(getSpecifiedLineTradeDelivery(), "requestedQuantity", quantity);
+		
+		Mapper.set(getSpecifiedLineTradeDelivery(), "requestedQuantity", quantity);
 	}
 
-//	@Override
-	public Quantity getQuantity() {
-		QuantityType requestedQuantity = super.getSpecifiedLineTradeDelivery()==null ? null : getSpecifiedLineTradeDelivery().getRequestedQuantity();
-		return requestedQuantity==null ? null : new Quantity(requestedQuantity.getUnitCode(), requestedQuantity.getValue());
+	@Override
+	public IQuantity getQuantity() {
+//		QuantityType requestedQuantity = super.getSpecifiedLineTradeDelivery()==null ? null : getSpecifiedLineTradeDelivery().getRequestedQuantity();
+//		return requestedQuantity==null ? null : new Quantity(requestedQuantity.getUnitCode(), requestedQuantity.getValue());
+		LineTradeDeliveryType ltd = super.getSpecifiedLineTradeDelivery();
+		return ltd.getRequestedQuantity()==null ?  null : Quantity.create(ltd.getRequestedQuantity());
 	}
 
 	// BT-131 ++ 1..1 Nettobetrag der Rechnungsposition
 	// ram:SpecifiedLineTradeSettlement + ram:SpecifiedTradeSettlementLineMonetarySummation
 	void setLineTotalAmount(Amount amount) {
-		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
-		AmountType lineTotalAmt = new AmountType();
-		amount.copyTo(lineTotalAmt);
-		tradeSettlementLineMonetarySummation.setLineTotalAmount(lineTotalAmt);
-		if(super.getSpecifiedLineTradeSettlement()==null) super.setSpecifiedLineTradeSettlement(new LineTradeSettlementType());
-		getSpecifiedLineTradeSettlement().setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
+//		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
+//		AmountType lineTotalAmt = new AmountType();
+//		amount.copyTo(lineTotalAmt);
+//		tradeSettlementLineMonetarySummation.setLineTotalAmount(lineTotalAmt);
+//		if(super.getSpecifiedLineTradeSettlement()==null) super.setSpecifiedLineTradeSettlement(new LineTradeSettlementType());
+//		getSpecifiedLineTradeSettlement().setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
+		
+//		Mapper.newFieldInstance(this, "specifiedLineTradeSettlement", amount);
+		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", amount);
+		Mapper.set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
 	}
 
-//	@Override
-	public Amount getLineTotalAmount() {
+	@Override
+	public IAmount getLineTotalAmount() {
 		TradeSettlementLineMonetarySummationType tsms = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation();
-		AmountType amount = tsms==null ? null : tsms.getLineTotalAmount();
-		return amount==null ? null : new Amount(amount.getCurrencyID(), amount.getValue());
+		return tsms==null ? null : Amount.create(tsms.getLineTotalAmount());
 	}
 
 	/*
@@ -206,41 +290,57 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType {
 	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
 	 */
 	// BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
-//	@Override
-	public UnitPriceAmount getUnitPriceAmount() {
+	@Override
+	public IAmount getUnitPriceAmount() {
 		TradePriceType tradePrice = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
-		AmountType upa = tradePrice==null ? null : tradePrice.getChargeAmount();
-		return upa==null ? null : new UnitPriceAmount(upa.getCurrencyID(), upa.getValue());
+		return tradePrice==null ? null : Amount.create(tradePrice.getChargeAmount());
 	}
 
-	// 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional
+	// BT-146 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional
 //	@Override
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
-		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
-		if(quantity!=null) {
-			QuantityType qt = new QuantityType();
-			quantity.copyTo(qt);
-			tradePrice.setBasisQuantity(qt); 
-		}
-		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
-	}	
-	private TradePriceType setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-		AmountType chargeAmount = new AmountType();
-		unitPriceAmount.copyTo(chargeAmount);
-		TradePriceType tradePrice = new TradePriceType();
-		tradePrice.setChargeAmount(chargeAmount);
-
-		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
-		return tradePrice;
+//	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
+//		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
+//		if(quantity!=null) {
+//			QuantityType qt = new QuantityType();
+//			quantity.copyTo(qt);
+//			tradePrice.setBasisQuantity(qt); 
+//		}
+//		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
+//	}	
+	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
+//		AmountType chargeAmount = new AmountType();
+//		unitPriceAmount.copyTo(chargeAmount);
+//		TradePriceType tradePrice = new TradePriceType();
+//		tradePrice.setChargeAmount(chargeAmount);
+//
+//		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
+//		return tradePrice;
+		
+//		Mapper.newFieldInstance(this, "specifiedLineTradeAgreement", unitPriceAmount);
+		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
+		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
 	}
 
+	// BG-29.BT-150 + BG-29.BT-149 0..1
+	@Override
+	public IQuantity getUnitPriceQuantity() {
+		TradePriceType tradePrice = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
+		return tradePrice==null ? null : Quantity.create(tradePrice.getBasisQuantity());
+	}
+	@Override
+	public void setUnitPriceQuantity(IQuantity basisQuantity) {
+		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", basisQuantity);
+		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", basisQuantity);
+	}
+	
 	// BG-31 SpecifiedTradeProduct
 	// BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) {
-		super.getSpecifiedTradeProduct().setName(Text.create(text));;
+		Mapper.newFieldInstance(this, "specifiedTradeProduct", text);
+		Mapper.set(getSpecifiedTradeProduct(), "name", text);
 	}
 
-//	@Override
+	@Override
 	public String getItemName() {
 		if(super.getSpecifiedTradeProduct()==null) return null;
 		return Text.create(super.getSpecifiedTradeProduct().getName()).getValue();
