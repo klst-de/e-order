@@ -27,12 +27,13 @@ import java.math.RoundingMode;
  */
 public interface IAmount extends IAmountFactory, Rounding {
 
+	static final RoundingMode roundingMode = RoundingMode.HALF_UP;
+	
+	// implements Rounding
 	public BigDecimal getValue(RoundingMode roundingMode);
 
-	// zur Info:
-//	aus IAmountFactory:
-//	public IAmount createAmount(String currencyID, BigDecimal amount);
-//	aus Rounding:
-//	public BigDecimal getValue(RoundingMode roundingMode);
+	default BigDecimal getValue() {
+		return getValue(roundingMode);
+	}
 
 }

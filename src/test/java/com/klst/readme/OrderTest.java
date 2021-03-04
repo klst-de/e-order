@@ -3,22 +3,29 @@ package com.klst.readme;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.api.BG2_ProcessControl;
-import com.klst.eorder.api.IContactExt;
 import com.klst.eorder.api.CoreOrder;
+import com.klst.eorder.api.IContactExt;
+import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.impl.Amount;
 import com.klst.eorder.impl.CrossIndustryOrder;
 import com.klst.eorder.impl.ID;
+import com.klst.eorder.impl.Quantity;
 import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.TradeContact;
 import com.klst.eorder.impl.TradeParty;
+import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -27,6 +34,8 @@ import com.klst.untdid.codelist.DocumentNameCode;
 public class OrderTest {
 	
 	private static final Logger LOG = Logger.getLogger(OrderTest.class.getName());
+
+	static final String EUR = "EUR";
 
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
@@ -97,6 +106,30 @@ public class OrderTest {
 		order.setContractReference("CONTRACT_2020-25987");
 		order.setPreviousOrderResponseReference("PREV_ORDER_R_ID");
 		
+		// ---------------
+		IAmount amount = new Amount(new BigDecimal(60.00));
+		// 60 <> 60.00, aber mit compare to ==
+		assertEquals(0, new BigDecimal(60).compareTo(amount.getValue(RoundingMode.UNNECESSARY)));
+		
+		OrderLine line = order.createOrderLine("1"    // order line number
+				  , new Quantity("C62", new BigDecimal(6))              // one unit/C62
+				  , new Amount(EUR, new BigDecimal(60.00))				// line net amount
+				  , new UnitPriceAmount(EUR, new BigDecimal(10.00))	    // price
+				  , "Zeitschrift [...]"									// itemName
+				  );
+		line.addNote("AAI", "Content of Note");
+		line.setUnitPriceQuantity(new Quantity("C62", new BigDecimal(1))); // (optional) price base quantity
+		order.addLine(line);
+		assertEquals(1, line.getNotes().size());
+		assertEquals(line.getLineTotalAmount().getValue()
+				, line.getQuantity().getValue().multiply(line.getUnitPriceAmount().getValue()).setScale(2, RoundingMode.HALF_UP));
+		
+		order.addLine("2"
+				, new Quantity("C62", new BigDecimal(10))
+				, new Amount(new BigDecimal(100.00))
+				, new UnitPriceAmount(new BigDecimal(10.00))
+				, "Product Name");
+
 		transformer = cioTransformer;
 		object = order;
 		commercialOrderTest();

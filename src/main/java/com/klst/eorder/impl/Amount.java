@@ -43,7 +43,6 @@ public class Amount extends AmountType implements IAmount {
 	// Der Betrag wird mit zwei Nachkommastellen angegeben. ==> setScale(2, RoundingMode.HALF_UP)
 	public static final int SCALE = 2;
 	private int scale = SCALE;
-	private RoundingMode roundingMode = RoundingMode.HALF_UP;
 
 	static Amount create() {
 		return new Amount((AmountType)null); 
@@ -77,8 +76,7 @@ public class Amount extends AmountType implements IAmount {
 		super();
 		super.setCurrencyID(currencyID);
 		this.scale = scale;
-		this.roundingMode = roundingMode;
-		super.setValue(amount.setScale(this.scale, this.roundingMode));
+		super.setValue(amount.setScale(this.scale, IAmount.roundingMode));
 	}
 	
 	@Override
