@@ -46,7 +46,7 @@ public class Amount extends AmountType implements IAmount {
 	private RoundingMode roundingMode = RoundingMode.HALF_UP;
 
 	static Amount create() {
-		return new Amount(null); 
+		return new Amount((AmountType)null); 
 	}
 	// copy factory
 	static Amount create(AmountType object) {
@@ -66,6 +66,9 @@ public class Amount extends AmountType implements IAmount {
 		}
 	}
 
+	public Amount(BigDecimal amount) {
+		this((String)null, amount);
+	}
 	public Amount(String currencyID, BigDecimal amount) {
 		this(currencyID, SCALE, RoundingMode.HALF_UP, amount);
 	}
