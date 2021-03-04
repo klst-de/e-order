@@ -8,7 +8,7 @@ import com.klst.edoc.api.IQuantity;
 /**
  * ORDER LINE
  * <p>
- * A group of business terms providing information on individual Invoice lines.
+ * A group of business terms providing information on individual order lines.
  * <p>
  * Cardinality: 1..n (mandatory)
  * <br>EN16931-ID: 	BG-25
@@ -18,7 +18,6 @@ import com.klst.edoc.api.IQuantity;
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
 public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
-//extends BG26_InvoiceLinePeriod, BG32_ItemAttributes {
 
 	/**
 	 * Line identifier
@@ -87,6 +86,8 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * 
 	 * A Object Identifier (BT-128) MUST have an ID
 
+			<ram:SpecifiedTradeProduct>
+				<ram:GlobalID schemeID="0160">1234567890123</ram:GlobalID>
 
 
 
@@ -121,9 +122,9 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 //	public GlobalIdentifier getLineObjectIdentifier();
 
 	/**
-	 * LINE TRADE DELIVERY
+	 * LINE TRADE DELIVERY Quantity
 
-	 * Billed quantity and UoM of items (goods or services) that is charged in the Invoice line.
+	 * Quantity and UoM of items (goods or services) to be charged in the Order line.
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-129 (decimal quantity) + BT-130 (unitCode) 
@@ -136,9 +137,9 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	public IQuantity getQuantity();
 
 	/**
-	 * Invoice line net amount 
+	 * line net amount 
 	 * <p>
-	 * The total amount of the Invoice line. The amount is “net” without VAT, i.e.
+	 * The total amount of the line. The amount is “net” without VAT, i.e.
 	 * inclusive of line level allowances and charges as well as other relevant taxes.
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
@@ -148,25 +149,11 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * 
 	 * @param Amount
 	 */
-//	public void setLineTotalAmount(Amount amount); // use ctor
+//	public void setLineTotalAmount(Amount amount); // use factory
 	public IAmount getLineTotalAmount();
 
-	/*
-Bsp. CII 01.01a-INVOICE_uncefact.xml :
-                <ram:BuyerOrderReferencedDocument>
-                    <ram:LineID>6171175.1</ram:LineID>
-                </ram:BuyerOrderReferencedDocument>
-     UBL
-        <cac:OrderLineReference>
-            <cbc:LineID>6171175.1</cbc:LineID>
-        </cac:OrderLineReference>
-
-	 */
 	/**
-	 * Referenced purchase order line reference
-	 * <p>
-	 * An identifier for a referenced line within a purchase order, issued by the Buyer.
-	 * The purchase order identifier is referenced on document level. 
+	 * The unique identifier of a line in the Buyer Order referenced document (initial order document ID)
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BT-132
@@ -175,14 +162,15 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 
 	 * @param reference id
 	 */
-//	public void setOrderLineID(String id);
-//	public String getOrderLineID();
+	// nicht in CIO, nur in CIOR/CIOC
+	public void setOrderLineID(String id);
+	public String getOrderLineID();
 	
 	/**
-	 * Invoice line Buyer accounting reference
+	 * line Buyer accounting reference
 	 * <p>
 	 * A textual value that specifies where to book the relevant data into the Buyer's financial accounts.
-	 * If required, this reference shall be provided by the Buyer to the Seller prior to the issuing of the Invoice.
+	 * If required, this reference shall be provided by the Buyer to the Seller prior to the issuing of the Order.
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BT-133
@@ -191,6 +179,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 
 	 * @param Text
 	 */
+	// ram:ReceivableSpecifiedTradeAccountingAccount existiert nicht in 103
 //	public void setBuyerAccountingReference(String text);
 //	public String getBuyerAccountingReference();
 
@@ -242,6 +231,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 
 	 * @return UnitPriceAmount
 	 */
+	// ram:SpecifiedLineTradeAgreement/
+//	ram:GrossPriceProductTradePrice/ram:AppliedTradeAllowanceCharge/ram:ActualAmount existiert nicht
 //	public UnitPriceAmount getPriceDiscount();
 
 	/**
@@ -256,6 +247,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 
 	 * @return UnitPriceAmount
 	 */
+	// ram:SpecifiedLineTradeAgreement/ram:GrossPriceProductTradePrice/ram:ChargeAmount existiert nicht
 //	public UnitPriceAmount getGrossPrice();
 	
 	/**

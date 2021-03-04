@@ -13,18 +13,15 @@ public interface OrderLineFactory {
 	/**
 	 * factory method to create an order line, BG-25
 	 * 
-	 * @param id              : BT-126, a unique identifier for the individual line within the Invoice.
-	 * @param quantity        : BT-129+BT-130, UoM and quantity of items (goods or services) that is charged in the Invoice line.
-	 * @param lineTotalAmount : BT-131, the total amount of the Invoice line.
-	 * @param priceAmount     : BT-146, item net price (mandatory part in PRICE DETAILS)
-	 * @param itemName        : BT-153, a name for an item (mandatory part in ITEM INFORMATION)
-//	 * @param codeEnum        : BG-30.BT-151, codeEnum 1..1 VAT category code
-//	 * @param percent         : BG-30.BT-152, percent  0..1 VAT rate
+	 * @param id              : BT-126, a unique identifier for the individual line
+	 * @param quantity        : BT-129+BT-130, UoM and quantity of items (goods or services) that is charged in the line
+	 * @param lineTotalAmount : BT-131, the total amount of the line
+	 * @param priceAmount     : BT-146, item net price (mandatory part in BG-29 PRICE DETAILS)
+	 * @param itemName        : BT-153, a name for an item (mandatory part in BG-31 ITEM INFORMATION)
 	 * 
-	 * @return invoice line object
+	 * @return line object
 	 */
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			IAmount priceAmount, String itemName);
-	//, TaxCategoryCode codeEnum, BigDecimal percent);
 
 }

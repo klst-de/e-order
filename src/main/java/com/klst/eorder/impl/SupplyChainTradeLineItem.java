@@ -14,6 +14,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
@@ -62,7 +63,6 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount,
 			IAmount priceAmount, String itemName) {
-		// gehen die casts ungestraft???????? TODO
 		return create(id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
 	}
 
@@ -83,9 +83,6 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 
 	private static final Logger LOG = Logger.getLogger(SupplyChainTradeLineItem.class.getName());
 
-//	ram:AssociatedDocumentLineDocument in super:
-//	protected DocumentLineDocumentType associatedDocumentLineDocument;
-	
 	// copy ctor
 	private SupplyChainTradeLineItem(SupplyChainTradeLineItemType line) {
 		super();
@@ -93,17 +90,9 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 			CopyCtor.invokeCopy(this, line);
 			LOG.fine("copy ctor:"+this);
 		}
-//		if(specifiedLineTradeSettlement.getApplicableTradeTax().isEmpty()) {
-//			tradeTax = null; //TradeTax.create();
-//		} else {
-//			tradeTax = TradeTax.create(specifiedLineTradeSettlement.getApplicableTradeTax().get(0));
-//		}
-//		applicableHeaderTradeAgreement = supplyChainTradeTransaction.createtHeaderTradeAgreement();
-
 	}
 
 	private SupplyChainTradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName) {
-//			, TaxCategoryCode codeEnum, BigDecimal percent) {
 		super.setAssociatedDocumentLineDocument(new DocumentLineDocumentType()); // mit id
 		super.setSpecifiedLineTradeAgreement(new LineTradeAgreementType()); // mit setUnitPriceAmount
 		super.setSpecifiedLineTradeDelivery(new LineTradeDeliveryType()); // mit quantity
@@ -114,7 +103,6 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		setLineTotalAmount(lineTotalAmount);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
-//		setTaxCategoryAndRate(taxCode, taxRate);
 	}
 	
 	public String toString() {
@@ -198,11 +186,10 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 
 	@Override // getter
 	public List<OrderNote> getNotes() {
-		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument(); // TODO wie in CrossIndustryOrder
+		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument();
 		if(dld==null) return null;
 		// delegieren:
 		return Note.getNotes(dld.getIncludedNote());
-
 	}
 //	public String getNote() {
 //		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument();
@@ -218,7 +205,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	}
 
 	public void addNote(OrderNote note) {
-		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument(); // TODO wie in CrossIndustryOrder
+		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument();
 		dld.getIncludedNote().add((Note)note);
 	}
 	
@@ -228,51 +215,21 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 //		/ram:AdditionalReferencedDocument
 		LineTradeAgreementType lta = super.getSpecifiedLineTradeAgreement(); // TODO wie in CrossIndustryOrder
 		// in lta gibt es kein ram:AdditionalReferencedDocument
-// TODO
-//		Mapper.newFieldInstance(this, "specifiedLineTradeAgreement", id);
-//		Mapper.set(getSpecifiedLineTradeAgreement(), "????", id);
-//	    "buyerOrderReferencedDocument",
-//	    "netPriceProductTradePrice",
-//	    "blanketOrderReferencedDocument"
-
 	}
 	
-	// BT-129 ++ 1..1 in Rechnung gestellte Menge
+	// BT-129 ++ 1..1 bestellte Menge
 	// BT-129+BT-130
-	// ram:SpecifiedLineTradeDelivery + ram:RequestedQuantity
-//	/rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedLineTradeDelivery
-
 	void setQuantity(Quantity quantity) { 
-//		QuantityType qt = new QuantityType();
-//		quantity.copyTo(qt);
-//		if(super.getSpecifiedLineTradeDelivery()==null) super.setSpecifiedLineTradeDelivery(new LineTradeDeliveryType());
-//		super.getSpecifiedLineTradeDelivery().setRequestedQuantity(qt);
-		
-//		Mapper.newFieldInstance(this, "specifiedLineTradeDelivery", quantity);
-//		Mapper.set(getSpecifiedLineTradeDelivery(), "requestedQuantity", quantity);
-		
 		Mapper.set(getSpecifiedLineTradeDelivery(), "requestedQuantity", quantity);
 	}
-
 	@Override
 	public IQuantity getQuantity() {
-//		QuantityType requestedQuantity = super.getSpecifiedLineTradeDelivery()==null ? null : getSpecifiedLineTradeDelivery().getRequestedQuantity();
-//		return requestedQuantity==null ? null : new Quantity(requestedQuantity.getUnitCode(), requestedQuantity.getValue());
 		LineTradeDeliveryType ltd = super.getSpecifiedLineTradeDelivery();
 		return ltd.getRequestedQuantity()==null ?  null : Quantity.create(ltd.getRequestedQuantity());
 	}
 
 	// BT-131 ++ 1..1 Nettobetrag der Rechnungsposition
-	// ram:SpecifiedLineTradeSettlement + ram:SpecifiedTradeSettlementLineMonetarySummation
 	void setLineTotalAmount(Amount amount) {
-//		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
-//		AmountType lineTotalAmt = new AmountType();
-//		amount.copyTo(lineTotalAmt);
-//		tradeSettlementLineMonetarySummation.setLineTotalAmount(lineTotalAmt);
-//		if(super.getSpecifiedLineTradeSettlement()==null) super.setSpecifiedLineTradeSettlement(new LineTradeSettlementType());
-//		getSpecifiedLineTradeSettlement().setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
-		
-//		Mapper.newFieldInstance(this, "specifiedLineTradeSettlement", amount);
 		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", amount);
 		Mapper.set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
 	}
@@ -282,6 +239,30 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		TradeSettlementLineMonetarySummationType tsms = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation();
 		return tsms==null ? null : Amount.create(tsms.getLineTotalAmount());
 	}
+
+	// BT-132 ++ 0..1 Referenced purchase order line reference
+	public void setOrderLineID(String id) {
+		if(id==null) return;
+		// wie komme ich an DocumentCode??? TODO
+//		if(getDocumentCode()==DocumentNameCode.Order) {
+//			LOG.warning("An Order (Document Type Code BT-3 = 220) MUST NOT contain a Previous Order Change Referenced Document");
+//		}
+		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "buyerOrderReferencedDocument", id);
+		Mapper.set(getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument(), "lineID", id);
+	}
+	public String getOrderLineID() {
+		ReferencedDocumentType referencedDocument = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument();
+		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
+	}
+
+//	/rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/
+//	ram:SpecifiedLineTradeSettlement/ram:ReceivableSpecifiedTradeAccountingAccount/ram:ID
+//	public void setBuyerAccountingReference(String text) {
+//		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "buyerOrderReferencedDocument", id);
+////		ram:ReceivableSpecifiedTradeAccountingAccount existiert nicht
+//		Mapper.set(getSpecifiedLineTradeSettlement().getBuyerOrderReferencedDocument(), "lineID", id);
+//	}
+//	public String getBuyerAccountingReference();
 
 	/*
 	 * BG-29 1..1 PRICE DETAILS
@@ -308,15 +289,6 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 //		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
 //	}	
 	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-//		AmountType chargeAmount = new AmountType();
-//		unitPriceAmount.copyTo(chargeAmount);
-//		TradePriceType tradePrice = new TradePriceType();
-//		tradePrice.setChargeAmount(chargeAmount);
-//
-//		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
-//		return tradePrice;
-		
-//		Mapper.newFieldInstance(this, "specifiedLineTradeAgreement", unitPriceAmount);
 		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
 		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
 	}
@@ -339,7 +311,6 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		Mapper.newFieldInstance(this, "specifiedTradeProduct", text);
 		Mapper.set(getSpecifiedTradeProduct(), "name", text);
 	}
-
 	@Override
 	public String getItemName() {
 		if(super.getSpecifiedTradeProduct()==null) return null;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.eorder.api.OrderLine;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeTransactionType;
@@ -31,9 +32,9 @@ public class SupplyChainTradeTransaction extends SupplyChainTradeTransactionType
 		}
 	}
 
-	public List<SupplyChainTradeLineItem> getLines() {
+	public List<OrderLine> getLines() {
 		List<SupplyChainTradeLineItemType> lines = super.getIncludedSupplyChainTradeLineItem();
-		List<SupplyChainTradeLineItem> resultLines = new ArrayList<SupplyChainTradeLineItem>(lines.size());
+		List<OrderLine> resultLines = new ArrayList<OrderLine>(lines.size());
 		lines.forEach(line -> {
 			resultLines.add(SupplyChainTradeLineItem.create(line));
 		});
