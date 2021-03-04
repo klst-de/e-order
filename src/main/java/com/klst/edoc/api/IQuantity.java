@@ -22,12 +22,11 @@ import java.math.RoundingMode;
  */
 public interface IQuantity extends IQuantityFactory, Rounding {
 
+	// implements Rounding
 	public BigDecimal getValue(RoundingMode roundingMode);
 
-	// zur Info:
-//	aus Factory:
-//	public IQuantity createQuantity(String unitCode, BigDecimal amount);
-//	aus Rounding:
-//	public BigDecimal getValue(RoundingMode roundingMode);
+	default BigDecimal getValue() {
+		return getValue(RoundingMode.HALF_UP);
+	}
 
 }
