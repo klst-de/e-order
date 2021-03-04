@@ -125,6 +125,7 @@ public class OrderTest {
 		assertEquals(line.getLineTotalAmount().getValue()
 				, line.getQuantity().getValue().multiply(line.getUnitPriceAmount().getValue()).setScale(2, RoundingMode.HALF_UP));
 		assertEquals(C62, line.getQuantity().getUnitCode());
+		assertEquals(EUR, line.getLineTotalAmount().getCurrencyID());
 		
 		order.addLine("2"
 				, new Quantity("C62", new BigDecimal(10))

@@ -32,6 +32,8 @@ public interface IAmount extends IAmountFactory, Rounding {
 	// implements Rounding
 	public BigDecimal getValue(RoundingMode roundingMode);
 
+	public String getCurrencyID();
+	
 	default BigDecimal getValue() {
 		return getValue(roundingMode);
 	}
