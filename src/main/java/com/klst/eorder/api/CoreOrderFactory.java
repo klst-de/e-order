@@ -1,12 +1,12 @@
-/**
- * abstract-factory, aka Kit to create invoices
- * 
- * @see <a href="https://java-design-patterns.com/patterns/abstract-factory/">java-design-patterns</a> for patterns abstract-factory
- */
 package com.klst.eorder.api;
 
 import com.klst.untdid.codelist.DocumentNameCode;
 
+/**
+ * abstract-factory, aka Kit to create order objects
+ * 
+ * @see <a href="https://java-design-patterns.com/patterns/abstract-factory/">java-design-patterns</a> for patterns abstract-factory
+ */
 public interface CoreOrderFactory {
 
 	/**
