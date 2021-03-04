@@ -3,7 +3,8 @@ package com.klst.eorder.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.edoc.api.Rounding;
+import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.edoc.api.IAmount;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.AmountType;
 
@@ -29,54 +30,62 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._103.AmountType;
  * Type is floating up to two fraction digits.
  *
  */
-public class Amount extends AmountType implements Rounding {
+public class Amount extends AmountType implements IAmount {
+
+	@Override
+	public IAmount createAmount(String currencyID, BigDecimal amount) {
+		return create(currencyID, amount);
+	}
+	static Amount create(String currencyID, BigDecimal amount) {
+		return new Amount(currencyID, amount);
+	}
 
 	// Der Betrag wird mit zwei Nachkommastellen angegeben. ==> setScale(2, RoundingMode.HALF_UP)
 	public static final int SCALE = 2;
+	private int scale = SCALE;
+	private RoundingMode roundingMode = RoundingMode.HALF_UP;
 
-	Amount() {
+	static Amount create() {
+		return new Amount(null); 
+	}
+	// copy factory
+	static Amount create(AmountType object) {
+		if(object instanceof AmountType && object.getClass()!=AmountType.class) {
+			// object is instance of a subclass of AmountType, but not AmountType itself
+			return (Amount)object;
+		} else {
+			return new Amount(object); 
+		}
+	}
+
+	// copy ctor
+	private Amount(AmountType object) {
 		super();
+		if(object!=null) {
+			CopyCtor.invokeCopy(this, object);
+		}
 	}
 
-	public Amount(BigDecimal amount) {
-		this(null, amount);
-	}
-	
 	public Amount(String currencyID, BigDecimal amount) {
-		this();
+		this(currencyID, SCALE, RoundingMode.HALF_UP, amount);
+	}
+
+	Amount(String currencyID, int scale, RoundingMode roundingMode, BigDecimal amount) {
+		super();
 		super.setCurrencyID(currencyID);
-		super.setValue(amount);
-	}
-
-//	public Amount(oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType amount) {
-//		this(amount.getCurrencyID(), amount.getValue());
-//	}
-
-	public Amount(AmountType amount) {
-		this(amount.getCurrencyID(), amount.getValue());
-	}
-
-	void copyTo(AmountType amount) {
-		amount.setCurrencyID(this.getCurrencyID());
-		amount.setValue(this.getValue(RoundingMode.HALF_UP));
+		this.scale = scale;
+		this.roundingMode = roundingMode;
+		super.setValue(amount.setScale(this.scale, this.roundingMode));
 	}
 	
-//	public void copyTo(oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType amount) {
-//		amount.setCurrencyID(this.getCurrencyID());
-//		amount.setValue(this.getValue(RoundingMode.HALF_UP));
-//	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.klst.cius.Rounding#getValue(java.math.RoundingMode)
-	 */
 	@Override
 	public BigDecimal getValue(RoundingMode roundingMode) {
-		return getValue().setScale(SCALE, roundingMode);
+		return super.getValue().setScale(scale, roundingMode);
 	}
 	
 	@Override
 	public String toString() {
-		return getCurrencyID()==null ? ""+getValue(RoundingMode.HALF_UP) : getCurrencyID() + getValue(RoundingMode.HALF_UP);
+		return getCurrencyID()==null ? ""+getValue(roundingMode) : getCurrencyID() + getValue(roundingMode);
 	}
+
 }
