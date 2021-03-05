@@ -37,6 +37,7 @@ public class OrderTest {
 
 	static final String EUR = "EUR";
 	static final String C62 = "C62";
+	static final String GTIN = "0160"; // Global Trade Item Number (GTIN)
 
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
@@ -120,12 +121,17 @@ public class OrderTest {
 				  );
 		line.addNote("AAI", "Content of Note");
 		line.setUnitPriceQuantity(new Quantity("C62", new BigDecimal(1))); // (optional) price base quantity
+		line.setPartialDeliveryIndicator(true);
+		line.addStandardIdentifier("1234567890123", GTIN);
+		line.setSellerAssignedID("987654321");
+		line.setBuyerAssignedID("654987321");
 		order.addLine(line);
 		assertEquals(1, line.getNotes().size());
 		assertEquals(line.getLineTotalAmount().getValue()
 				, line.getQuantity().getValue().multiply(line.getUnitPriceAmount().getValue()).setScale(2, RoundingMode.HALF_UP));
 		assertEquals(C62, line.getQuantity().getUnitCode());
 		assertEquals(EUR, line.getLineTotalAmount().getCurrencyID());
+		assertEquals(GTIN, line.getStandardIdentifier().get(0).getSchemeIdentifier());
 		
 		order.addLine("2"
 				, new Quantity("C62", new BigDecimal(10))

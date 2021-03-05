@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.api.Identifier;
 
 /**
  * ORDER LINE
@@ -85,9 +86,6 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * A Line MUST NOT HAVE more than 1 Object Identifier BT-128
 	 * 
 	 * A Object Identifier (BT-128) MUST have an ID
-
-			<ram:SpecifiedTradeProduct>
-				<ram:GlobalID schemeID="0160">1234567890123</ram:GlobalID>
 
 
 
@@ -300,10 +298,12 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 ////	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
 //	public BigDecimal getTaxRate(); 
 
+	// BG-31 PRODUCT 0..1 : A group of business terms providing information about the goods and services ordered.
+
 	/**
-	 * Item name (mandatory part in 1..1 BG-31 ITEM INFORMATION)
+	 * Item name (optional BT in BG-31 PRODUCT)
 	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
+	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BT-153 
 	 * <br>Rule ID: 	BR-25
 	 * <br>Request ID: 	R20, R56
@@ -314,7 +314,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	public String getItemName();
 
 	/**
-	 * Item description (optional part in 1..1 BG-31 ITEM INFORMATION)
+	 * Item description (optional BT in BG-31 PRODUCT)
  	 * <p>
 	 * The Item description allows for describing the item and its features in more detail than the Item name.
 	 * <p>
@@ -329,7 +329,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 //	public String getDescription();
 
 	/**
-	 * Item Seller's identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
+	 * Item Seller's identifier (optional BT in BG-31 PRODUCT)
  	 * <p>
 	 * An identifier, assigned by the Seller, for the item.
 	 * <p>
@@ -340,11 +340,11 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * 
 	 * @param Identifier
 	 */
-//	public void setSellerAssignedID(String id);
-//	public String getSellerAssignedID();
+	public void setSellerAssignedID(String id);
+	public String getSellerAssignedID();
 
 	/**
-	 * Item Buyer's identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
+	 * Item Buyer's identifier (optional BT in BG-31 PRODUCT)
  	 * <p>
 	 * An identifier, assigned by the Buyer, for the item.
 	 * <p>
@@ -355,8 +355,8 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * 
 	 * @param Identifier
 	 */
-//	public void setBuyerAssignedID(String id);
-//	public String getBuyerAssignedID();
+	public void setBuyerAssignedID(String id);
+	public String getBuyerAssignedID();
 	
 	/*
 	 * GlobalID Kennung eines Artikels nach registriertem Schema
@@ -367,27 +367,29 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * Codeliste: ISO 6523 :
 	 * 0021 : SWIFT 
 	 * 0088 : EAN 
-	 * 0060 : DUNS 
+	 * 0060 : DUNS
+	 * 0160 : GTIN , Global Trade Item Number https://www.gs1.org/standards/gs1-application-standard-usage-isoiec-6523-international-code-designator-icd-0209/current-standard#2-Purpose+2-1-Principles
 	 * 0177 : ODETTE automotive industry
 	 */
 	/**
-	 * Item standard identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
+	 * Item standard (aka global) identifier (optional BT in BG-31 PRODUCT)
  	 * <p>
 	 * An item identifier based on a registered scheme.
 	 * <p>
-	 * Cardinality: 	0..1 (optional)
+	 * Cardinality: 	0..n (optional)
 	 * <br>EN16931-ID: 	BT-157 BT-157-1
-	 * <br>Rule ID: 	BR-64
+	 * <br>Rule ID: 	CSCMUS GS1 : an Order must contain a GlobalID for the Product on line level
 	 * <br>Request ID: 	R23, R56
 	 * 
 	 * @param Identifier
 	 * @param schemeID, The identification scheme shall be identified from the entries of the list published by the ISO/IEC 6523 maintenance agency.
 	 */
-//	public void setStandardID(String globalID, String schemeID);
-//	public void setStandardID(String globalID);
-//	public void setStandardIdentifier(Identifier id);
-//	public Identifier getStandardIdentifier();
-//	public String getStandardID();
+	public Identifier createStandardIdentifier(String globalID, String schemeID);
+	public void addStandardIdentifier(Identifier id);
+	default void addStandardIdentifier(String globalID, String schemeID) {
+		addStandardIdentifier(createStandardIdentifier(globalID, schemeID));
+	}
+	public List<Identifier> getStandardIdentifier();
 
 	/**
 	 * Item classification identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
@@ -424,5 +426,19 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 */
 //	public void setCountryOfOrigin(String code);
 //	public String getCountryOfOrigin();
+
+	public static final boolean NO = false;
+	public static final boolean YES = true;
+	/**
+	 * set Partial Delivery Allowed Indicator Value
+	 * <p>
+	 * The indication, at line level, of whether or not this trade delivery can be partially delivered.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * 
+	 * @param indicator
+	 */
+	public void setPartialDeliveryIndicator(boolean indicator);
+	public boolean isPartialDeliveryAllowed();
 
 }

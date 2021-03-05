@@ -1,5 +1,6 @@
 package com.klst.eorder.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -7,6 +8,7 @@ import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.api.Identifier;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 
@@ -18,6 +20,8 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 
 /*
 BG-25 + 1..n INVOICE LINE
@@ -203,7 +207,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	public OrderNote createNote(String subjectCode, String content) {
 		return Note.create(subjectCode, content);
 	}
-
+	@Override
 	public void addNote(OrderNote note) {
 		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument();
 		dld.getIncludedNote().add((Note)note);
@@ -306,15 +310,68 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	}
 	
 	// BG-31 SpecifiedTradeProduct
+	private static final String FIELD_specifiedTradeProduct = "specifiedTradeProduct";
 	// BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) {
-		Mapper.newFieldInstance(this, "specifiedTradeProduct", text);
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, text);
 		Mapper.set(getSpecifiedTradeProduct(), "name", text);
 	}
 	@Override
 	public String getItemName() {
 		if(super.getSpecifiedTradeProduct()==null) return null;
 		return Text.create(super.getSpecifiedTradeProduct().getName()).getValue();
+	}
+	
+	// BG-31.BT-155 0..1 SpecifiedTradeProduct.sellerAssignedID
+	public void setSellerAssignedID(String id) {
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		Mapper.set(getSpecifiedTradeProduct(), "sellerAssignedID", id);
+	}
+	public String getSellerAssignedID() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		return new ID(super.getSpecifiedTradeProduct().getSellerAssignedID()).getContent();
+	}
+
+	// BG-31.BT-156 0..1 SpecifiedTradeProduct.buyerAssignedID
+	public void setBuyerAssignedID(String id) {
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		Mapper.set(getSpecifiedTradeProduct(), "buyerAssignedID", id);		
+	}
+	public String getBuyerAssignedID() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		return new ID(super.getSpecifiedTradeProduct().getBuyerAssignedID()).getContent();
+	}
+
+	// BG-31.BT-157 0..n SpecifiedTradeProduct.GlobalID
+	@Override
+	public Identifier createStandardIdentifier(String globalID, String schemeID) {
+		return new ID(globalID, schemeID);
+	}
+	@Override
+	public void addStandardIdentifier(Identifier id) {
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		super.getSpecifiedTradeProduct().getGlobalID().add((ID)id);
+	}
+	@Override
+	public List<Identifier> getStandardIdentifier() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		List<IDType> list = getSpecifiedTradeProduct().getGlobalID();
+		List<Identifier> result = new ArrayList<Identifier>(list.size());
+		list.forEach(note -> {
+			result.add(new ID(note));
+		});
+		return result;
+	}
+
+	// --------------------------- CIO only:
+	@Override
+	public void setPartialDeliveryIndicator(boolean indicator) {
+		Mapper.set(getSpecifiedLineTradeDelivery(), "partialDeliveryAllowedIndicator", indicator);		
+	}
+	@Override
+	public boolean isPartialDeliveryAllowed() {
+		IndicatorType indicator = super.getSpecifiedLineTradeDelivery().getPartialDeliveryAllowedIndicator();
+		return indicator!=null && indicator.isIndicator().equals(YES);
 	}
 
 }
