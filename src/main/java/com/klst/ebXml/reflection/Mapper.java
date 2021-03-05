@@ -70,9 +70,22 @@ public class Mapper {
 			return;
 		}
 		
-//		LOG.warning(obj.getClass().getSimpleName() + " / " + value.getClass().getSimpleName());
-//		value.getClass()
-//		obj.getClass()
+		// boolean indicator, z.B. partialDeliveryAllowedIndicator ==> setIndicator(Boolean value)
+		if(value.getClass()==Boolean.class) {
+			methodName = "setIndicator";
+			try {
+				Object fo = field.get(obj); // IndicatorType?
+				Method setter = fo.getClass().getDeclaredMethod(methodName, Boolean.class);
+				setter.invoke(fo, Boolean.class.cast(value));
+			} catch (NoSuchMethodException e) {
+				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+//				e.printStackTrace();
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		if(value instanceof QuantityType && value.getClass()!=QuantityType.class) {
 			// value is instance of a subclass of QuantityType, but not QuantityType itself
 			// mögliche Methoden: setRequestedQuantity / setAgreedQuantity / setBasisQuantity
@@ -101,28 +114,28 @@ public class Mapper {
 		if(value instanceof AmountType && value.getClass()!=AmountType.class) {
 			// value is instance of a subclass of AmountType, but not AmountType itself
 			// mögliche Methoden: setLineTotalAmount / setChargeAmount
+			methodName = "setLineTotalAmount"; 
 			try {
-				Method setter = obj.getClass().getDeclaredMethod("setLineTotalAmount", AmountType.class);
+				Method setter = obj.getClass().getDeclaredMethod(methodName, AmountType.class);
 				setter.invoke(obj, AmountType.class.cast(value));
 			} catch (NoSuchMethodException e) {
+				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+//				e.printStackTrace();
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
+			}
+			methodName = "setChargeAmount"; 
+			try {
+				Method setter = obj.getClass().getDeclaredMethod(methodName, AmountType.class);
+				setter.invoke(obj, AmountType.class.cast(value));
+			} catch (NoSuchMethodException e) {
+				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+//				e.printStackTrace();
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
 		}
 
-		if(value instanceof AmountType && value.getClass()!=AmountType.class) {
-			// value is instance of a subclass of AmountType, but not AmountType itself
-			// mögliche Methoden: setLineTotalAmount / setChargeAmount
-			try {
-				Method setter = obj.getClass().getDeclaredMethod("setChargeAmount", AmountType.class);
-				setter.invoke(obj, AmountType.class.cast(value));
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public static void set(Object obj, String fieldName, Object value) {
