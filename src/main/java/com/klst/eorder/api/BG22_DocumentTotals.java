@@ -5,7 +5,7 @@ import com.klst.edoc.api.IAmount;
 /**
  * BG-22 DOCUMENT TOTALS
  * <p>
- * A group of business terms providing the monetary totals for the Invoice.
+ * A group of business terms providing the monetary totals
  * <p>
  * Cardinality: 	1..1
  * <br>EN16931-ID: 	BG-22
@@ -14,63 +14,17 @@ import com.klst.edoc.api.IAmount;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-
-/*  (de) rules / Geschäftsregel:
- * 
- * BR-12    : Gesamtsummen auf Dokumentenebene 
- * Eine Rechnung muss die Summe der Nettobeträge aller Rechnungspositionen (BT-106) anzeigen.
- * 
- * BR-13    : Gesamtsummen auf Dokumentenebene 
- * Eine Rechnung muss den Rechnungsgesamtbetrag ohne Umsatzsteuer (BT-109) anzeigen.
- * 
- * BR-14    : Gesamtsummen auf Dokumentenebene 
- * Eine Rechnung muss den Rechnungsgesamtbetrag mit Umsatzsteuer (BT-112) anzeigen.
- * 
- * BR-15    : Gesamtsummen auf Dokumentenebene 
- * Eine Rechnung muss den fälligen Zahlungsbetrag (BT-115) anzeigen.
- * 
- * BR-53    : Gesamtsummen auf Dokumentenebene 
- * Falls der Code für die Währung der Umsatzsteuerbuchung (BT-6) vorhanden ist, muss der Steuergesamtbetrag in Buchungswährung (BT-111) angegeben werden.
- * 
- * BR-CO-10 : Gesamtsummen auf Dokumentenebene 
- * Summe der Nettobeträge aller Rechnungspositionen (BT-106) = Summe Nettobeträge der Rechnungsposition (BT-131).
- * 
- * BR-CO-11 : 
- * Der Inhalt des Elementes „Sum of allowances on document level“ (BT-107) muss der Summe 
- * aller Inhalte der Elemente „Document level allowance amount“ (BT-92) entsprechen.
- * 
- * BR-CO-12 : 
- * Der Inhalt des Elementes „Sum of charges on document level“ (BT-108) muss der Summe 
- * aller Inhalte der Elemente „Document level charge amount“ (BT-99) entsprechen.
- * 
- * BR-CO-13 : Gesamtsummen auf Dokumentenebene 
- * Rechnungsgesamtbetrag ohne Umsatzsteuer (BT-109) = 
- * Summe Nettobeträge der Rechnungsposition (BT-131) - Summe der Abschläge auf Dokumentenebene (BT-107) + Summe der Zuschläge auf Dokumentenebene (BT-108).
- * 
- * BR-CO-14 : Gesamtsummen auf Dokumentenebene 
- * Gesamtbetrag der Rechnungsumsatzsteuer (BT-110) = ? kategoriespezifische Steuerbeträge (BT-117).
- * 
- * BR-CO-15 : Gesamtsummen auf Dokumentenebene 
- * Rechnungsgesamtbetrag einschließlich Umsatzsteuer (BT-112) = 
- * Rechnungsgesamtbetrag ohne Umsatzsteuer (BT-109) + Gesamtbetrag der Rechnungsumsatzsteuer (BT-110).
- * 
- * BR-CO-16 : Gesamtsummen auf Dokumentenebene 
- * Fälliger Zahlungsbetrag (BT-115) = 
- * Gesamtbetrag der Rechnungsumsatzsteuer (BT-112) - Vorauszahlungsbetrag (BT-113) + Rundungsbetrag (BT-114).
- */
 public interface BG22_DocumentTotals {
 
 	/**
 	 * mandatory total amounts of the order
 	 * 
-	 * @param lineExtension : Sum of Invoice line net amount
-	 * @param taxExclusive : Invoice total amount without VAT
-	 * @param taxInclusive : Invoice total amount with VAT
-//	 * @param payable : Amount due for payment 
+	 * @param lineNet : Sum of line net amount
+	 * @param taxExclusive : total amount without VAT, aka Tax Basis
+	 * @param taxInclusive : total amount with VAT, aka Grand Total
 	 */
-//	public void setDocumentTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive /*, IAmount payable*/);
 	// factory:
-//	public DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive);
+	public BG22_DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive);
 /*
 			<ram:SpecifiedTradeSettlementHeaderMonetarySummation>
 				<ram:LineTotalAmount>310.00</ram:LineTotalAmount>                <!-- LineNetTotal
@@ -82,23 +36,11 @@ public interface BG22_DocumentTotals {
 			</ram:SpecifiedTradeSettlementHeaderMonetarySummation>
 
  */
-	// mandatory setter not implemeted, use setDocumentTotals
-//	public void setInvoiceLineNetTotal(Amount amount); // mandatory
-//	public void setInvoiceTotalTaxExclusive(Amount amount); // mandatory
-//	public void setInvoiceTotalTaxInclusive(Amount amount); // mandatory
-//	public void setDuePayable(Amount amount); // mandatory
 	
 	/**
-	 * Order Sum of lines Amount
-1..1
-Sum of line Total Amounts
-Be careful if there are document level Charges or allowances
-OR
-rsm:CrossIndustryOrder/rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram:SpecifiedTradeSettlementHeaderMonetarySummation/
-ram:TaxBasisTotalAmount
-//	 * Sum of Invoice line net amount
-//	 * <p>
-//	 * Sum of all Invoice line net amounts in the Invoice. 
+	 * Order Sum of lines Total Amount
+	 * <p>
+	 * Be careful if there are document level Charges or allowances 
 	 * <p>
 	 * Cardinality: 	1..1
 	 * <br>EN16931-ID: 	BT-106
@@ -107,16 +49,13 @@ ram:TaxBasisTotalAmount
 	 * 
 	 * @return Amount
 	 */
-//	public IAmount getInvoiceLineNetTotal(); 
 	public IAmount getLineNetTotal(); 
 	
 	/**
-	 * Total amount without VAT
-1..1
-	 * Invoice total amount without VAT
+	 * Total amount without VAT, aka Tax Basis
 	 * <p>
 	 * The total amount of the Invoice without VAT.
-	 * The Invoice total amount without VAT is the Sum of Invoice line net amount 
+	 * The total amount without VAT is the Sum of line net amount 
 	 *     minus Sum of allowances on document level plus Sum of charges on document level.
 	 * <p>
 	 * Cardinality: 	1..1
@@ -126,7 +65,6 @@ ram:TaxBasisTotalAmount
 	 * 
 	 * @return Amount
 	 */
-//	public IAmount getInvoiceTotalTaxExclusive();
 	public IAmount getTotalTaxExclusive();
 	
 	/**
@@ -201,6 +139,7 @@ ram:TaxBasisTotalAmount
 	 */
 //	public IAmount getInvoiceTax(); 
 //	public void setInvoiceTax(IAmount amount);
+	public void setTaxTotal(IAmount amount); 
 	public IAmount getTaxTotal(); 
 	
 	/**

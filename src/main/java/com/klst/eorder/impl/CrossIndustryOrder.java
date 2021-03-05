@@ -11,6 +11,7 @@ import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
+import com.klst.eorder.api.BG22_DocumentTotals;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
@@ -398,6 +399,80 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return applicableHeaderTradeAgreement.getPreviousOrderResponseReference();
 	}
 	
+	// BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112
+	@Override
+	public BG22_DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
+		TradeSettlementHeaderMonetarySummation documentTotals = TradeSettlementHeaderMonetarySummation.create(lineNet, taxExclusive, taxInclusive);
+		applicableHeaderTradeSettlement.setSpecifiedTradeSettlementHeaderMonetarySummation(documentTotals);
+		return documentTotals;
+	}
+
+	// BG-22.BT-106 - 1..1/1..1
+	@Override
+	public IAmount getLineNetTotal() {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		return tshms.getLineNetTotal();
+	}
+
+	// BG-22.BT-109 - 1..1/1..1
+	@Override
+	public IAmount getTotalTaxExclusive() {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		return tshms.getTotalTaxExclusive();
+	}
+
+	// BG-22.BT-112 - 1..1/1..1
+	@Override
+	public IAmount getTotalTaxInclusive() {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		return tshms.getTotalTaxInclusive();
+	}
+
+	// BG-22.BT-107 - 1..1/0..1 (optional
+	@Override
+	public void setAllowancesTotal(IAmount amount) {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		tshms.setAllowancesTotal(amount);
+	}
+	@Override
+	public IAmount getAllowancesTotal() {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		return tshms.getAllowancesTotal();
+	}
+
+	// BG-22.BT-108 - 1..1/0..1 (optional
+	@Override
+	public void setChargesTotal(IAmount amount) {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		tshms.setChargesTotal(amount);
+	}
+	@Override
+	public IAmount getChargesTotal() {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		return tshms.getChargesTotal();
+	}
+
+	// BG-22.BT-110 - 1..1/0..1 (optional
+	@Override
+	public void setTaxTotal(IAmount amount) {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		tshms.setTaxTotal(amount);
+	}
+	@Override
+	public IAmount getTaxTotal() {
+		TradeSettlementHeaderMonetarySummation tshms =
+		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		return tshms.getTaxTotal();
+	}
+
 /*
 	<rsm:SupplyChainTradeTransaction>
 		<ram:IncludedSupplyChainTradeLineItem>

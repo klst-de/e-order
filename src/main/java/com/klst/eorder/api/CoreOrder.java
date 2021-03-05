@@ -10,7 +10,7 @@ import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
-	BG25_OrderLine, 	
+	BG22_DocumentTotals, BG25_OrderLine, 	
 	ShipTo, ShipFrom,
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 

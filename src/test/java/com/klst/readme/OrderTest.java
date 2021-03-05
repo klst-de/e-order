@@ -113,6 +113,16 @@ public class OrderTest {
 		// 60 <> 60.00, aber mit compare to ==
 		assertEquals(0, new BigDecimal(60).compareTo(amount.getValue(RoundingMode.UNNECESSARY)));
 		
+		order.createTotals(new Amount(new BigDecimal(310.00)) // Sum of line net amount
+				, new Amount(new BigDecimal(300.00))
+				, new Amount(new BigDecimal(360.00)));
+		assertEquals(0, new BigDecimal(310).compareTo(order.getLineNetTotal().getValue(RoundingMode.UNNECESSARY)));
+		order.setChargesTotal(new Amount(new BigDecimal(21.00)));
+		order.setAllowancesTotal(new Amount(new BigDecimal(31.00)));
+		assertEquals(order.getTotalTaxExclusive().getValue(), // 
+				order.getLineNetTotal().getValue().add(order.getChargesTotal().getValue()).subtract(order.getAllowancesTotal().getValue())
+				);
+		
 		OrderLine line = order.createOrderLine("1"    // order line number
 				  , new Quantity("C62", new BigDecimal(6))              // one unit/C62
 				  , new Amount(EUR, new BigDecimal(60.00))				// line net amount

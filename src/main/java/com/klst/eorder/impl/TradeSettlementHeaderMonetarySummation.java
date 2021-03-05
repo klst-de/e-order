@@ -8,10 +8,10 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 
 public class TradeSettlementHeaderMonetarySummation extends TradeSettlementHeaderMonetarySummationType implements BG22_DocumentTotals {
 
-//	@Override  // implements Factory
-//	public DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
-//		return create(lineNet, taxExclusive, taxInclusive);
-//	}
+	@Override  // implements Factory
+	public BG22_DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
+		return create(lineNet, taxExclusive, taxInclusive);
+	}
 	static TradeSettlementHeaderMonetarySummation create(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
 		return new TradeSettlementHeaderMonetarySummation(lineNet, taxExclusive, taxInclusive);
 	}
@@ -39,6 +39,8 @@ public class TradeSettlementHeaderMonetarySummation extends TradeSettlementHeade
 	
 	private TradeSettlementHeaderMonetarySummation(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
 		setLineNetTotal(lineNet);
+		setTotalTaxExclusive(taxExclusive);
+		setTotalTaxInclusive(taxInclusive);
 	}
 	
 	void setLineNetTotal(IAmount amount) {
@@ -57,38 +59,38 @@ public class TradeSettlementHeaderMonetarySummation extends TradeSettlementHeade
 	}
 	@Override
 	public IAmount getTotalTaxExclusive() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getTaxBasisTotalAmount()==null ? null : Amount.create(getTaxBasisTotalAmount());
 	}
 	@Override
 	public IAmount getTotalTaxInclusive() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getGrandTotalAmount()==null ? null : Amount.create(getGrandTotalAmount());
 	}
+	
 	@Override
 	public void setAllowancesTotal(IAmount amount) {
-		// TODO Auto-generated method stub
-		
+		if(amount!=null) super.setAllowanceTotalAmount((Amount)amount);
 	}
 	@Override
 	public IAmount getAllowancesTotal() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getAllowanceTotalAmount()==null ? null : Amount.create(getAllowanceTotalAmount());
 	}
+	
 	@Override
 	public void setChargesTotal(IAmount amount) {
-		// TODO Auto-generated method stub
-		
+		if(amount!=null) super.setChargeTotalAmount((Amount)amount);
 	}
 	@Override
 	public IAmount getChargesTotal() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getChargeTotalAmount()==null ? null : Amount.create(getChargeTotalAmount());
+	}
+	
+	@Override
+	public void setTaxTotal(IAmount amount) {
+		if(amount!=null) super.setTaxTotalAmount((Amount)amount);
 	}
 	@Override
 	public IAmount getTaxTotal() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getTaxTotalAmount()==null ? null : Amount.create(getTaxTotalAmount());
 	}
 
 }
