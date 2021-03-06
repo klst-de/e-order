@@ -11,7 +11,6 @@ import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
-import com.klst.eorder.api.ShipTo;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TaxRegistrationType;
@@ -106,9 +105,7 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	// PostalAddress
 	@Override
 	public PostalAddress getAddress() {
-		TradeAddressType address = super.getPostalTradeAddress();
-		if(address==null) return null; // defensiv, sollte nie null sein
-		return TradeAddress.create(address);
+		return super.getPostalTradeAddress()==null ? null : TradeAddress.create(getPostalTradeAddress());
 	}
 
 	@Override
@@ -118,7 +115,6 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	void setAddress(TradeAddressType address) {
 		super.setPostalTradeAddress(address);
 	}
-	
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
 		return TradeAddress.create(countryCode, postalCode, city);
