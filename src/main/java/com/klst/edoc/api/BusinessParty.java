@@ -12,6 +12,20 @@ package com.klst.edoc.api;
 
 public interface BusinessParty extends BusinessPartyFactory {
 
+	/* 
+	 * a shortcut for getAddress()
+	 */
+	default PostalAddress getAddress() {
+		return ((BusinessPartyAddress)this).getAddress();
+	}
+	
+	/* 
+	 * a shortcut for getIContact()
+	 */
+	default IContact getContact() {
+		return ((BusinessPartyContact)this).getIContact();
+	}
+	
 	// use factory: createParty(String name, String tradingName, PostalAddress address, IContact contact);
 	// instead setter:
 //	public void setRegistrationName(String name);

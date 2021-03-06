@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
@@ -107,6 +108,14 @@ public class OrderTest {
 		order.setPurchaseOrderReference("PO123456789");
 		order.setContractReference("CONTRACT_2020-25987");
 		order.setPreviousOrderResponseReference("PREV_ORDER_R_ID");
+		
+		BusinessParty buyer = order.getBuyer();
+		// test shortcuts for Address + Contact
+		if(buyer instanceof TradeParty) {
+			BusinessPartyAddress buyerAddress = (BusinessPartyAddress)buyer;
+			LOG.info("buyerAddress (no shortcut):"+buyerAddress.getAddress());
+		}
+		LOG.info("buyer Address:"+buyer.getAddress() + " Contact:"+buyer.getContact());
 		
 		// ---------------
 		IAmount amount = new Amount(new BigDecimal(60.00));
