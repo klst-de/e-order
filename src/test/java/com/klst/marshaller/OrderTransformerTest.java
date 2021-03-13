@@ -2,6 +2,7 @@ package com.klst.marshaller;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -21,7 +22,9 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.xml.sax.SAXException;
 
+import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.impl.CrossIndustryOrder;
+import com.klst.untdid.codelist.DocumentNameCode;
 
 import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 
@@ -32,6 +35,7 @@ public class OrderTransformerTest {
 	static private AbstactTransformer cioTransformer;
 
 	private static final String TESTDIR = "src/test/resources/";
+	private static final String NOT_EXISTING_FILE = "NOT_EXISTING_FILE.xml";
 	private static final String UNCEFACT_XML = "ORDER-X_EX01_ORDER_FULL_DATA-BASIC.xml";
 
 	private static final Logger LOG = Logger.getLogger(OrderTransformerTest.class.getName());
@@ -54,6 +58,31 @@ public class OrderTransformerTest {
 		File file = new File(uri);
 		assertTrue(file.canRead());
 		return file;
+    }
+    
+    @Test
+    public void notExistingFileTest() {
+		File file = new File(TESTDIR+NOT_EXISTING_FILE);
+		assertFalse(file.canRead());
+		Validator validator = null;
+		try {
+			validator = transformer.getSchemaValidator(); // throws SAXException
+		} catch (SAXException ex) {
+			fail("Validator SAXException="+ex.getMessage());
+		}
+		
+		try {
+			Source xmlFile = new StreamSource(file);
+			validator.validate(xmlFile); // throws SAXException, Exception
+			fail("Exception notExistingFile not thrown");
+		} catch (SAXException ex) {
+			LOG.warning("Validator SAXException="+ex.getMessage());
+			fail("Validator SAXException="+ex.getMessage());
+		} catch (Exception ex) {
+			LOG.warning("expected SAXException="+ex.getMessage());
+			// expected this exception : fail("Validator Exception="+ex.getMessage());
+		}
+		
     }
     
     @Test
@@ -81,18 +110,13 @@ public class OrderTransformerTest {
 		try {
 			InputStream is = new FileInputStream(file);
 			SCRDMCCBDACIOMessageStructureType ms = transformer.toModel(is);
-			CrossIndustryOrder order = new CrossIndustryOrder(ms);
-			// TODO ...
+			CoreOrder order = new CrossIndustryOrder(ms);
+			assertEquals(DocumentNameCode.Order, order.getDocumentCode());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			LOG.severe(ex.getMessage());
 		}
 
     }
-
-//	@Test
-//	void test() {
-//		fail("Not yet implemented");
-//	}
 
 }
