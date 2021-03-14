@@ -124,13 +124,16 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	// Contact
 	@Override
 	public IContact getIContact() {
-		TradeContactType tradeContact = super.getDefinedTradeContact();
-		return tradeContact==null ? null : TradeContact.create(tradeContact);
+//		TradeContactType tradeContact = super.getDefinedTradeContact();
+//		return tradeContact==null ? null : TradeContact.create(tradeContact);
+		List<TradeContactType> tradeContactList = super.getDefinedTradeContact();
+		return tradeContactList.isEmpty() ? null : TradeContact.create(tradeContactList.get(0));
 	}
 
 	@Override
 	public void setIContact(IContact contact) {
-		super.setDefinedTradeContact((TradeContact)contact);	
+//		super.setDefinedTradeContact((TradeContact)contact);
+		super.getDefinedTradeContact().add((TradeContact)contact);
 	}
 
 	@Override
@@ -250,16 +253,22 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	// BT-31 ++ 0..1 Seller VAT identifier                    / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
 	@Override
 	public Identifier getTaxRegistrationIdentifier() {
-		return super.getSpecifiedTaxRegistration()==null ? null : new ID(getSpecifiedTaxRegistration().getID());
+//		return super.getSpecifiedTaxRegistration()==null ? null : new ID(getSpecifiedTaxRegistration().getID());
+		return super.getSpecifiedTaxRegistration().isEmpty() ? null : new ID(getSpecifiedTaxRegistration().get(0).getID());
 	}
 	
 	@Override
 	public void setTaxRegistrationId(String name, String schemeID) {
 		if(name==null) return;
-		if(super.getSpecifiedTaxRegistration()==null) {
-			setSpecifiedTaxRegistration(new TaxRegistrationType());
+//		if(super.getSpecifiedTaxRegistration()==null) {
+//			setSpecifiedTaxRegistration(new TaxRegistrationType());
+//		}
+//		getSpecifiedTaxRegistration().setID(new ID(name, schemeID));
+		if(super.getSpecifiedTaxRegistration().isEmpty()) {
+			TaxRegistrationType taxRegistrationType = new TaxRegistrationType();
+			taxRegistrationType.setID(new ID(name, schemeID));
+			getSpecifiedTaxRegistration().add(taxRegistrationType);
 		}
-		getSpecifiedTaxRegistration().setID(new ID(name, schemeID));
 	}
 	
 	// BT-33 ++ 0..1 Seller additional legal information      / weitere rechtliche Informationen, wie z. B. Aktienkapital
