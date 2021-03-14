@@ -8,8 +8,6 @@ import javax.inject.Singleton;
 //import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
-import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
-
 @Named
 /* Notice 
  * that there are two @Singleton annotations, 
@@ -50,7 +48,14 @@ public class CioTransformer extends AbstactTransformer {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Object> T toModel(InputStream xmlInputStream) {
-		Object result = this.toModel(xmlInputStream, SCRDMCCBDACIOMessageStructureType.class);
+		Class<?> type = null;
+		try {
+			// dynamisch die Klasse laden 
+			type = Class.forName("un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		Object result = this.toModel(xmlInputStream, type);
 		return (T) result;
 	}
 
