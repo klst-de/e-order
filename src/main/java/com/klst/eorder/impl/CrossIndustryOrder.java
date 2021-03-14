@@ -11,13 +11,13 @@ import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG22_DocumentTotals;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.DocumentNameCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._103.DocumentCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.DocumentContextParameterType;

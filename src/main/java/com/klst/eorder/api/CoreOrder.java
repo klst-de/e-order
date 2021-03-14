@@ -6,8 +6,8 @@ import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.IContactFactory;
 import com.klst.edoc.api.PostalAddressFactory;
 import com.klst.edoc.api.Reference;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.DocumentNameCode;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
 	BG22_DocumentTotals, BG25_OrderLine, 	

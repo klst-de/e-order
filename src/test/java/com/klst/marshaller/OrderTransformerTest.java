@@ -22,9 +22,9 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.xml.sax.SAXException;
 
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.impl.CrossIndustryOrder;
-import com.klst.untdid.codelist.DocumentNameCode;
 
 import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 

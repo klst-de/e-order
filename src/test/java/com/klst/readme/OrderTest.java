@@ -15,6 +15,8 @@ import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.IContactExt;
@@ -29,8 +31,6 @@ import com.klst.eorder.impl.TradeParty;
 import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.DocumentNameCode;
 
 public class OrderTest {
 	

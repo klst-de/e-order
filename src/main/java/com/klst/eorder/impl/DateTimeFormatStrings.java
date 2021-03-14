@@ -2,7 +2,7 @@ package com.klst.eorder.impl;
 
 import java.sql.Timestamp;
 
-import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.edoc.untdid.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
 

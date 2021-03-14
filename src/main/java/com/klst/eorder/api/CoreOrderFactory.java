@@ -1,6 +1,6 @@
 package com.klst.eorder.api;
 
-import com.klst.untdid.codelist.DocumentNameCode;
+import com.klst.edoc.untdid.DocumentNameCode;
 
 /**
  * abstract-factory, aka Kit to create order objects
