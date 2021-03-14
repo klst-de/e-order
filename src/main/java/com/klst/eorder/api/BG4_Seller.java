@@ -1,13 +1,8 @@
 package com.klst.eorder.api;
 
-import java.util.List;
-
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.BusinessPartyAddress;
-import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
-import com.klst.untdid.codelist.ReferenceCode;
 
 /**
  * BG-4 + 1..1 SELLER 
