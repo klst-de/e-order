@@ -86,11 +86,13 @@ public class TradeSettlementHeaderMonetarySummation extends TradeSettlementHeade
 	
 	@Override
 	public void setTaxTotal(IAmount amount) {
-		if(amount!=null) super.setTaxTotalAmount((Amount)amount);
+//		if(amount!=null) super.setTaxTotalAmount((Amount)amount);
+		if(amount!=null) super.getTaxTotalAmount().add((Amount)amount);
 	}
 	@Override
 	public IAmount getTaxTotal() {
-		return super.getTaxTotalAmount()==null ? null : Amount.create(getTaxTotalAmount());
+//		return super.getTaxTotalAmount()==null ? null : Amount.create(getTaxTotalAmount());
+		return super.getTaxTotalAmount().isEmpty() ? null : Amount.create(getTaxTotalAmount().get(0));
 	}
 
 }
