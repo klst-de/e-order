@@ -45,16 +45,21 @@ public class CioTransformer extends AbstactTransformer {
 		return CIO_1_XSD;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Object> T toModel(InputStream xmlInputStream) {
+	Class<?> loadClass() {
 		Class<?> type = null;
 		try {
-			// dynamisch die Klasse laden 
-			type = Class.forName("un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType");
+			// dynamisch die CIO  Klasse laden 
+			type = Class.forName(CONTENT_PATH+".SCRDMCCBDACIOMessageStructureType");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		return type;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Object> T toModel(InputStream xmlInputStream) {
+		Class<?> type = loadClass();
 		Object result = this.toModel(xmlInputStream, type);
 		return (T) result;
 	}

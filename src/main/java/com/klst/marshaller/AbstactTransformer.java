@@ -102,22 +102,19 @@ public abstract class AbstactTransformer {
 		}
 	}
 
+	abstract Class<?> loadClass();
+	
 	public byte[] fromModel(Object document) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(16000);
-		Class<?> type = null;
-		try {
-			// dynamisch die Klasse für marshal festlegen 
-			type = Class.forName("un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		Class<?> type = loadClass();
+		
 		try {
 			Marshaller marshaller = createMarshaller();
-//			marshaller.marshal((SCRDMCCBDACIOMessageStructureType)document, outputStream);
 			marshaller.marshal(type.cast(document), outputStream);
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.MARSHALLING_ERROR, ex);
 		}
+		
 		return outputStream.toByteArray();
 	}
 
@@ -146,13 +143,6 @@ public abstract class AbstactTransformer {
 		Marshaller marshaller = jaxbContext.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formatXmlOutput());
 		
-		// see https://stackoverflow.com/questions/277996/remove-standalone-yes-from-generated-xml
-//		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE); 
-//		marshaller.setProperty("com.sun.xml.internal.bind.xmlDeclaration", Boolean.FALSE);
-//		marshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders", "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-		
-		// see https://stackoverflow.com/questions/2161350/jaxb-xjc-code-generation-schemalocation-missing-in-xml-generated-by-marshall
-//		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/maindoc/UBL-Invoice-2.1.xsd");
         try {
         	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", getNamespacePrefixMapper());
         } catch(PropertyException ex) {
