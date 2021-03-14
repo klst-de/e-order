@@ -77,15 +77,21 @@ public class Note extends NoteType implements OrderNote, OrderNoteFactory {
 	}
 
 	// BG-1 .BT-22  1..1 Invoice note
-	// BG-25.BT-127 0..n IncludedNote.Content 
+	// BG-25.BT-127 0..n IncludedNote.Content
+	/*
+	 * in in Order-X_Extended content is mapped to List
+	 * @see https://github.com/klst-de/e-order/issues/3
+	 */
 	@Override
 	public String getNote() {
-		return super.getContent()==null ? null : getContent().getValue();
+//		return super.getContent()==null ? null : getContent().getValue();
+		return super.getContent().isEmpty() ? null : getContent().get(0).getValue();
 	}
 
 	void setNote(String content) {
 		if(content==null) return; // defensiv, sollte nicht vorkommen
-		super.setContent(Text.create(content));
+//		super.setContent(Text.create(content));
+		super.getContent().add(Text.create(content));
 	}
 
 }
