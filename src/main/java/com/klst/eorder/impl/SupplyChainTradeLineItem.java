@@ -9,6 +9,7 @@ import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.IdentifierExt;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 
@@ -16,13 +17,16 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ProductClassificationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
 
 /*
 BG-25 + 1..n INVOICE LINE
@@ -325,20 +329,24 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	}
 	
 	// BG-31.BT-155 0..1 SpecifiedTradeProduct.sellerAssignedID
+	@Override
 	public void setSellerAssignedID(String id) {
 		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
 		Mapper.set(getSpecifiedTradeProduct(), "sellerAssignedID", id);
 	}
+	@Override
 	public String getSellerAssignedID() {
 		if(super.getSpecifiedTradeProduct()==null) return null;
 		return new ID(super.getSpecifiedTradeProduct().getSellerAssignedID()).getContent();
 	}
 
 	// BG-31.BT-156 0..1 SpecifiedTradeProduct.buyerAssignedID
+	@Override
 	public void setBuyerAssignedID(String id) {
 		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
 		Mapper.set(getSpecifiedTradeProduct(), "buyerAssignedID", id);		
 	}
+	@Override
 	public String getBuyerAssignedID() {
 		if(super.getSpecifiedTradeProduct()==null) return null;
 		return new ID(super.getSpecifiedTradeProduct().getBuyerAssignedID()).getContent();
@@ -359,12 +367,37 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		if(super.getSpecifiedTradeProduct()==null) return null;
 		List<IDType> list = getSpecifiedTradeProduct().getGlobalID();
 		List<Identifier> result = new ArrayList<Identifier>(list.size());
-		list.forEach(note -> {
-			result.add(new ID(note));
+		list.forEach(id -> {
+			result.add(new ID(id));
 		});
 		return result;
 	}
 
+	// BG-31.BT-158 0..n Item classification identifier designatedProductClassification
+	// ProductClassificationType CodeType classCode (value, listID, listVersionID)
+	//                           TextType className
+	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText) {
+		// ignore idText 
+		return new Code(classCode, listID, listVersionID);
+	}
+	public void addClassificationIdentifier(IdentifierExt id) {
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		ProductClassificationType productClassificationType = new ProductClassificationType();
+		productClassificationType.setClassCode((Code)id);
+		super.getSpecifiedTradeProduct().getDesignatedProductClassification().add(productClassificationType);		
+	}
+	public List<IdentifierExt> getClassifications() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		List<ProductClassificationType> list = getSpecifiedTradeProduct().getDesignatedProductClassification();
+		List<IdentifierExt> result = new ArrayList<IdentifierExt>(list.size());
+		list.forEach(producClass -> {
+			IdentifierExt idExt= new Code(producClass.getClassCode());
+			//idExt.setIdText(producClass.getClassName().getValue());
+			result.add(idExt);
+		});
+		return result;
+	}
+	
 	// --------------------------- CIO only:
 	@Override
 	public void setPartialDeliveryIndicator(boolean indicator) {

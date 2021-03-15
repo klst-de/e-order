@@ -5,6 +5,7 @@ import java.util.List;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.IdentifierExt;
 
 /**
  * ORDER LINE
@@ -334,7 +335,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * An identifier, assigned by the Seller, for the item.
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BT-155
+	 * <br>EN16931-ID: 	BG-31.BT-155
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R21, R56
 	 * 
@@ -349,7 +350,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * An identifier, assigned by the Buyer, for the item.
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BT-156
+	 * <br>EN16931-ID: 	BG-31.BT-156
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R21, R56, R22
 	 * 
@@ -377,11 +378,11 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * An item identifier based on a registered scheme.
 	 * <p>
 	 * Cardinality: 	0..n (optional)
-	 * <br>EN16931-ID: 	BT-157 BT-157-1
+	 * <br>EN16931-ID: 	BG-31.BT-157 BG-31.BT-157-1
 	 * <br>Rule ID: 	CSCMUS GS1 : an Order must contain a GlobalID for the Product on line level
 	 * <br>Request ID: 	R23, R56
 	 * 
-	 * @param Identifier
+	 * @param globalID
 	 * @param schemeID, The identification scheme shall be identified from the entries of the list published by the ISO/IEC 6523 maintenance agency.
 	 */
 	public Identifier createStandardIdentifier(String globalID, String schemeID);
@@ -395,20 +396,39 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * Item classification identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
  	 * <p>
 	 * A code for classifying the item by its type or nature.
-	 * Classification codes are used to allow grouping of similar items for a various purposes e.g. public procurement (CPV), e-Commerce (UNSPSC) etc.
+	 * Classification codes are used to allow grouping of similar items for a various purposes 
+	 * e.g. public procurement (CPV), e-Commerce (UNSPSC) etc.
 	 * <p>
 	 * Cardinality: 	0..n (optional)
-	 * <br>EN16931-ID: 	BT-158
+	 * <br>EN16931-ID: 	BG-31.BT-158
 	 * <br>Rule ID: 	BR-64
 	 * <br>Request ID: 	R24
 	 * 
-	 * @param Identifier
-	 * @param schemeID,      BT-158-1 1..1 The identification scheme shall be chosen from the entries in UNTDID 7143
-	 * @param schemeVersion, BT-158-2 0..1 Scheme version identifier - The version of the identification scheme.
+	 * @param classCode,     BT-158   1..1
+	 * @param listID,        BT-158-1 1..1 The identification scheme shall be chosen from the entries in UNTDID 7143
+	 * @param listVersionID, BT-158-2 0..1 Scheme version identifier - The version of the identification scheme.
+	 * @param idText         optional Product Classification Class Name 0..1
+
+ Bsp. ORDER-X_EX01_ORDER_FULL_DATA-COMFORT.xml :
+         ...
+        <ram:DesignatedProductClassification>
+        <ram:ClassCode listID="TST">Class_code</ram:ClassCode>
+             <ram:ClassName>Name Class Codification</ram:ClassName> <!-- text zu "TST", TST nicht in UNTDID 7143
+        </ram:DesignatedProductClassification>
+
+realistisches Beispiel:
+        <ram:DesignatedProductClassification>
+        <ram:ClassCode listID="EN">4047247110051</ram:ClassCode>
+             <ram:ClassName>EN==EAN==European Article Number</ram:ClassName>
+        </ram:DesignatedProductClassification>
+
 	 */
-//	public void addClassificationID(String id, String schemeID, String schemeVersion);
-//	public void addClassificationID(GlobalIdentifier id);
-//	public List<GlobalIdentifier> getClassifications();
+	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText);
+	public void addClassificationIdentifier(IdentifierExt id);
+	default void addClassificationIdentifier(String code, String listID, String listVersionID, String name) {
+		addClassificationIdentifier(createClassificationIdentifier(code, listID, listVersionID, name));
+	}
+	public List<IdentifierExt> getClassifications();
 
 	/**
 	 * Item country of origin (optional part in 1..1 BG-31 ITEM INFORMATION)
