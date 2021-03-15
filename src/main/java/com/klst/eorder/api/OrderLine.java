@@ -304,7 +304,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * Item name (optional BT in BG-31 PRODUCT)
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BT-153 
+	 * <br>EN16931-ID: 	BG-31.BT-153 
 	 * <br>Rule ID: 	BR-25
 	 * <br>Request ID: 	R20, R56
 	 * 
@@ -319,14 +319,14 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * The Item description allows for describing the item and its features in more detail than the Item name.
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BT-154
+	 * <br>EN16931-ID: 	BG-31.BT-154
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R20, R56
 	 * 
 	 * @param Text
 	 */
-//	public void setDescription(String text);
-//	public String getDescription();
+	public void setDescription(String text);
+	public String getDescription();
 
 	/**
 	 * Item Seller's identifier (optional BT in BG-31 PRODUCT)

@@ -311,6 +311,18 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		if(super.getSpecifiedTradeProduct()==null) return null;
 		return Text.create(super.getSpecifiedTradeProduct().getName()).getValue();
 	}
+
+	// BG-31.BT-154 0..1 Item description
+	@Override
+	public void setDescription(String text) {
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, text);
+		Mapper.set(getSpecifiedTradeProduct(), "description", text);
+	}
+	@Override
+	public String getDescription() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		return Text.create(super.getSpecifiedTradeProduct().getDescription()).getValue();
+	}
 	
 	// BG-31.BT-155 0..1 SpecifiedTradeProduct.sellerAssignedID
 	public void setSellerAssignedID(String id) {
