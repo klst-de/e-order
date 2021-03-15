@@ -9,5 +9,5 @@ development of a jar to read and write [electronic orders](http://fnfe-mpe.org/w
 
 Similar because
 - CIO schema is based on SCRDM (103) D19A which was published in 2019
-- CII however is based on Version (100) [SCRDM 16B released in 2016](https://unece.org/trade/uncefact/xml-schemas)
+- CII however is based on Version (100) [SCRDM 16B](https://unece.org/trade/uncefact/xml-schemas) released in 2016
 
