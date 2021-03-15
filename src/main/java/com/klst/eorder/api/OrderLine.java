@@ -408,20 +408,6 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * @param listID,        BT-158-1 1..1 The identification scheme shall be chosen from the entries in UNTDID 7143
 	 * @param listVersionID, BT-158-2 0..1 Scheme version identifier - The version of the identification scheme.
 	 * @param idText         optional Product Classification Class Name 0..1
-
- Bsp. ORDER-X_EX01_ORDER_FULL_DATA-COMFORT.xml :
-         ...
-        <ram:DesignatedProductClassification>
-        <ram:ClassCode listID="TST">Class_code</ram:ClassCode>
-             <ram:ClassName>Name Class Codification</ram:ClassName> <!-- text zu "TST", TST nicht in UNTDID 7143
-        </ram:DesignatedProductClassification>
-
-realistisches Beispiel:
-        <ram:DesignatedProductClassification>
-        <ram:ClassCode listID="EN">4047247110051</ram:ClassCode>
-             <ram:ClassName>EN==EAN==European Article Number</ram:ClassName>
-        </ram:DesignatedProductClassification>
-
 	 */
 	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText);
 	public void addClassificationIdentifier(IdentifierExt id);
@@ -438,14 +424,14 @@ realistisches Beispiel:
 	 * “Codes for the representation of names of countries and their subdivisions”.
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BT-159
+	 * <br>EN16931-ID: 	BG-31.BT-159
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R29 
 	 * 
 	 * @param code
 	 */
-//	public void setCountryOfOrigin(String code);
-//	public String getCountryOfOrigin();
+	public void setCountryOfOrigin(String code);
+	public String getCountryOfOrigin();
 
 	public static final boolean NO = false;
 	public static final boolean YES = true;

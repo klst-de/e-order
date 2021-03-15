@@ -144,6 +144,11 @@ public class OrderTest {
 		line.addStandardIdentifier("1234567890123", GTIN);
 		line.setSellerAssignedID("987654321");
 		line.setBuyerAssignedID("654987321");
+		
+		line.setDescription("description"); // BG-31.BT-154
+		line.addClassificationIdentifier("4047247110051", "EN", null, null); // BG-31.BT-158
+		line.setCountryOfOrigin("FR"); // BG-31.BT-159
+		
 		order.addLine(line);
 		assertEquals(1, line.getNotes().size());
 		assertEquals(line.getLineTotalAmount().getValue()

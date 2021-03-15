@@ -27,6 +27,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
+import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
 
 /*
 BG-25 + 1..n INVOICE LINE
@@ -374,18 +375,36 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	}
 
 	// BG-31.BT-158 0..n Item classification identifier designatedProductClassification
-	// ProductClassificationType CodeType classCode (value, listID, listVersionID)
-	//                           TextType className
+	/* ProductClassificationType CodeType classCode (value, listID, listVersionID)
+	                             TextType className
+
+ Bsp. ORDER-X_EX01_ORDER_FULL_DATA-COMFORT.xml :
+         ...
+        <ram:DesignatedProductClassification>
+        <ram:ClassCode listID="TST">Class_code</ram:ClassCode>
+             <ram:ClassName>Name Class Codification</ram:ClassName> <!-- text zu "TST", TST nicht in UNTDID 7143
+        </ram:DesignatedProductClassification>
+
+realistisches Beispiel:
+        <ram:DesignatedProductClassification>
+        <ram:ClassCode listID="EN">4047247110051</ram:ClassCode>
+             <ram:ClassName>EN==EAN==European Article Number</ram:ClassName>
+        </ram:DesignatedProductClassification>
+
+	 */
+	@Override
 	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText) {
-		// ignore idText 
+		// ignore idText TODO
 		return new Code(classCode, listID, listVersionID);
 	}
+	@Override
 	public void addClassificationIdentifier(IdentifierExt id) {
 		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
 		ProductClassificationType productClassificationType = new ProductClassificationType();
 		productClassificationType.setClassCode((Code)id);
 		super.getSpecifiedTradeProduct().getDesignatedProductClassification().add(productClassificationType);		
 	}
+	@Override
 	public List<IdentifierExt> getClassifications() {
 		if(super.getSpecifiedTradeProduct()==null) return null;
 		List<ProductClassificationType> list = getSpecifiedTradeProduct().getDesignatedProductClassification();
@@ -397,7 +416,25 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		});
 		return result;
 	}
-	
+
+	// BG-31.BT-159 0..1 Item country of origin
+/*
+                    <ram:OriginTradeCountry>
+                         <ram:ID>FR</ram:ID>
+                    </ram:OriginTradeCountry>
+ */
+	@Override
+	public void setCountryOfOrigin(String code) {
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, code);
+		Mapper.newFieldInstance(getSpecifiedTradeProduct(), "originTradeCountry", code);		
+		Mapper.set(getSpecifiedTradeProduct().getOriginTradeCountry(), "id", ISOTwoletterCountryCodeContentType.fromValue(code));
+	}
+	@Override
+	public String getCountryOfOrigin() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		return getSpecifiedTradeProduct().getOriginTradeCountry()==null ? null : getSpecifiedTradeProduct().getOriginTradeCountry().getID().getValue().value();
+	}
+
 	// --------------------------- CIO only:
 	@Override
 	public void setPartialDeliveryIndicator(boolean indicator) {
