@@ -36,11 +36,11 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	public String getId();
 
 	/**
-	 * Invoice line note
+	 * line note
 	 * <p>
-	 * A textual note that gives unstructured information that is relevant to the Invoice line.
+	 * A textual note that gives unstructured information that is relevant to the line.
 	 * <p>
-	 * Cardinality: 0..1 (optional)
+	 * Cardinality: 0..1 (optional), extend to 0..n
 	 * <br>EN16931-ID: 	BT-127
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R28
@@ -177,9 +177,9 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * 
 	 * @param Text
 	 */
-	// ram:ReceivableSpecifiedTradeAccountingAccount existiert nicht in 103
-//	public void setBuyerAccountingReference(String text);
-//	public String getBuyerAccountingReference();
+	// ram:ReceivableSpecifiedTradeAccountingAccount existiert nicht in BASIC
+	public void setBuyerAccountingReference(String text);
+	public String getBuyerAccountingReference();
 
 	// BG-26 0..1 INVOICE LINE PERIOD with 
 	//       BT-134 +++ 0..1 Invoice line period start date

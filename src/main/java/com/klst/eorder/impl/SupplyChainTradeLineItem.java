@@ -18,6 +18,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
@@ -174,20 +175,14 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		Mapper.set(getAssociatedDocumentLineDocument(), "lineID", id);
 	}
 
-	//ram:IncludedNote
-//	@Override // BT-127 0..1 Freitext zur Rechnungsposition 
-	// - also nur maximal 1 Note, dann braucht man keine factory und kein add, sondern nur set/get
-	// - und ohne subjectCode
-	public void setNote(String text) {
-		if(text==null) return; // optional
-		Note note = Note.create(text);
-		if(super.getAssociatedDocumentLineDocument().getIncludedNote().isEmpty()) {
-			getAssociatedDocumentLineDocument().getIncludedNote().add(note);
-		} else {
-			getAssociatedDocumentLineDocument().getIncludedNote().set(0, note);
-		}
-	}
+/* TODO
 
+Line status code : not in CIO
+An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
+
+ */
+	
+	// BT-127 0..1/n Freitext zur Rechnungsposition : ram:IncludedNote
 	@Override // getter
 	public List<OrderNote> getNotes() {
 		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument();
@@ -195,13 +190,6 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		// delegieren:
 		return Note.getNotes(dld.getIncludedNote());
 	}
-//	public String getNote() {
-//		DocumentLineDocumentType dld = super.getAssociatedDocumentLineDocument();
-//		if(dld==null) return null;
-//		if(dld.getIncludedNote().isEmpty()) return null;
-//		List<OrderNote> list = Note.getNotes(dld.getIncludedNote());
-//		return list.get(0).getNote();
-//	}	
 
 	@Override
 	public OrderNote createNote(String subjectCode, String content) {
@@ -218,7 +206,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 //		/rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedLineTradeAgreement
 //		/ram:AdditionalReferencedDocument
 		LineTradeAgreementType lta = super.getSpecifiedLineTradeAgreement(); // TODO wie in CrossIndustryOrder
-		// in lta gibt es kein ram:AdditionalReferencedDocument
+		// in BASIC gibt es kein ram:AdditionalReferencedDocument
+		lta.getAdditionalReferencedDocument();
 	}
 	
 	// BT-129 ++ 1..1 bestellte Menge
@@ -259,14 +248,15 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
 	}
 
-//	/rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/
-//	ram:SpecifiedLineTradeSettlement/ram:ReceivableSpecifiedTradeAccountingAccount/ram:ID
-//	public void setBuyerAccountingReference(String text) {
-//		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "buyerOrderReferencedDocument", id);
-////		ram:ReceivableSpecifiedTradeAccountingAccount existiert nicht
-//		Mapper.set(getSpecifiedLineTradeSettlement().getBuyerOrderReferencedDocument(), "lineID", id);
-//	}
-//	public String getBuyerAccountingReference();
+	// BT-133 0..1 line Buyer accounting reference : ram:ReceivableSpecifiedTradeAccountingAccount
+	public void setBuyerAccountingReference(String text) {
+		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "receivableSpecifiedTradeAccountingAccount", text);
+		Mapper.set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), "id", text);
+	}
+	public String getBuyerAccountingReference() {
+		TradeAccountingAccountType taa = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount();
+		return taa==null ? null : new ID(taa.getID()).getName();		
+	}
 
 	/*
 	 * BG-29 1..1 PRICE DETAILS
