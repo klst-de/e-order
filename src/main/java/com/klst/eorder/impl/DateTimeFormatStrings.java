@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import com.klst.edoc.untdid.DateTimeFormats;
 
+import un.unece.uncefact.data.standard.qualifieddatatype._103.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
 
 //import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
@@ -40,17 +41,17 @@ public class DateTimeFormatStrings extends DateTimeFormats {
 		return dateTime;
 	}
 
-//	static FormattedDateTimeType toFormattedDateTime(Timestamp ts) {
-//		if (ts == null) return null;
-//
-//		FormattedDateTimeType.DateTimeString dts = new FormattedDateTimeType.DateTimeString();
-//		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-//		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
-//		
-//		FormattedDateTimeType fdt = new FormattedDateTimeType();
-//		fdt.setDateTimeString(dts);
-//
-//		return fdt;
-//	}
+	static FormattedDateTimeType toFormattedDateTime(Timestamp ts) {
+		if (ts == null) return null;
+
+		FormattedDateTimeType.DateTimeString dts = new FormattedDateTimeType.DateTimeString();
+		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
+		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
+		
+		FormattedDateTimeType fdt = new FormattedDateTimeType();
+		fdt.setDateTimeString(dts);
+
+		return fdt;
+	}
 
 }
