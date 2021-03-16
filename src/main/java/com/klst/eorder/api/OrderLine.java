@@ -84,7 +84,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * for example in the case of large attachments and/or when sensitive information, 
 	 * e.g. person-related services, has to be separated from the order itself.
 	 * 
-	 * A Line MUST NOT HAVE more than 1 Object Identifier BT-128
+	 * A Line MUST NOT HAVE more than 1 Object Identifier BT-128 ===> also doch nur 0..1
 	 * 
 	 * A Object Identifier (BT-128) MUST have an ID
 
@@ -99,26 +99,26 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 //	0 .. 1 ReferenceTypeCode Kennung des Schemas                                                BT-128-1	
 	 */
 	/*
-	 * Invoice line object identifier
+	 * line object identifier
 	 * <p>
-	 * An identifier for an object on which the invoice line is based, given by the Seller.
+	 * An identifier for an object on which the line is based, given by the Seller.
 	 * It may be a subscription number, telephone number, meter point etc., as applicable.  
 	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>EN16931-ID: 	BT-128, BT-128-0, BT-128-1
+	 * Cardinality:     0..1 (optional)
+	 * <br>EN16931-ID: 	BG.25.BT-128, BT-128-0, BT-128-1
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R33
 	 * 
 	 * @param Identifier
-	 * @param schemeID, (optional) if it may be not clear for the receiver what scheme is used for the identifier, 
+	 * @param typecode for an Object Identifier MUST be present and equal to 130 (UNTDID 1001)
+	 * @param schemeCode (optional) if it may be not clear for the receiver what scheme is used for the identifier, 
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
-	 * @param schemeCode, example AAC :  Documentary credit identifier
 	 */
-	public void setLineObjectID(String id, String schemeID, String schemeCode);
+	public void setLineObjectID(String id, String typecode, String schemeCode);
 //	public void setLineObjectID(String id);
 //	public void setLineObjectID(String id, String schemeID);
 //	public void setLineObjectIdentifier(GlobalIdentifier id);
-//	public GlobalIdentifier getLineObjectIdentifier();
+	public Identifier getLineObjectIdentifier(); // Identifier.Content == id , .SchemeIdentifier == schemeCode
 
 	/**
 	 * LINE TRADE DELIVERY Quantity

@@ -215,13 +215,35 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		dld.getIncludedNote().add((Note)note);
 	}
 	
-	// BT-128 ++ 0..1 Objektkennung // (OBJECT IDENTIFIER FOR INVOICE LINE) Zeile 154
+	// BG.25.BT-128 0..1 Objektkennung // (OBJECT IDENTIFIER FOR INVOICE LINE) Zeile 154
+/*
+                    <ram:AdditionalReferencedDocument>
+                         <ram:IssuerAssignedID>ADD_REF_DOC_ID</ram:IssuerAssignedID>
+                         <ram:URIID>ADD_REF_DOC_URIID</ram:URIID>
+                         <ram:LineID>5</ram:LineID>
+                         <ram:TypeCode>916</ram:TypeCode>
+                         <ram:Name>ADD_REF_DOC_Desc</ram:Name>
+                    </ram:AdditionalReferencedDocument>
+                    <ram:AdditionalReferencedDocument>
+                         <ram:IssuerAssignedID>OBJECT_125487</ram:IssuerAssignedID> <!-- id
+                         <ram:TypeCode>130</ram:TypeCode>                           <!-- schemeID, TypeCode = "130" Rechnungsdatenblatt, UNTDID 1001 Untermenge
+                         <ram:ReferenceTypeCode>AWV</ram:ReferenceTypeCode>         <!-- schemeCode, aus UNTDID 1153
+                    </ram:AdditionalReferencedDocument>
+ */
+	@Override
 	public void setLineObjectID(String id, String schemeID, String schemeCode) {
-//		/rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedLineTradeAgreement
-//		/ram:AdditionalReferencedDocument
-		LineTradeAgreementType lta = super.getSpecifiedLineTradeAgreement(); // TODO wie in CrossIndustryOrder
-		// in BASIC gibt es kein ram:AdditionalReferencedDocument
-		lta.getAdditionalReferencedDocument();
+		if(id==null) return;
+		ReferencedDocument rd = ReferencedDocument.create(id, schemeID, schemeCode);
+		LineTradeAgreementType lta = super.getSpecifiedLineTradeAgreement(); 
+		lta.getAdditionalReferencedDocument().add(rd);
+	}
+	@Override
+	public Identifier getLineObjectIdentifier() {
+		List<ReferencedDocumentType> rds = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getAdditionalReferencedDocument();
+		if(rds==null || rds.isEmpty()) return null;
+		// A Line MUST NOT HAVE more than 1 Object Identifier BT-128
+		ReferencedDocument rd = ReferencedDocument.create(rds.get(0));
+		return new ID(rd.getIssuerAssignedID().getValue(), rd.getReferenceCode());
 	}
 	
 	// BT-129 ++ 1..1 bestellte Menge
