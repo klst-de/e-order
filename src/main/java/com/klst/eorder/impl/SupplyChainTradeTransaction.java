@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
@@ -15,14 +16,19 @@ public class SupplyChainTradeTransaction extends SupplyChainTradeTransactionType
 		return new SupplyChainTradeTransaction(null); 
 	}
 	// copy factory
-	static SupplyChainTradeTransaction create(SupplyChainTradeTransactionType object) {
+	static SupplyChainTradeTransaction create(SupplyChainTradeTransactionType object, CoreOrder order) {
+		SupplyChainTradeTransaction res;
 		if(object instanceof SupplyChainTradeTransactionType && object.getClass()!=SupplyChainTradeTransactionType.class) {
 			// object is instance of a subclass of SupplyChainTradeTransactionType, but not SupplyChainTradeTransactionType itself
-			return (SupplyChainTradeTransaction)object;
+			res = (SupplyChainTradeTransaction)object;
 		} else {
-			return new SupplyChainTradeTransaction(object); 
+			res = new SupplyChainTradeTransaction(object); 
 		}
+		res.order = order;
+		return res;
 	}
+
+	private CoreOrder order;
 
 	// copy ctor
 	private SupplyChainTradeTransaction(SupplyChainTradeTransactionType object) {
@@ -36,7 +42,7 @@ public class SupplyChainTradeTransaction extends SupplyChainTradeTransactionType
 		List<SupplyChainTradeLineItemType> lines = super.getIncludedSupplyChainTradeLineItem();
 		List<OrderLine> resultLines = new ArrayList<OrderLine>(lines.size());
 		lines.forEach(line -> {
-			resultLines.add(SupplyChainTradeLineItem.create(line));
+			resultLines.add(SupplyChainTradeLineItem.create(line, this.order));
 		});
 		return resultLines;
 	}

@@ -49,7 +49,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 //			LOG.info("copy ctor:"+this); // toString liefert hier NPE wg.getLines
 		}
 
-		supplyChainTradeTransaction = SupplyChainTradeTransaction.create(super.getSupplyChainTradeTransaction());
+		supplyChainTradeTransaction = SupplyChainTradeTransaction.create(super.getSupplyChainTradeTransaction(), this);
 		applicableHeaderTradeAgreement = supplyChainTradeTransaction.createtHeaderTradeAgreement();
 		applicableHeaderTradeDelivery = supplyChainTradeTransaction.createtHeaderTradeDelivery();
 		applicableHeaderTradeSettlement = supplyChainTradeTransaction.createtHeaderTradeSettlement();
@@ -503,7 +503,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			IAmount priceAmount, String itemName) {
 		// delegieren:
-		return SupplyChainTradeLineItem.create(id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
+		return SupplyChainTradeLineItem.create(this, id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
 	}
 
 	@Override

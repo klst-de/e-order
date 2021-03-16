@@ -149,6 +149,8 @@ public class OrderTest {
 		line.addClassificationIdentifier("4047247110051", "EN", null, null); // BG-31.BT-158
 		line.setCountryOfOrigin("FR"); // BG-31.BT-159
 		
+		line.setOrderLineID("id-1"); // warning expected
+		
 		order.addLine(line);
 		assertEquals(1, line.getNotes().size());
 		assertEquals(line.getLineTotalAmount().getValue()

@@ -10,6 +10,8 @@ import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 
@@ -23,10 +25,9 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;
+
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
 import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
 
 /*
@@ -73,26 +74,33 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount,
 			IAmount priceAmount, String itemName) {
-		return create(id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
+		return create(this.order, id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
 	}
 
-	static SupplyChainTradeLineItem create(String id, Quantity quantity, Amount lineTotalAmount, 
+	static SupplyChainTradeLineItem create(CoreOrder order, String id, Quantity quantity, Amount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName) {
-		return new SupplyChainTradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName);
+		SupplyChainTradeLineItem orderLine =  new SupplyChainTradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName);
+		orderLine.order = order;
+		return orderLine;
 	}
 
 	// copy factory
-	static SupplyChainTradeLineItem create(SupplyChainTradeLineItemType object) {
+	static SupplyChainTradeLineItem create(SupplyChainTradeLineItemType object, CoreOrder order) {
+		SupplyChainTradeLineItem res;
 		if(object instanceof SupplyChainTradeLineItemType && object.getClass()!=SupplyChainTradeLineItemType.class) {
 			// object is instance of a subclass of SupplyChainTradeLineItemType, but not SupplyChainTradeLineItemType itself
-			return (SupplyChainTradeLineItem)object;
+			res = (SupplyChainTradeLineItem)object;
 		} else {
-			return new SupplyChainTradeLineItem(object); 
+			res = new SupplyChainTradeLineItem(object); 
 		}
+		res.order = order;
+		return res;
 	}
 
 	private static final Logger LOG = Logger.getLogger(SupplyChainTradeLineItem.class.getName());
 
+	private CoreOrder order; // order this orderLine belongs to
+	
 	// copy ctor
 	private SupplyChainTradeLineItem(SupplyChainTradeLineItemType line) {
 		super();
@@ -100,6 +108,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 			CopyCtor.invokeCopy(this, line);
 			LOG.fine("copy ctor:"+this);
 		}
+		this.order = null;
 	}
 
 	private SupplyChainTradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName) {
@@ -238,13 +247,14 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		return tsms==null ? null : Amount.create(tsms.getLineTotalAmount());
 	}
 
-	// BT-132 ++ 0..1 Referenced purchase order line reference
+	private static final String WARN_ORDERLINEID = "An Order (Document Type Code BT-3 = 220) MUST NOT contain a purchase order line reference.";
+	// BT-132 0..1 Referenced purchase order line reference
 	public void setOrderLineID(String id) {
 		if(id==null) return;
-		// wie komme ich an DocumentCode??? TODO
-//		if(getDocumentCode()==DocumentNameCode.Order) {
-//			LOG.warning("An Order (Document Type Code BT-3 = 220) MUST NOT contain a Previous Order Change Referenced Document");
-//		}
+		if(this.order.getDocumentCode()==DocumentNameCode.Order) {
+			LOG.warning(WARN_ORDERLINEID + " Ignore:'"+id+"'.");
+			return;
+		}
 		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "buyerOrderReferencedDocument", id);
 		Mapper.set(getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument(), "lineID", id);
 	}
