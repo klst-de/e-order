@@ -6,6 +6,7 @@ import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
+import com.klst.edoc.untdid.DocumentNameCode;
 
 /**
  * ORDER LINE
@@ -71,9 +72,12 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 		addNote((String)null, content);
 	}
 	
-
-
 	/*
+	 * line object identifier
+	 * <p>
+	 * An identifier for an object on which the line is based, given by the Seller.
+	 * It may be a subscription number, telephone number, meter point etc., as applicable.  
+	 * <p>
 	 * A group of business terms providing information about additional supporting documents 
 	 * substantiating the claims made in the order.
 	 * <p>
@@ -83,26 +87,10 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * The option to link to an external document will be needed, 
 	 * for example in the case of large attachments and/or when sensitive information, 
 	 * e.g. person-related services, has to be separated from the order itself.
-	 * 
-	 * A Line MUST NOT HAVE more than 1 Object Identifier BT-128 ===> also doch nur 0..1
-	 * 
-	 * A Object Identifier (BT-128) MUST have an ID
-
-
-
-	
-	 * Eine vom Verkäufer angegebene Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert
-	 * EN16931-ID: BT-128-0 1..1 TypeCode = "130" Rechnungsdatenblatt, UNTDID 1001 Untermenge
-	 * EN16931-ID: BT-128-1 0..1 UNTDID 1153
-//	0 .. 1 IssuerAssignedID Objektkennung auf Ebene der Rechnungsposition, Wert             	BT-128
-//	1 .. 1 TypeCode Typ der Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert BT-128-0
-//	0 .. 1 ReferenceTypeCode Kennung des Schemas                                                BT-128-1	
-	 */
-	/*
-	 * line object identifier
 	 * <p>
-	 * An identifier for an object on which the line is based, given by the Seller.
-	 * It may be a subscription number, telephone number, meter point etc., as applicable.  
+	 * A Line MUST NOT HAVE more than 1 Object Identifier BT-128 ==> Cardinality 0..1
+	 * <p>
+	 * A Object Identifier (BT-128) MUST have an ID/IssuerAssignedID
 	 * <p>
 	 * Cardinality:     0..1 (optional)
 	 * <br>EN16931-ID: 	BG.25.BT-128, BT-128-0, BT-128-1
@@ -110,19 +98,25 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	 * <br>Request ID: 	R33
 	 * 
 	 * @param Identifier
-	 * @param typecode for an Object Identifier MUST be present and equal to 130 (UNTDID 1001)
+	 * @param typeCode for an Object Identifier MUST be present and equal to 130 (UNTDID 1001 : InvoicingDataSheet)
 	 * @param schemeCode (optional) if it may be not clear for the receiver what scheme is used for the identifier, 
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
 	 */
-	public void setLineObjectID(String id, String typecode, String schemeCode);
-//	public void setLineObjectID(String id);
-//	public void setLineObjectID(String id, String schemeID);
-//	public void setLineObjectIdentifier(GlobalIdentifier id);
+	public void setLineObjectID(String id, String typeCode, String schemeCode);
+	default void setLineObjectID(String id) {
+		setLineObjectID(id, DocumentNameCode.InvoicingDataSheet.getValueAsString(), null);
+	}
+	default void setLineObjectID(String id, String schemeCode) {
+		setLineObjectID(id, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeCode);
+	}
+	default void setLineObjectIdentifier(Identifier id) {
+		setLineObjectID(id.getContent(), DocumentNameCode.InvoicingDataSheet.getValueAsString(), id.getSchemeIdentifier());
+	}
 	public Identifier getLineObjectIdentifier(); // Identifier.Content == id , .SchemeIdentifier == schemeCode
 
 	/**
 	 * LINE TRADE DELIVERY Quantity
-
+	 * 
 	 * Quantity and UoM of items (goods or services) to be charged in the Order line.
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
