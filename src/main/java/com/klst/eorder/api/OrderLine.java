@@ -1,5 +1,6 @@
 package com.klst.eorder.api;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.klst.edoc.api.IAmount;
@@ -20,7 +21,7 @@ import com.klst.edoc.untdid.DocumentNameCode;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
-public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
+public interface OrderLine extends OrderLineFactory, OrderNoteFactory, AllowancesOrChargesFactory {
 
 	/**
 	 * Line identifier
@@ -181,17 +182,33 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory {
 	//       BT-135 +++ 0..1 Invoice line period end date
 	
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage);	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage);
+	
+	/**
 	 * add an allowance or charge
 	 * <p>
-	 * BG-27 0..n INVOICE LINE ALLOWANCES / ABSCHLÄGE
+	 * BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
 	 * <br>
-	 * BG-28 0..n INVOICE LINE CHARGES / ZUSCHLÄGE
+	 * BG-28 0..n LINE CHARGES / ZUSCHLÄGE
 	 * 
 	 * @param allowanceOrCharge
 	 */
-//	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge);
-//	public List<AllowancesAndCharges> getAllowancesAndCharges();
-
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge);
+	default void addAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
+		addAllowanceCharge(createAllowance(amount, baseAmount, percentage));
+	}
+	default void addCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
+		addAllowanceCharge(createCharge(amount, baseAmount, percentage));
+	}
+	public List<AllowancesAndCharges> getAllowancesAndCharges();
 	
 	// BG-29 ++ 1..1 PRICE DETAILS // TODO move this Block to BG29_PriceDetails, order doc Zeile 170
 	/**
