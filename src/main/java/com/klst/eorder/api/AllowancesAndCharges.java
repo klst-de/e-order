@@ -23,7 +23,7 @@ import com.klst.edoc.api.IAmount;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-public interface AllowancesAndCharges extends AllowancesOrChargesFactory /*extends ITaxCategory*/ {
+public interface AllowancesAndCharges extends AllowancesOrChargesFactory, ITaxCategory {
 	
 	public static final boolean ALLOWANCE = false;
 	public static final boolean CHARGE = true;
@@ -80,6 +80,7 @@ public interface AllowancesAndCharges extends AllowancesOrChargesFactory /*exten
 	public void setPercentage(BigDecimal percentage);
 	public BigDecimal getPercentage();
 
+//ITaxCategory:
 //	// BT-95-0, BT-102-0 (CII)
 //	/**
 //	 * {@inheritDoc}
