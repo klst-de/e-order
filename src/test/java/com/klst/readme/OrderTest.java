@@ -17,6 +17,7 @@ import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
@@ -133,6 +134,16 @@ public class OrderTest {
 				order.getLineNetTotal().getValue().add(order.getChargesTotal().getValue()).subtract(order.getAllowancesTotal().getValue())
 				);
 		
+		// BG-20 0..n DOCUMENT LEVEL ALLOWANCE:
+		BigDecimal tenPerCent = new BigDecimal(10);
+		AllowancesAndCharges allowance = order.createAllowance(new Amount(new BigDecimal(31)), new Amount(new BigDecimal(310)), tenPerCent);
+		allowance.setReasoncode("64");
+		allowance.setReasonText("SPECIAL AGREEMENT");
+		allowance.setTaxType("VAT");
+		allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
+		allowance.setTaxPercentage(new BigDecimal(20));
+		order.addAllowanceCharge(allowance);
+		
 		OrderLine line = order.createOrderLine("1"    // order line number
 				  , new Quantity("C62", new BigDecimal(6))              // one unit/C62
 				  , new Amount(EUR, new BigDecimal(60.00))				// line net amount
@@ -154,7 +165,7 @@ public class OrderTest {
 		line.setOrderLineID("id-1"); // warning expected
 		
 		// BG-27 0..n LINE ALLOWANCES:
-		BigDecimal tenPerCent = new BigDecimal(10);
+		//BigDecimal tenPerCent = new BigDecimal(10);
 		line.addAllowance(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
 		// BG-28 0..n LINE CHARGES:
 		AllowancesAndCharges charge = line.createCharge(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);

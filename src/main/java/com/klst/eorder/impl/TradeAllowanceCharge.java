@@ -6,11 +6,13 @@ import java.util.logging.Logger;
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 
+import un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d19b.DutyorTaxorFeeCategoryCodeContentType;
+import un.unece.uncefact.codelist.standard.unece.dutytaxfeetypecode.d19b.DutyTaxFeeTypeCodeContentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.PercentType;
 
 public class TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges {
 	
@@ -149,8 +151,54 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	@Override
 	public BigDecimal getPercentage() {
-		PercentType percent = super.getCalculationPercent();
-		return percent==null ? null : percent.getValue();
+		return super.getCalculationPercent()==null ? null : getCalculationPercent().getValue();
+	}
+
+	// BT-95-0, BT-102-0
+	@Override
+	public void setTaxType(String type) {
+		// TODO type muss in enum DutyTaxFeeTypeCodeContentType sein!!!
+		Mapper.newFieldInstance(this, "categoryTradeTax", type);
+		Mapper.set(getCategoryTradeTax(), "typeCode", DutyTaxFeeTypeCodeContentType.fromValue(type));	
+	}
+	@Override // liefert in CII immer "VAT", in CIO andere aus DutyTaxFeeTypeCodeContentType
+	public String getTaxType() {
+		if(super.getCategoryTradeTax()==null) return null;
+		TradeTax tradeTax = TradeTax.create(getCategoryTradeTax());
+		return tradeTax.getTaxType();
+	}
+
+	// BT-95, BT-102 1..1 (mandatory) Document level allowance/charge VAT category code
+//	@Override
+//	public void setTaxCategoryCode(TaxCategoryCode code) {
+//		setTaxCategoryCode(code.getValue());
+//	}
+	@Override
+	public void setTaxCategoryCode(String code) {
+		Mapper.newFieldInstance(this, "categoryTradeTax", code);
+		Mapper.set(getCategoryTradeTax(), "typeCode", DutyorTaxorFeeCategoryCodeContentType.fromValue(code));		
+	}
+
+	@Override
+	public TaxCategoryCode getTaxCategoryCode() {
+		if(super.getCategoryTradeTax()==null) return null;
+		TradeTax tradeTax = TradeTax.create(getCategoryTradeTax());
+		return tradeTax.getTaxCategoryCode();
+	}
+
+	// BT-96, BT-103 0..1 Document level allowance/charge VAT rate
+	@Override
+	public void setTaxPercentage(BigDecimal percentage) {
+		if(percentage==null) return;
+		Mapper.newFieldInstance(this, "categoryTradeTax", percentage);
+		Mapper.set(getCategoryTradeTax(), "rateApplicablePercent", percentage);		
+	}
+
+	@Override
+	public BigDecimal getTaxPercentage() {
+		if(super.getCategoryTradeTax()==null) return null;
+		TradeTax tradeTax = TradeTax.create(getCategoryTradeTax());
+		return tradeTax.getTaxPercentage();
 	}
 
 	// BT-97, BT-104 0..1 Document level allowance/charge reason
