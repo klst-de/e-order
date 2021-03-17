@@ -10,6 +10,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
+	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG25_OrderLine, 	
 	ShipTo, ShipFrom,
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
@@ -270,5 +271,5 @@ The identification of a the Previous Order Response Document, issued by the Sell
  */
 	public void setPreviousOrderResponseReference(String id);
 	public String getPreviousOrderResponseReference();
-
+	
 }

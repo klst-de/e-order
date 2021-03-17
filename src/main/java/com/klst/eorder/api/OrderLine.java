@@ -21,7 +21,8 @@ import com.klst.edoc.untdid.DocumentNameCode;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
-public interface OrderLine extends OrderLineFactory, OrderNoteFactory, AllowancesOrChargesFactory {
+public interface OrderLine extends OrderLineFactory, OrderNoteFactory, 
+	BG27_LineLevelAllowences, BG28_LineLevelCharges {
 
 	/**
 	 * Line identifier
@@ -191,25 +192,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory, Allowance
 	 */
 	@Override
 	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage);
-	
-	/**
-	 * add an allowance or charge
-	 * <p>
-	 * BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
-	 * <br>
-	 * BG-28 0..n LINE CHARGES / ZUSCHLÄGE
-	 * 
-	 * @param allowanceOrCharge
-	 */
-	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge);
-	default void addAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		addAllowanceCharge(createAllowance(amount, baseAmount, percentage));
-	}
-	default void addCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		addAllowanceCharge(createCharge(amount, baseAmount, percentage));
-	}
-	public List<AllowancesAndCharges> getAllowancesAndCharges();
-	
+		
 	// BG-29 ++ 1..1 PRICE DETAILS // TODO move this Block to BG29_PriceDetails, order doc Zeile 170
 	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
