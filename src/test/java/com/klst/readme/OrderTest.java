@@ -17,6 +17,7 @@ import com.klst.edoc.api.IContact;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.IContactExt;
@@ -151,6 +152,15 @@ public class OrderTest {
 		line.setCountryOfOrigin("FR"); // BG-31.BT-159
 		
 		line.setOrderLineID("id-1"); // warning expected
+		
+		// BG-27 0..n LINE ALLOWANCES:
+		BigDecimal tenPerCent = new BigDecimal(10);
+		line.addAllowance(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
+		// BG-28 0..n LINE CHARGES:
+		AllowancesAndCharges charge = line.createCharge(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
+		charge.setReasoncode("64");
+		charge.setReasonText("Special agreement");
+		line.addAllowanceCharge(charge);
 		
 		order.addLine(line);
 		assertEquals(1, line.getNotes().size());

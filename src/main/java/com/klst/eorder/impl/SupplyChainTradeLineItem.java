@@ -1,5 +1,6 @@
 package com.klst.eorder.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -11,6 +12,7 @@ import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
@@ -23,6 +25,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAccountingAccountType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
 
@@ -319,29 +322,42 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 
  */
 	/*
-	 * BG-27 0..n INVOICE LINE ALLOWANCES
-	 * BG-28 0..n INVOICE LINE CHARGES
+	 * BG-27 0..n LINE ALLOWANCES
+	 * BG-28 0..n LINE CHARGES
 	 */
-//	TODO
-//	@Override
-//	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
-//		if(allowanceOrCharge==null) return; // optional
+	@Override
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
+		// delegieren:
+		return TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
+	@Override
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
+		// delegieren:
+		return TradeAllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
+	}
+
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		if(allowanceOrCharge==null) return; // optional
+//		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeAllowanceCharge", amount);
+//		Mapper.set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
 //		// The method add(TradeAllowanceChargeType) in the type List<TradeAllowanceChargeType> 
 //		// is not applicable for the arguments (AllowancesAndCharges)
 //		// specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge().add(allowanceOrCharge);
 //		// TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges !!!
 //		specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
-//	}
-//
-//	@Override
-//	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-//		List<TradeAllowanceChargeType> allowanceChargeList = specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge();
-//		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
-//		allowanceChargeList.forEach(stac -> {
-//			res.add(TradeAllowanceCharge.create(stac));
-//		});
-//		return res;
-//	}
+		super.getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
+	}
+
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		List<TradeAllowanceChargeType> allowanceChargeList = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge();
+		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+		allowanceChargeList.forEach(allowanceOrCharge -> {
+			res.add(TradeAllowanceCharge.create(allowanceOrCharge));
+		});
+		return res;
+	}
 
 	/*
 	 * BG-29 1..1 PRICE DETAILS
