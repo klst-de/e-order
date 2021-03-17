@@ -1,6 +1,8 @@
 package com.klst.eorder.impl;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -13,6 +15,7 @@ import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG22_DocumentTotals;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
@@ -23,6 +26,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._103.DocumentCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ExchangedDocumentContextType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ExchangedDocumentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
@@ -397,6 +401,34 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	@Override
 	public String getPreviousOrderResponseReference() {
 		return applicableHeaderTradeAgreement.getPreviousOrderResponseReference();
+	}
+	
+	// BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+	// BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+	@Override
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
+		// delegieren:
+		return TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
+	@Override
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
+		// delegieren:
+		return TradeAllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
+	}
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		if(allowanceOrCharge==null) return; // optional
+		applicableHeaderTradeSettlement.getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
+	}
+
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		List<TradeAllowanceChargeType> allowanceChargeList = applicableHeaderTradeSettlement.getSpecifiedTradeAllowanceCharge();
+		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+		allowanceChargeList.forEach(allowanceOrCharge -> {
+			res.add(TradeAllowanceCharge.create(allowanceOrCharge));
+		});
+		return res;
 	}
 	
 	// BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112

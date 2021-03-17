@@ -339,13 +339,6 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		if(allowanceOrCharge==null) return; // optional
-//		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeAllowanceCharge", amount);
-//		Mapper.set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
-//		// The method add(TradeAllowanceChargeType) in the type List<TradeAllowanceChargeType> 
-//		// is not applicable for the arguments (AllowancesAndCharges)
-//		// specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge().add(allowanceOrCharge);
-//		// TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges !!!
-//		specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
 		super.getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
 	}
 
