@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import com.klst.edoc.api.IAmount;
 
 /**
- * Common Interface for optional DOCUMENT LEVEL ALLOWANCES (BG-20) and CHARGES (BG-21) and
- *                               LINE ALLOWANCES (BG-27) and CHARGES (BG-28)
+ * Common Interface for ALLOWANCES and CHARGES
+ *
  * <p>
  * BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
  * <br>
@@ -22,97 +22,6 @@ import com.klst.edoc.api.IAmount;
  * <br>Request ID: 	R15, R18
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
- */
-
-/* ChargeIndicator
-Anwendung: 
-Im Fall eine Abschlags (BG-27) ist der Wert des ChargeIndicators auf "false" zu setzen.
-Im Fall eine Zuschlags (BG-28) ist der Wert des ChargeIndicators auf "true" zu setzen.
-
-Bsp 02.01:
-UBL:
-  <cac:AllowanceCharge>
-    <cbc:ChargeIndicator>true</cbc:ChargeIndicator>                    <!-- true : ZUSCHLAG / CHARGES -->
-    <cbc:AllowanceChargeReasonCode>TAC</cbc:AllowanceChargeReasonCode> <!-- TAC : kein gültiger Cade -->
-    <cbc:AllowanceChargeReason>Testing</cbc:AllowanceChargeReason>
-    <cbc:MultiplierFactorNumeric>0</cbc:MultiplierFactorNumeric>
-    <cbc:Amount currencyID="EUR">0</cbc:Amount>
-    <cbc:BaseAmount currencyID="EUR">0</cbc:BaseAmount>
-    <cac:TaxCategory>
-      <cbc:ID>E</cbc:ID>
-      <cbc:Percent>0</cbc:Percent>
-      <cac:TaxScheme>
-        <cbc:ID>VAT</cbc:ID>
-      </cac:TaxScheme>
-    </cac:TaxCategory>
-  </cac:AllowanceCharge>
-  <cac:AllowanceCharge>
-    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>                   <!-- false : ABSCHLAG / ALLOWANCE -->
-    <cbc:AllowanceChargeReasonCode>102</cbc:AllowanceChargeReasonCode> <!-- Fixed long term -->
-    <cbc:AllowanceChargeReason>Fixed long term</cbc:AllowanceChargeReason>
-    <cbc:MultiplierFactorNumeric>0</cbc:MultiplierFactorNumeric>
-    <cbc:Amount currencyID="EUR">0</cbc:Amount>
-    <cbc:BaseAmount currencyID="EUR">0</cbc:BaseAmount>
-    <cac:TaxCategory>
-      <cbc:ID>E</cbc:ID>
-      <cbc:Percent>0</cbc:Percent>
-      <cac:TaxScheme>
-        <cbc:ID>VAT</cbc:ID>
-      </cac:TaxScheme>
-    </cac:TaxCategory>
-  </cac:AllowanceCharge>
-
-ubl-tc434-example5.xml für INVOICE LINE
-
-CII: ApplicableHeaderTradeSettlement ...
-            <ram:SpecifiedTradeAllowanceCharge>
-                <ram:ChargeIndicator>
-                    <udt:Indicator>true</udt:Indicator>
-                </ram:ChargeIndicator>
-                <ram:CalculationPercent>0</ram:CalculationPercent>
-                <ram:BasisAmount>0</ram:BasisAmount>
-                <ram:ActualAmount>0</ram:ActualAmount>
-                <ram:ReasonCode>TAC</ram:ReasonCode>
-                <ram:Reason>Testing</ram:Reason>
-                <ram:CategoryTradeTax>
-                    <ram:TypeCode>VAT</ram:TypeCode>
-                    <ram:CategoryCode>E</ram:CategoryCode>
-                    <ram:RateApplicablePercent>0</ram:RateApplicablePercent>
-                </ram:CategoryTradeTax>
-            </ram:SpecifiedTradeAllowanceCharge>
-            <ram:SpecifiedTradeAllowanceCharge>
-                <ram:ChargeIndicator>
-                    <udt:Indicator>false</udt:Indicator>
-                </ram:ChargeIndicator>
-                <ram:CalculationPercent>0</ram:CalculationPercent>
-                <ram:BasisAmount>0</ram:BasisAmount>
-                <ram:ActualAmount>0</ram:ActualAmount>
-                <ram:ReasonCode>102</ram:ReasonCode>
-                <ram:Reason>Fixed long term</ram:Reason>
-                <ram:CategoryTradeTax>
-                    <ram:TypeCode>VAT</ram:TypeCode>
-                    <ram:CategoryCode>E</ram:CategoryCode>
-                    <ram:RateApplicablePercent>0</ram:RateApplicablePercent>
-                </ram:CategoryTradeTax>
-            </ram:SpecifiedTradeAllowanceCharge>
-            
-0 .. n SpecifiedTradeAllowanceCharge Zu- und Abschläge auf Dokumentenebene           BG-20, BG-21
- 1 .. 1 ChargeIndicator Schalter für Zu-/Abschlag                                     BG-20-0 , BG-21-0  xs:choice
-  1 .. 1 Indicator Schalter für Zu-/Abschlag, Wert                                     BG-20-00, BG-21-00
- 0 .. 1 SequenceNumeric Berechnungsreihenfolge
- 0 .. 1 CalculationPercent Prozentualer Zu- oder Abschlag auf Dokumentenebene         BT-94, BT-101
- 0 .. 1 BasisAmount Grundbetrag des Zu- oder Abschlags auf Dokumentenebene            BT-93, BT-100
- 0 .. 1 BasisQuantity Basismenge des Rabatts required unitCode Einheit der Preisbasismenge
- 1 .. 1 ActualAmount Betrag des Zu- oder Abschlags auf Dokumentenebene                BT-92, BT-99
- 0 .. 1 ReasonCode Code für den Grund für den Zu- oder Abschlag auf Dokumentenebene   BT-98, BT-105
- 0 .. 1 Reason Grund für den Zu- oder Abschlag auf Dokumentenebene                    BT-97, BT-104
- 1 .. 1 CategoryTradeTax Detailinformationen zu Steuerangaben                                       xs:sequence
-  1 .. 1 TypeCode Code für die Umsatzsteuerkategorie 
-          des Zu- oder Abschlages auf Dokumentenebene                                  BT-95-0, BT-102-0
-  1 .. 1 CategoryCode Code für die Umsatzsteuerkategorie 
-          des Zu- oder Abschlages auf Dokumentenebene                                  BT-95  , BT-102
-  0 .. 1 RateApplicablePercent Umsatzsteuersatz 
-          für den Zu- oder Abschlag auf Dokumentenebene                                BT-96  , BT-103
  */
 public interface AllowancesAndCharges extends AllowancesOrChargesFactory /*extends ITaxCategory*/ {
 	

@@ -13,8 +13,6 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.PercentType;
 
 public class TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges {
-// in CII:  implements AllowancesAndCharges
-// in CIO: used in orderLine 
 	
 	@Override
 	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
@@ -34,15 +32,11 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 //    protected AmountType actualAmount;
 //    protected AllowanceChargeReasonCodeType reasonCode;
 //    protected TextType reason;
-//    protected TradeTaxType categoryTradeTax;
+//    protected TradeTaxType categoryTradeTax;                      TODO
 
 	private static final String NO_TRADETAX_ELEMENT = "No TradeTax. Expected one element.";
 	private static final Logger LOG = Logger.getLogger(TradeAllowanceCharge.class.getName());
 
-	/**
-	 * used in TradeLineItem
-	 * @see TradeLineItem#setUnitPriceAllowance
-	 */
 	static TradeAllowanceCharge create(boolean chargeIndicator, IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return new TradeAllowanceCharge(chargeIndicator, amount, baseAmount, percentage);
 	}
@@ -53,7 +47,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	static TradeAllowanceCharge create(TradeAllowanceChargeType object) {
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
 		if(object instanceof TradeAllowanceChargeType && object.getClass()!=TradeAllowanceChargeType.class) {
-			// tt is instance of a subclass of TradeAllowanceChargeType, but not TradeAllowanceChargeType itself
+			// object is instance of a subclass of TradeAllowanceChargeType, but not TradeAllowanceChargeType itself
 			return (TradeAllowanceCharge)object;
 		} else {
 			return new TradeAllowanceCharge(object); 
@@ -163,11 +157,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	@Override
 	public void setReasonText(String text) {
 		if(text==null) return;		
-//		Mapper.set(this, "reason", Text.create(text));	// exception
 		Mapper.set(this, "reason", text);
-		
-//		Text allowanceChargeReasonCode = Text.create(text);
-//		super.setReason(allowanceChargeReasonCode);
 	}
 
 	@Override
@@ -179,14 +169,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	@Override
 	public void setReasoncode(String code) {
 		if(code==null) return; 
-//		Mapper.newFieldInstance(this, "reasonCode", code);
-//		Mapper.set(getReasonCode(), "value", code);
-		// oder:
 		Mapper.set(this, "reasonCode", code);
-		
-//		AllowanceChargeReasonCodeType allowanceChargeReasonCode = new AllowanceChargeReasonCodeType();
-//		allowanceChargeReasonCode.setValue(code);
-//		super.setReasonCode(allowanceChargeReasonCode);
 	}
 
 	@Override
