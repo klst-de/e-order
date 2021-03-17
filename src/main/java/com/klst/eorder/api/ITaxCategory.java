@@ -13,18 +13,18 @@ import com.klst.edoc.untdid.TaxCategoryCode;
  * <br> BG-23 VAT BREAKDOWN : BT-118 , BT-119
  * <br> BG-30 LINE VAT INFORMATION : BT-151
  */
-public interface ITaxCategory extends ITaxType {
+public interface ITaxCategory extends ITaxCategoryFactory, ITaxType {
 	
 	// ALLOWANCES (BG-20) and CHARGES (BG-21) BT-95-0, BT-102-0
 	// VAT BREAKDOWN BG-23.BT-118-0
 	// LINE VAT INFORMATION : BG-30.BT-151-0
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setTaxType(String type);
-	@Override
-	public String getTaxType();
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public void setTaxType(String type);
+//	@Override
+//	public String getTaxType();
 	
 	/**
 	 * VAT/tax category code 

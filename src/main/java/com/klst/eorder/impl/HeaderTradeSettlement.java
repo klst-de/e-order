@@ -1,18 +1,15 @@
 package com.klst.eorder.impl;
 
-import java.util.List;
-
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.Reference;
 
 import un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31.ISO3AlphaCurrencyCodeContentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeSettlementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAllowanceChargeType;
 
 public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 
-//	TODO use     protected List<TradeAllowanceChargeType> specifiedTradeAllowanceCharge;
+// use protected List<TradeAllowanceChargeType> specifiedTradeAllowanceCharge ist implementiert in CrossIndustryOrder
 
 	static HeaderTradeSettlement create() {
 		return new HeaderTradeSettlement(null); 

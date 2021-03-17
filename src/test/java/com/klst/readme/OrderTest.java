@@ -18,6 +18,7 @@ import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
@@ -139,7 +140,7 @@ public class OrderTest {
 		AllowancesAndCharges allowance = order.createAllowance(new Amount(new BigDecimal(31)), new Amount(new BigDecimal(310)), tenPerCent);
 		allowance.setReasoncode("64");
 		allowance.setReasonText("SPECIAL AGREEMENT");
-		allowance.setTaxType("VAT");
+		allowance.setTaxType(TaxTypeCode.VAT);
 		allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
 		allowance.setTaxPercentage(new BigDecimal(20));
 		order.addAllowanceCharge(allowance);

@@ -7,7 +7,9 @@ import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AllowancesAndCharges;
+import com.klst.eorder.api.ITaxCategory;
 
 import un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d19b.DutyorTaxorFeeCategoryCodeContentType;
 import un.unece.uncefact.codelist.standard.unece.dutytaxfeetypecode.d19b.DutyTaxFeeTypeCodeContentType;
@@ -17,6 +19,11 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 public class TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges {
 	
 	@Override
+	public ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return TradeTax.create(taxType, taxCode, taxRate);
+	}
+
+	@Override
 	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
@@ -24,17 +31,6 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
-
-	// super member:
-//    protected IndicatorType chargeIndicator;
-//    protected NumericType sequenceNumeric;
-//    protected PercentType calculationPercent;
-//    protected AmountType basisAmount;
-//    protected QuantityType basisQuantity;
-//    protected AmountType actualAmount;
-//    protected AllowanceChargeReasonCodeType reasonCode;
-//    protected TextType reason;
-//    protected TradeTaxType categoryTradeTax;                      TODO
 
 	private static final String NO_TRADETAX_ELEMENT = "No TradeTax. Expected one element.";
 	private static final Logger LOG = Logger.getLogger(TradeAllowanceCharge.class.getName());
@@ -68,9 +64,9 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		super();
 		if(tradeAllowanceCharge!=null) {
 			CopyCtor.invokeCopy(this, tradeAllowanceCharge);
-//			if(getCategoryTradeTax().isEmpty()) {
-//				LOG.warning(NO_TRADETAX_ELEMENT);
-//			}
+			if(getCategoryTradeTax()==null) {
+				LOG.warning(NO_TRADETAX_ELEMENT);
+			}
 			LOG.fine("copy ctor:"+this);
 		}
 	}
@@ -87,12 +83,12 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		stringBuilder.append(", %rate:");            // BT-101
 		stringBuilder.append(getPercentage()==null ? "null" : getPercentage());
 		
-//		stringBuilder.append(", tax:");   // BT-102-0
-//		stringBuilder.append(getTaxType()==null ? "null" : getTaxType());
-//		stringBuilder.append("/");        // BT-102
-//		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
-//		stringBuilder.append(", tax%:");  // BT-103
-//		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
+		stringBuilder.append(", tax:");   // BT-102-0
+		stringBuilder.append(getTaxType()==null ? "null" : getTaxType());
+		stringBuilder.append("/");        // BT-102
+		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
+		stringBuilder.append(", tax%:");  // BT-103
+		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
 		
 		stringBuilder.append(", Reasoncode:"); // BT-104
 		stringBuilder.append(getReasoncode()==null ? "null" : getReasoncode());
@@ -157,7 +153,9 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	// BT-95-0, BT-102-0
 	@Override
 	public void setTaxType(String type) {
-		// TODO type muss in enum DutyTaxFeeTypeCodeContentType sein!!!
+		// the following throws IllegalArgumentException if tax type is invalid
+		DutyTaxFeeTypeCodeContentType.fromValue(type);
+		
 		Mapper.newFieldInstance(this, "categoryTradeTax", type);
 		Mapper.set(getCategoryTradeTax(), "typeCode", DutyTaxFeeTypeCodeContentType.fromValue(type));	
 	}
@@ -175,6 +173,9 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 //	}
 	@Override
 	public void setTaxCategoryCode(String code) {
+		// the following throws IllegalArgumentException if tax code is invalid
+		DutyorTaxorFeeCategoryCodeContentType.fromValue(code);
+		
 		Mapper.newFieldInstance(this, "categoryTradeTax", code);
 		Mapper.set(getCategoryTradeTax(), "typeCode", DutyorTaxorFeeCategoryCodeContentType.fromValue(code));		
 	}
