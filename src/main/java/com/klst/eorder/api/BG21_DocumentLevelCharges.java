@@ -1,7 +1,7 @@
 package com.klst.eorder.api;
 
 /**
- * BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+ * BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
  * 
  * @see BG20_DocumentLevelAllowences
  */
