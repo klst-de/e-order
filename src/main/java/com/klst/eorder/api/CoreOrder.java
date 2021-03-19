@@ -3,7 +3,7 @@ package com.klst.eorder.api;
 import java.sql.Timestamp;
 
 import com.klst.edoc.api.BusinessPartyFactory;
-import com.klst.edoc.api.IContactFactory;
+import com.klst.edoc.api.ContactInfoFactory;
 import com.klst.edoc.api.PostalAddressFactory;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
@@ -13,7 +13,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG25_OrderLine, 	
 	ShipTo, ShipFrom,
-	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
+	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory {
 
 	/**
 	 * Invoice number   - A unique identification of the Invoice.

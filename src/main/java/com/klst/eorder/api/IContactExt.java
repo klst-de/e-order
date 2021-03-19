@@ -1,10 +1,10 @@
 package com.klst.eorder.api;
 
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 
 // reusable ABIE (aggregate business information entity) 103 TradeContactType hat ein element
 // das zwar in ABIE 100 TradeContactType , aber nicht in UBL existiert
-public interface IContactExt extends IContact {
+public interface IContactExt extends ContactInfo {
 
 	public void setContactDepartment(String department);
 	public String getContactDepartment();

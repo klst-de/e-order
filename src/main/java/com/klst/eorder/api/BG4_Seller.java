@@ -1,7 +1,7 @@
 package com.klst.eorder.api;
 
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 
 /**
@@ -84,7 +84,7 @@ public interface BG4_Seller {
 //		return null;
 //	}
 	
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm);
+	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm);
 	public void setSeller(BusinessParty party);
 	public BusinessParty getSeller();
 

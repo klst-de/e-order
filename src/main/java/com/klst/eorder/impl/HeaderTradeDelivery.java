@@ -2,7 +2,7 @@ package com.klst.eorder.impl;
 
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.api.ShipFrom;
 import com.klst.eorder.api.ShipTo;
@@ -33,7 +33,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 	}
 
 	@Override
-	public void setShipToParty(String name, PostalAddress address, IContact contact) {
+	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);
 		setShipToParty(party);
 	}
@@ -48,7 +48,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 	}
 
 	@Override
-	public void setShipFromParty(String name, PostalAddress address, IContact contact) {
+	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);
 		setShipFromParty(party);
 	}

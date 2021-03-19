@@ -13,7 +13,7 @@ import org.junit.Test;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.IAmount;
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
@@ -66,7 +66,7 @@ public class OrderTest {
 		
 		order.addNote( order.createNote("AAI", "Content of Note") );
 		
-		IContact contact = TradeContact.create().createContact(null, null, null);
+		ContactInfo contact = TradeContact.create().createContactInfo(null, null, null);
 		IContactExt contactExt = (IContactExt)contact;
 		contactExt.setContactDepartment("dept");
 		LOG.info("contact:"+contactExt);
@@ -90,7 +90,7 @@ public class OrderTest {
 		// <ram:BuyerReference>BUYER_REF_BU123</ram:BuyerReference>
 		
 		PostalAddress address = order.createAddress("DE", "123", "Ort");
-		IContact icontact = order.createContact("name", "tel", "mail");
+		ContactInfo icontact = order.createContactInfo("name", "tel", "mail");
 //		order.setSeller("SUPPLIER_ID_321654", address, icontact, null, null);
 		BusinessParty seller = order.createParty("SELLER_NAME", "SELLER_TRADING_NAME", postalAddress, contact);
 		seller.setId("SUPPLIER_ID_321654");
@@ -118,7 +118,7 @@ public class OrderTest {
 			BusinessPartyAddress buyerAddress = (BusinessPartyAddress)buyer;
 			LOG.info("buyerAddress (no shortcut):"+buyerAddress.getAddress());
 		}
-		LOG.info("buyer Address:"+buyer.getAddress() + " Contact:"+buyer.getContact());
+		LOG.info("buyer Address:"+buyer.getAddress() + " Contact:"+buyer.getBPContact());
 		
 		// ---------------
 		IAmount amount = new Amount(new BigDecimal(60.00));

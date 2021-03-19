@@ -8,7 +8,7 @@ import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.BusinessPartyFactory;
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 
@@ -24,10 +24,10 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
 public class TradeParty extends TradePartyType implements BusinessParty, BusinessPartyAddress, BusinessPartyContact {
 
 	@Override  // implements BusinessPartyFactory
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return create(name, tradingName, address, contact);
 	}
-	static TradeParty create(String name, String tradingName, PostalAddress address, IContact contact) {
+	static TradeParty create(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return new TradeParty(name, tradingName, address, contact);
 	}
 
@@ -75,12 +75,12 @@ BT-32 ++ 0..1 Seller tax registration identifier       / Steuernummer des Verkä
 BT-33 ++ 0..1 Seller additional legal information      / weitere rechtliche Informationen, wie z. B. Aktienkapital
 BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
  */
-	private TradeParty(String registrationName, String businessName, PostalAddress address, IContact contact) {
+	private TradeParty(String registrationName, String businessName, PostalAddress address, ContactInfo contact) {
 		super();
 		setRegistrationName(registrationName);
 		setBusinessName(businessName);
 		setAddress(address);
-		if(contact!=null) setIContact(contact);
+		if(contact!=null) setContactInfo(contact);
 	}
 
 	public String toString() {
@@ -96,7 +96,7 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 		stringBuilder.append(getAddress()==null ? "null" : getAddress());
 		
 		stringBuilder.append(", Contact:");
-		stringBuilder.append(getIContact()==null ? "null" : getIContact());
+		stringBuilder.append(getContactInfo()==null ? "null" : getContactInfo());
 		
 		stringBuilder.append("]");
 		return stringBuilder.toString();
@@ -123,7 +123,7 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 
 	// Contact
 	@Override
-	public IContact getIContact() {
+	public ContactInfo getContactInfo() {
 //		TradeContactType tradeContact = super.getDefinedTradeContact();
 //		return tradeContact==null ? null : TradeContact.create(tradeContact);
 		List<TradeContactType> tradeContactList = super.getDefinedTradeContact();
@@ -131,13 +131,13 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	}
 
 	@Override
-	public void setIContact(IContact contact) {
+	public void setContactInfo(ContactInfo contact) {
 //		super.setDefinedTradeContact((TradeContact)contact);
 		super.getDefinedTradeContact().add((TradeContact)contact);
 	}
 
 	@Override
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		return TradeContact.create(contactName, contactTel, contactMail);
 	}
 

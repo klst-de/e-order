@@ -1,7 +1,7 @@
 package com.klst.eorder.api;
 
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 
 /*
@@ -34,7 +34,7 @@ import com.klst.edoc.api.PostalAddress;
  */
 public interface ShipTo {
 
-	public void setShipToParty(String name, PostalAddress address, IContact contact);
+	public void setShipToParty(String name, PostalAddress address, ContactInfo contact);
 	public void setShipToParty(BusinessParty party);
 	public BusinessParty getShipToParty();
 

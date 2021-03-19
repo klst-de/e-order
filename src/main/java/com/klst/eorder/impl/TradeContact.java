@@ -1,7 +1,7 @@
 package com.klst.eorder.impl;
 
 import com.klst.ebXml.reflection.CopyCtor;
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.eorder.api.IContactExt;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeContactType;
@@ -10,7 +10,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 public class TradeContact extends TradeContactType implements IContactExt {
 
 	@Override // implements IContactFactory
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		return create(contactName, contactTel, contactMail);
 	}
 	

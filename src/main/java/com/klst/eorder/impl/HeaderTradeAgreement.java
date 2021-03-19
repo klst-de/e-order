@@ -3,7 +3,7 @@ package com.klst.eorder.impl;
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
@@ -69,7 +69,7 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller
 	@Override
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
@@ -85,7 +85,7 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
 	@Override
-	public void setBuyer(String name, PostalAddress address, IContact contact) {
+	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);
 		setBuyer(party);
 	}

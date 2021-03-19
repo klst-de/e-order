@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IAmount;
-import com.klst.edoc.api.IContact;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
@@ -275,7 +275,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller
 	@Override
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
 		BusinessParty party = createParty(name, address, contact);
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
@@ -292,7 +292,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
 	@Override
-	public void setBuyer(String name, PostalAddress address, IContact contact) {
+	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
 		setBuyer(party);
 	}
@@ -306,7 +306,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	}
 
 	@Override
-	public void setShipToParty(String name, PostalAddress address, IContact contact) {
+	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact);
 		setShipToParty(party);
 	}
@@ -320,7 +320,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	}
 
 	@Override
-	public void setShipFromParty(String name, PostalAddress address, IContact contact) {
+	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact);
 		setShipFromParty(party);
 	}
@@ -590,7 +590,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 
 	// ----------------- factories to delegate
 	@Override
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return TradeParty.create(name, tradingName, address, contact); 
 	}
 
@@ -600,7 +600,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	}
 
 	@Override
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		return TradeContact.create(contactName, contactTel, contactMail);
 	}
 
