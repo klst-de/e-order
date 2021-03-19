@@ -82,7 +82,7 @@ public class OrderTest {
 		assertNull(postalAddress.getAddressLine2());
 		
 		BusinessParty bp = TradeParty.create().createParty("Reg.Name", "Name", postalAddress, contact);
-		bp.setId("123654879","0088"); // 0088 : EAN
+		bp.setId("123654879","0088"); // 0088 : EAN // TODO EAN is veraltert ==> ???
 		LOG.info("bp:"+bp);
 		
 		order.setDocumentCurrency("EUR");
@@ -144,6 +144,13 @@ public class OrderTest {
 		allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
 		allowance.setTaxPercentage(new BigDecimal(20));
 		order.addAllowanceCharge(allowance);
+		
+		// BG-24 ADDITIONAL SUPPORTING DOCUMENTS
+		// <ram:TypeCode>916</ram:TypeCode>
+//		Use for "ADDITIONAL SUPPORTING DOCUMENTS" with TypeCode Value = 916, 
+//		or for "OBJECT IDENTIFIER with Type Code Value = 130, "
+//		or for "TENDER OR LOT REFERENCE" with Type Code Value = 50
+		order.addSupportigDocument("ADD_REF_DOC_ID", "ADD_REF_DOC_Desc", "ADD_REF_DOC_URIID");
 		
 		OrderLine line = order.createOrderLine("1"    // order line number
 				  , new Quantity("C62", new BigDecimal(6))              // one unit/C62

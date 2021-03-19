@@ -6,6 +6,7 @@ import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.SupportingDocument;
 
 import un.unece.uncefact.codelist.standard.unece.referencetypecode.d19b.ReferenceTypeCodeContentType;
@@ -116,8 +117,10 @@ Beispiel:
 		}
 	}
 
+	// BG-24
 	private ReferencedDocument(String docRefId, String description) {
 		super();
+		setDocumentCode(DocumentNameCode.RelatedDocument.getValueAsString());
 		setDocumentReference(new ID(docRefId));
 		setSupportingDocumentDescription(description);
 	}
@@ -130,6 +133,7 @@ Beispiel:
 		setReferenceCode(referenceTypeCode);
 	}
 
+	// code == 916 :"ADDITIONAL SUPPORTING DOCUMENTS" ==> BG-24
 	// code ==  50 : isValidatedPricedTender() ==> BT-17
 	// code == 130 : isInvoicingDataSheet()    ==> BT-18
 	private void setDocumentCode(String code) {
