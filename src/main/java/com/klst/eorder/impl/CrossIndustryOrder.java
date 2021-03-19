@@ -21,6 +21,7 @@ import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
+import com.klst.eorder.api.SupportingDocument;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._103.DocumentCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.DocumentContextParameterType;
@@ -503,6 +504,26 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		TradeSettlementHeaderMonetarySummation tshms =
 		TradeSettlementHeaderMonetarySummation.create(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation());
 		return tshms.getTaxTotal();
+	}
+
+	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	public SupportingDocument createSupportigDocument(String docRefId, String description, String uri) {
+		// delegieren
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, description);
+		rd.setExternalDocumentLocation(uri);
+		return rd;
+	}
+	public SupportingDocument createSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
+		// delegieren
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, description);
+		rd.setAttachedDocument(content, mimeCode, filename);
+		return rd;
+	}
+	public void addSupportigDocument(SupportingDocument supportigDocument) {
+		applicableHeaderTradeAgreement.addSupportigDocument(supportigDocument);
+	}
+	public List<SupportingDocument> getAdditionalSupportingDocuments() {
+		return applicableHeaderTradeAgreement.getAdditionalSupportingDocuments();
 	}
 
 /*

@@ -6,9 +6,7 @@ import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.PostalAddress;
 
-import un.unece.uncefact.data.standard.qualifieddatatype._103.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAddressType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
 import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
 

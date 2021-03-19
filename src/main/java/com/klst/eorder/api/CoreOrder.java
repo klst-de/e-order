@@ -11,7 +11,7 @@ import com.klst.edoc.untdid.DocumentNameCode;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
 	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
-	BG22_DocumentTotals, BG25_OrderLine, 	
+	BG22_DocumentTotals, BG24_AdditionalSupportingDocs, BG25_OrderLine, 	
 	ShipTo, ShipFrom,
 	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory {
 

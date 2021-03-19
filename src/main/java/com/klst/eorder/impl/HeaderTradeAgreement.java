@@ -1,5 +1,8 @@
 package com.klst.eorder.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.BusinessParty;
@@ -7,8 +10,10 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
+import com.klst.eorder.api.SupportingDocument;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeAgreementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
 
 public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG4_Seller, BG7_Buyer {
 
@@ -162,6 +167,19 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	String getPreviousOrderResponseReference() {
 		if(getPreviousOrderResponseReferencedDocument()==null) return null;
 		return getPreviousOrderResponseReferencedDocument().getIssuerAssignedID()==null ? null : getPreviousOrderResponseReferencedDocument().getIssuerAssignedID().getValue();
+	}
+
+	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	public void addSupportigDocument(SupportingDocument supportigDocument) {
+		super.getAdditionalReferencedDocument().add((ReferencedDocument)supportigDocument);
+	}
+	public List<SupportingDocument> getAdditionalSupportingDocuments() {
+		List<ReferencedDocumentType> list = super.getAdditionalReferencedDocument();
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
+		list.forEach(rd -> {
+			res.add(ReferencedDocument.create(rd));
+		});
+		return res;
 	}
 
 }
