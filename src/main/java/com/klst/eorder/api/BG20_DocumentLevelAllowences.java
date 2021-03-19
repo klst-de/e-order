@@ -21,54 +21,8 @@ import com.klst.edoc.api.IAmount;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-/* example 
-           <ram:ApplicableHeaderTradeSettlement>
-           ...
-              <ram:SpecifiedTradeAllowanceCharge>
-                    <ram:ChargeIndicator>
-                         <udt:Indicator>false</udt:Indicator>
-                    </ram:ChargeIndicator>
-                    <ram:CalculationPercent>10.00</ram:CalculationPercent>
-                    <ram:BasisAmount>310</ram:BasisAmount>
-                    <ram:ActualAmount>31.00</ram:ActualAmount>
-                    <ram:ReasonCode>64</ram:ReasonCode>
-                    <ram:Reason>SPECIAL AGREEMENT</ram:Reason>
-                    <ram:CategoryTradeTax>
-                         <ram:TypeCode>VAT</ram:TypeCode>
-                         <ram:CategoryCode>S</ram:CategoryCode>
-                         <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
-                    </ram:CategoryTradeTax>
-               </ram:SpecifiedTradeAllowanceCharge>
-               <ram:SpecifiedTradeAllowanceCharge>
-                    <ram:ChargeIndicator>
-                         <udt:Indicator>false</udt:Indicator>
-                    </ram:ChargeIndicator>
-                    <ram:CalculationPercent>10.00</ram:CalculationPercent>
-                    <ram:BasisAmount>210.00</ram:BasisAmount>
-                    <ram:ActualAmount>21.00</ram:ActualAmount>
-                    <ram:ReasonCode>79</ram:ReasonCode>
-                    <ram:Reason>FREIGHT SERVICES</ram:Reason>
-                    <ram:CategoryTradeTax>
-                         <ram:TypeCode>VAT</ram:TypeCode>
-                         <ram:CategoryCode>S</ram:CategoryCode>
-                         <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
-                    </ram:CategoryTradeTax>
-               </ram:SpecifiedTradeAllowanceCharge>
-...
- */
 public interface BG20_DocumentLevelAllowences extends AllowancesOrChargesFactory {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage);	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage);
-	
 	/**
 	 * add an allowance or charge
 	 * 
