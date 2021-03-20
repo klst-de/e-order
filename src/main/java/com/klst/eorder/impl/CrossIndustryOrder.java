@@ -65,7 +65,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 			supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		}
 
-		LOG.info("copy ctor:"+this);
+		LOG.config("copy ctor:"+this);
 	}
 
 	/**
@@ -606,8 +606,11 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		
 		stringBuilder.append("]");
 		
-		stringBuilder.append("\nSeller:");
-		stringBuilder.append(getSeller()==null ? "null" : getSeller());
+//		BusinessParty seller = getSeller();
+//		if(seller!=null) {
+//			stringBuilder.append("\nSeller:");
+//			stringBuilder.append(seller);
+//		}
 		
 		this.getLines().forEach(line -> {
 			stringBuilder.append("\nline:").append(line);
