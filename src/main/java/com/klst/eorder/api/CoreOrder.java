@@ -58,6 +58,21 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 		if(ymd!=null) setIssueDate(DateTimeFormats.ymdToTs(ymd));
 	}
 
+	/*
+	 * The Requested Date or Period on which Delivery is requested
+	 * for Delivery, mutually exclusive with Pick up = Despatch
+	 * (nicht in CII)
+	 * 
+	 * Requested Delivery Date
+	 * Requested Delivery Period, at least 1 StartDate or 1 EndDate
+	 * TODO
+	 */
+	public void setDeliveryDate(Timestamp timestamp);
+	public Timestamp getDeliveryDateAsTimestamp();
+	default void setDeliveryDate(String ymd) {
+		if(ymd!=null) setDeliveryDate(DateTimeFormats.ymdToTs(ymd));
+	}
+	
 	/**
 	 * The Document TypeCode (BT-3) MUST be:
 - 220 for an ORDER

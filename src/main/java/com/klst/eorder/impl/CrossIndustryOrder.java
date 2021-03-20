@@ -186,6 +186,15 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 
+	@Override
+	public void setDeliveryDate(Timestamp ts) {
+		applicableHeaderTradeDelivery.setDeliveryDate(ts);
+	}
+	@Override
+	public Timestamp getDeliveryDateAsTimestamp() {
+		return applicableHeaderTradeDelivery.getDeliveryDateAsTimestamp();
+	}
+
 	// ExchangedDocument.Name wird in einvoice nicht verwendet
 	public String getName() {
 		return super.getExchangedDocument().getName().getValue();

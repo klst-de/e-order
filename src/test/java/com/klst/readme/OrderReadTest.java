@@ -16,6 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
@@ -93,6 +94,8 @@ public class OrderReadTest {
 		BusinessParty shipFromParty = cio.getShipFromParty();
 		LOG.info("Seller:"+seller);
 		LOG.info("Buyer:"+buyer);
+		
+		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
 	}
 	
 }

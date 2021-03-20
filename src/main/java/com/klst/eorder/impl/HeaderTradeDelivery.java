@@ -1,13 +1,19 @@
 package com.klst.eorder.impl;
 
+import java.sql.Timestamp;
+
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.eorder.api.ShipFrom;
 import com.klst.eorder.api.ShipTo;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeDeliveryType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainEventType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
 
 public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements ShipTo, ShipFrom {
 
@@ -62,4 +68,17 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		return super.getShipFromTradeParty()==null ? null : TradeParty.create(super.getShipFromTradeParty());
 	}
 
+	public void setDeliveryDate(Timestamp ts) {
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
+		// nur ein (?) element:
+		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) {
+			getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
+	}
+	public Timestamp getDeliveryDateAsTimestamp() {
+		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) return null;
+		DateTimeType dateTime = getRequestedDeliverySupplyChainEvent().get(0).getOccurrenceDateTime();
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
 }
