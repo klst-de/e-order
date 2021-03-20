@@ -8,6 +8,7 @@ import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
 import com.klst.eorder.api.SupportingDocument;
@@ -70,6 +71,36 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	public String getPurchaseOrderReference() {
 		if(getBuyerOrderReferencedDocument()==null) return null;
 		return getBuyerOrderReferencedDocument().getIssuerAssignedID()==null ? null : getBuyerOrderReferencedDocument().getIssuerAssignedID().getValue();
+	}
+	
+	
+	// BT-17 0..1 Tender or lot reference
+/* Beispiel:
+               <ram:AdditionalReferencedDocument>
+                    <ram:IssuerAssignedID>TENDER_ID</ram:IssuerAssignedID>
+                    <ram:TypeCode>50</ram:TypeCode>
+               </ram:AdditionalReferencedDocument>
+               
+   ram:AdditionalReferencedDocument wird für BT-17 mit <ram:TypeCode>50 verwendet
+                                     und für BG-24 mit <ram:TypeCode>916
+   
+   BR: ON profiles BASIC OR COMFORT, the Order MUST NOT HAVE more than 1 Tender or Lot Reference on Header Level
+   
+   nicht public, CrossIndustryOrder delegiert hierhin
+ */
+	void setTenderOrLotReference(String docRefId) {
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, DocumentNameCode.ValidatedPricedTender.getValueAsString()
+				, (String)null);
+		super.getAdditionalReferencedDocument().add(rd);
+	}
+	String getTenderOrLotReference() {
+		List<ReferencedDocumentType> list = super.getAdditionalReferencedDocument();
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isValidatedPricedTender()) res.add(referencedDocument);
+		});
+		return res.isEmpty() ? null : res.get(0).getDocumentReference().getName();
 	}
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller
@@ -177,7 +208,8 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 		List<ReferencedDocumentType> list = super.getAdditionalReferencedDocument();
 		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
 		list.forEach(rd -> {
-			res.add(ReferencedDocument.create(rd));
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isRelatedDocument()) res.add(referencedDocument);
 		});
 		return res;
 	}

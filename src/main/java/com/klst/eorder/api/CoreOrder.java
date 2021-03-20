@@ -164,6 +164,25 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public String getPurchaseOrderReference();
 
 	/**
+	 * Tender or lot reference
+	 * <p>
+	 * A group of business terms providing information about additional supporting documents substantiating 
+	 * the claims made in the order.
+	 * The identification of the call for tender or lot the order relates to.
+	 * In some countries a reference to the call for tender that has led to the contract shall be provided.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-17
+	 * <br>Rule ID: 	ON profiles BASIC OR COMFORT, 
+	 *                  the Order MUST NOT HAVE more than 1 Tender or Lot Reference on Header Level
+	 * <br>Request ID: 	R7, R4
+	 * 
+	 * @param Document reference
+	 */
+	public void setTenderOrLotReference(String docRefId);
+	public String getTenderOrLotReference();
+
+	/**
 	 * Buyer accounting reference
 	 * <p>
 	 * A textual value that specifies where to book the relevant data into the Buyer's financial accounts.

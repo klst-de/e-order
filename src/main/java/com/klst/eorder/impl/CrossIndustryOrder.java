@@ -264,6 +264,16 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return applicableHeaderTradeAgreement.getPurchaseOrderReference();	
 	}
 
+	// BT-17 + 0..1 Tender or lot reference
+	@Override
+	public void setTenderOrLotReference(String docRefId) {
+		applicableHeaderTradeAgreement.setTenderOrLotReference(docRefId);	
+	}
+	@Override
+	public String getTenderOrLotReference() {
+		return applicableHeaderTradeAgreement.getTenderOrLotReference();	
+	}
+
 	// BT-19 + 0..1 Buyer accounting reference
 	@Override
 	public void setBuyerAccountingReference(Reference textReference) {

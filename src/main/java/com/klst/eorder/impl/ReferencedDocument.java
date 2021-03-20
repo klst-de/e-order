@@ -15,6 +15,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._103.FormattedDateTimeT
 import un.unece.uncefact.data.standard.qualifieddatatype._103.ReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.BinaryObjectType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 
 public class ReferencedDocument extends ReferencedDocumentType implements SupportingDocument {
 // in CII: implements BG24_AdditionalSupportingDocs, PrecedingInvoice
@@ -92,6 +93,8 @@ Beispiel:
 		return rd;
 	}
 	
+	// used for BT-17 0..1 Tender or lot reference
+	//  and for BG.25.BT-128 0..1 Objektkennung
 	static ReferencedDocument create(String docRefId, String code, String referenceTypeCode) {
 		return new ReferencedDocument(docRefId, code, referenceTypeCode);
 	}
@@ -117,7 +120,7 @@ Beispiel:
 		}
 	}
 
-	// BG-24
+	// used for BG-24
 	private ReferencedDocument(String docRefId, String description) {
 		super();
 		setDocumentCode(DocumentNameCode.RelatedDocument.getValueAsString());
@@ -150,6 +153,16 @@ Beispiel:
 			//super.getFormattedIssueDateTime();
 		}
 		return documentCode.getValue();
+	}
+	boolean isRelatedDocument() {
+		String typeCode = getDocumentCode();
+		if(typeCode==null) return false;
+		return typeCode.equals(DocumentNameCode.RelatedDocument.getValueAsString());
+	}
+	boolean isValidatedPricedTender() {
+		String typeCode = getDocumentCode();
+		if(typeCode==null) return false;
+		return typeCode.equals(DocumentNameCode.ValidatedPricedTender.getValueAsString());
 	}
 
 // ReferenceTypeCode Kennung des Schemas BT-18-1
