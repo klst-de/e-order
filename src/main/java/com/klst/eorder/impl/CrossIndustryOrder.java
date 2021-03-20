@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
@@ -193,6 +194,19 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	@Override
 	public Timestamp getDeliveryDateAsTimestamp() {
 		return applicableHeaderTradeDelivery.getDeliveryDateAsTimestamp();
+	}
+
+	@Override
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return Period.create(start, end);
+	}
+	@Override
+	public void setDeliveryPeriod(IPeriod period) {
+		applicableHeaderTradeDelivery.setDeliveryPeriod(period);
+	}
+	@Override
+	public IPeriod getDeliveryPeriod() {
+		return applicableHeaderTradeDelivery.getDeliveryPeriod();
 	}
 
 	// ExchangedDocument.Name wird in einvoice nicht verwendet

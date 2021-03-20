@@ -3,9 +3,9 @@ package com.klst.eorder.impl;
 import java.sql.Timestamp;
 
 import com.klst.ebXml.reflection.CopyCtor;
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.eorder.api.ShipFrom;
@@ -68,7 +68,8 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		return super.getShipFromTradeParty()==null ? null : TradeParty.create(super.getShipFromTradeParty());
 	}
 
-	public void setDeliveryDate(Timestamp ts) {
+	// die nachfolgenden nicht public, methoden werden hierhin delegiert
+	void setDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		// nur ein (?) element:
 		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) {
@@ -76,9 +77,21 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		}
 		getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
-	public Timestamp getDeliveryDateAsTimestamp() {
+	Timestamp getDeliveryDateAsTimestamp() {
 		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) return null;
 		DateTimeType dateTime = getRequestedDeliverySupplyChainEvent().get(0).getOccurrenceDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
+	
+	void setDeliveryPeriod(IPeriod period) {
+		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) {
+			getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
+	}
+	IPeriod getDeliveryPeriod() {
+		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) return null;
+		return Period.create(getRequestedDeliverySupplyChainEvent().get(0).getOccurrenceSpecifiedPeriod());
+	}
+	
 }

@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 
 import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.ContactInfoFactory;
+import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IPeriodFactory;
 import com.klst.edoc.api.PostalAddressFactory;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
@@ -13,7 +15,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG24_AdditionalSupportingDocs, BG25_OrderLine, 	
 	ShipTo, ShipFrom,
-	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory {
+	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory, IPeriodFactory {
 
 	/**
 	 * Invoice number   - A unique identification of the Invoice.
@@ -65,12 +67,20 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * 
 	 * Requested Delivery Date
 	 * Requested Delivery Period, at least 1 StartDate or 1 EndDate
-	 * TODO
+	 *
 	 */
 	public void setDeliveryDate(Timestamp timestamp);
 	public Timestamp getDeliveryDateAsTimestamp();
 	default void setDeliveryDate(String ymd) {
 		if(ymd!=null) setDeliveryDate(DateTimeFormats.ymdToTs(ymd));
+	}
+	public void setDeliveryPeriod(IPeriod period);
+	public IPeriod getDeliveryPeriod();
+	default void setDeliveryPeriod(Timestamp start, Timestamp end) {
+		setDeliveryPeriod(createPeriod(start, end));
+	}
+	default void setDeliveryPeriod(String ymdStart, String ymdEnd) {
+		setDeliveryPeriod(createPeriod(ymdStart, ymdEnd));
 	}
 	
 	/**

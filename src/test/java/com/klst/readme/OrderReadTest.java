@@ -16,6 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG2_ProcessControl;
@@ -96,6 +97,9 @@ public class OrderReadTest {
 		LOG.info("Buyer:"+buyer);
 		
 		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
+		IPeriod deliveryPeriod = cio.getDeliveryPeriod();
+		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getStartDateAsTimestamp()));
+		assertEquals("20200430", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getEndDateAsTimestamp()));
 	}
 	
 }
