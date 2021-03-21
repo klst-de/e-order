@@ -267,7 +267,17 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return applicableHeaderTradeAgreement.getBuyerReferenceValue();
 	}
 	
-	// BT-12 + 0..1 Contract reference
+	// BT-11 0..1 procuring project
+	@Override
+	public void setProjectReference(String id, String name) {
+		applicableHeaderTradeAgreement.setProjectReference(id, name);
+	}
+	@Override
+	public Reference getProjectReference() {
+		return applicableHeaderTradeAgreement.getProjectReference();
+	}
+	
+	// BT-12 0..1 Contract reference
 	@Override
 	public void setContractReference(String id) {
 		applicableHeaderTradeAgreement.setContractReference(id);	
@@ -277,7 +287,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		return applicableHeaderTradeAgreement.getContractReference();	
 	}
 
-	// BT-13 + 0..1 Purchase order reference
+	// BT-13 0..1 Purchase order reference
 	@Override
 	public void setPurchaseOrderReference(String id) {
 		applicableHeaderTradeAgreement.setPurchaseOrderReference(id);	

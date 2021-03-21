@@ -1,6 +1,7 @@
 package com.klst.readme;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -112,7 +113,22 @@ public class OrderReadTest {
 		assertEquals("QUOT_125487", cio.getQuotationReference());
 		assertEquals("CONTRACT_2020-25987", cio.getContractReference());
 		assertEquals("BLANKET_ORDER_ID", cio.getBlanketOrderReference());
-
+/*
+               <ram:PreviousOrderChangeReferencedDocument>
+                    <ram:IssuerAssignedID>PREV_ORDER_C_ID</ram:IssuerAssignedID>
+               </ram:PreviousOrderChangeReferencedDocument>
+               <ram:PreviousOrderResponseReferencedDocument>
+                    <ram:IssuerAssignedID>PREV_ORDER_R_ID</ram:IssuerAssignedID>
+               </ram:PreviousOrderResponseReferencedDocument>
+               <ram:SpecifiedProcuringProject>                     <!-- BT-11 nicht in BASIC / TODO test COMFORT
+                    <ram:ID>PROJECT_ID</ram:ID>
+                    <ram:Name>Project Reference</ram:Name>
+               </ram:SpecifiedProcuringProject>
+ */
+		assertEquals("PREV_ORDER_C_ID", cio.getPreviousOrderChangeReference());
+		assertEquals("PREV_ORDER_R_ID", cio.getPreviousOrderResponseReference());
+		assertNull(cio.getProjectReference());
+		
 		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
 		IPeriod deliveryPeriod = cio.getDeliveryPeriod();
 		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getStartDateAsTimestamp()));

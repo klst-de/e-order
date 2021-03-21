@@ -151,9 +151,19 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public void setBuyerReference(String reference);
 	public String getBuyerReferenceValue();
 	
-	// TODO:
 	// BT-11, (Projektname BT-11-0)
-	// ...
+	/**
+	 * The procuring project specified for this header trade agreement.
+	 * 
+	 * @param id - Project reference
+	 * @param name - Project name
+	 */
+	public void setProjectReference(String id, String name);
+//	public void setProjectReference(String id);
+	default void setProjectReference(Reference ref) {
+		setProjectReference(ref.getName(), ref.getID()); // TODO symetrisch zu e-invoice falschrum?
+	}	
+	public Reference getProjectReference();
 
 	/**
 	 * Contract reference

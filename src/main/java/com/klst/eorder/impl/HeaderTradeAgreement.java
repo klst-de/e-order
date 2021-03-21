@@ -8,6 +8,7 @@ import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
@@ -51,6 +52,25 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	}
 	public String getBuyerReferenceValue() {
 		return super.getBuyerReference()==null ? null : getBuyerReference().getValue();	
+	}
+	
+	// BT-11 0..1 procuring project
+/*
+               <ram:SpecifiedProcuringProject>
+                    <ram:ID>PROJECT_ID</ram:ID>
+                    <ram:Name>Project Reference</ram:Name>
+               </ram:SpecifiedProcuringProject>
+ */
+	public void setProjectReference(String id, String name) {
+		Mapper.newFieldInstance(this, "specifiedProcuringProject", id);
+		Mapper.set(getSpecifiedProcuringProject(), "id", id);
+		Mapper.set(getSpecifiedProcuringProject(), "name", name);
+	}
+	public Reference getProjectReference() {
+		return getSpecifiedProcuringProject()==null ? null 
+				: new ID( getSpecifiedProcuringProject().getName()==null ? "" : getSpecifiedProcuringProject().getName().getValue()
+						, getSpecifiedProcuringProject().getID()==null ? null : getSpecifiedProcuringProject().getID().getValue()
+						);
 	}
 
 	// BT-12 + 0..1 Contract reference
