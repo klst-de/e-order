@@ -639,9 +639,9 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 			stringBuilder.append("\nline:").append(line);
 		});
 		
-		stringBuilder.append(", SupplyChainTradeTransaction:");
-		stringBuilder.append(super.getSupplyChainTradeTransaction()==null ? "null" : getSupplyChainTradeTransaction());
-		stringBuilder.append("]");
+//		stringBuilder.append(", SupplyChainTradeTransaction:");
+//		stringBuilder.append(super.getSupplyChainTradeTransaction()==null ? "null" : getSupplyChainTradeTransaction());
+		stringBuilder.append("\n]");
 		return stringBuilder.toString();
 	}
 
