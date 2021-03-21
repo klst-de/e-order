@@ -22,7 +22,7 @@ import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
-import com.klst.eorder.api.IContactExt;
+import com.klst.eorder.api.ContactInfoExt;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.impl.Amount;               // impl.jar
 import com.klst.eorder.impl.CrossIndustryOrder;   // impl.jar
@@ -67,7 +67,7 @@ public class OrderTest {
 		order.addNote( order.createNote("AAI", "Content of Note") );
 		
 		ContactInfo contact = TradeContact.create().createContactInfo(null, null, null);
-		IContactExt contactExt = (IContactExt)contact;
+		ContactInfoExt contactExt = (ContactInfoExt)contact;
 		contactExt.setContactDepartment("dept");
 		LOG.info("contact:"+contactExt);
 //		java.lang.IllegalArgumentException: No enum constant un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType.XX
@@ -103,7 +103,7 @@ public class OrderTest {
 		
 		ContactInfo buyerContact = order.createContactInfo("buyerContact name", "buyerContact tel", null);
 		if(buyerContact instanceof TradeContact) { // TradeContact implements IContactExt
-			IContactExt buyerContactExt = (IContactExt)buyerContact;
+			ContactInfoExt buyerContactExt = (ContactInfoExt)buyerContact;
 			buyerContactExt.setContactDepartment("BUYER_CONTACT_DEP");
 			buyerContactExt.setContactType("LB");
 		}

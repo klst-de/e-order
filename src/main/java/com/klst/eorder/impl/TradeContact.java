@@ -3,13 +3,13 @@ package com.klst.eorder.impl;
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.ContactInfo;
-import com.klst.eorder.api.IContactExt;
+import com.klst.eorder.api.ContactInfoExt;
 
 import un.unece.uncefact.codelist.standard.unece.contactfunctioncode.d19b.ContactFunctionCodeContentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.UniversalCommunicationType;
 
-public class TradeContact extends TradeContactType implements IContactExt {
+public class TradeContact extends TradeContactType implements ContactInfoExt {
 
 	@Override // implements IContactFactory
 	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
