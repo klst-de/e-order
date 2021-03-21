@@ -24,14 +24,14 @@ import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.IContactExt;
 import com.klst.eorder.api.OrderLine;
-import com.klst.eorder.impl.Amount;
-import com.klst.eorder.impl.CrossIndustryOrder;
-import com.klst.eorder.impl.ID;
+import com.klst.eorder.impl.Amount;               // impl.jar
+import com.klst.eorder.impl.CrossIndustryOrder;   // impl.jar
+import com.klst.eorder.impl.ID;                   // ...
 import com.klst.eorder.impl.Quantity;
 import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.TradeContact;
 import com.klst.eorder.impl.TradeParty;
-import com.klst.eorder.impl.UnitPriceAmount;
+import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 
