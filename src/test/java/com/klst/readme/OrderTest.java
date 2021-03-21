@@ -102,7 +102,11 @@ public class OrderTest {
 		order.setSeller(seller);
 		
 		ContactInfo buyerContact = order.createContactInfo("buyerContact name", "buyerContact tel", null);
-		buyerContact.setContactType("LB");
+		if(buyerContact instanceof TradeContact) { // TradeContact implements IContactExt
+			IContactExt buyerContactExt = (IContactExt)buyerContact;
+			buyerContactExt.setContactDepartment("BUYER_CONTACT_DEP");
+			buyerContactExt.setContactType("LB");
+		}
 		order.setBuyer("Buyer", address, buyerContact);
 		
 		order.setBuyerAccountingReference(new ID("BUYER_ACCOUNT_REF"));
