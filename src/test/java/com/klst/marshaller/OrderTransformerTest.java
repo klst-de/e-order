@@ -24,9 +24,6 @@ import org.xml.sax.SAXException;
 
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.CoreOrder;
-import com.klst.eorder.impl.CrossIndustryOrder;
-
-import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OrderTransformerTest {
@@ -37,6 +34,7 @@ public class OrderTransformerTest {
 	private static final String TESTDIR = "src/test/resources/";
 	private static final String NOT_EXISTING_FILE = "NOT_EXISTING_FILE.xml";
 	private static final String UNCEFACT_XML = "ORDER-X_EX01_ORDER_FULL_DATA-BASIC.xml";
+	private static final String NON_UNCEFACT_XML = "UBL-2.1-order.xml";
 
 	private static final Logger LOG = Logger.getLogger(OrderTransformerTest.class.getName());
 
@@ -109,9 +107,49 @@ public class OrderTransformerTest {
 		LOG.info("file " +file+ " is valid.");
 		try {
 			InputStream is = new FileInputStream(file);
-			SCRDMCCBDACIOMessageStructureType ms = transformer.toModel(is);
-			CoreOrder order = new CrossIndustryOrder(ms);
+			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder laden
+//			CoreOrder order = new CrossIndustryOrder(transformer.toModel(is));
+			// dynamisch:
+			Object o = transformer.toModel(is);
+			CoreOrder order = CoreOrder.class.cast(type.getConstructor(o.getClass()).newInstance(o));
 			assertEquals(DocumentNameCode.Order, order.getDocumentCode());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			LOG.severe(ex.getMessage());
+		}
+
+    }
+
+    @Test
+    public void validateNonCioTest() {
+		File file = getXmlFile(TESTDIR+NON_UNCEFACT_XML);	
+		Validator validator = null;
+		try {
+			validator = transformer.getSchemaValidator(); // throws SAXException
+		} catch (SAXException ex) {
+			fail("Validator SAXException="+ex.getMessage());
+		}
+		
+		try {
+			Source xmlFile = new StreamSource(file);
+			validator.validate(xmlFile); // throws SAXException, Exception
+			// expected SAXException because input is not CIO xml
+			fail("SAXException not thrown");
+		} catch (SAXException ex) {
+			LOG.warning("expected Validator SAXException="+ex.getMessage());
+			//fail("Validator SAXException="+ex.getMessage());
+		} catch (Exception ex) {
+			LOG.warning("Validator SAXException="+ex.getMessage());
+			fail("Validator Exception="+ex.getMessage());
+		}
+		
+		LOG.info("file " +file+ " is not valid.");
+		try {
+			InputStream is = new FileInputStream(file);
+//			Object o = 
+					transformer.toModel(is);
+			// expected Exception because input is not CIO
+			fail("UnmarshalException not thrown");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			LOG.severe(ex.getMessage());
