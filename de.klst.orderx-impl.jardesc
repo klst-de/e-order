@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="de.klst.orderx-impl-0.2.0.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/e-order/de.klst.orderx-impl.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d19b"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.codelist.standard.unece.contactfunctioncode.d19b"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/resources&lt;xsd"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;com.klst.eorder.impl"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.data.standard.qualifieddatatype._103"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.codelist.standard.unece.referencetypecode.d19b"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.codelist.standard.unece.dutytaxfeetypecode.d19b"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006"/>
+        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;un.unece.uncefact.data.standard.unqualifieddatatype._103"/>
+    </selectedElements>
+</jardesc>
