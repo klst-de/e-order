@@ -96,6 +96,7 @@ public abstract class AbstactTransformer {
 	<T extends Object> T toModel(InputStream xmlInputStream, Class<T> declaredType) {
 		try {
 			Unmarshaller unmarshaller = createUnmarshaller();
+			LOG.info("try unmarshal to "+declaredType.getName());
 			return unmarshaller.unmarshal(new StreamSource(xmlInputStream), declaredType).getValue();
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.MARSHALLING_ERROR, ex);
