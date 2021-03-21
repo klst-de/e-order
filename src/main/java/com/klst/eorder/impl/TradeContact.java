@@ -1,9 +1,11 @@
 package com.klst.eorder.impl;
 
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.eorder.api.IContactExt;
 
+import un.unece.uncefact.codelist.standard.unece.contactfunctioncode.d19b.ContactFunctionCodeContentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.UniversalCommunicationType;
 
@@ -110,6 +112,22 @@ public class TradeContact extends TradeContactType implements IContactExt {
 		return super.getEmailURIUniversalCommunication()==null ? null : getEmailURIUniversalCommunication().getURIID().getValue();
 	}
 	
+	// Bsp. UNTDID 3139 LB == Place of delivery contact : Department/employee to be contacted at the place of delivery.
+	// buyer contact type
+	@Override
+	public void setContactType(String code) {
+		try {
+			Mapper.set(this, "typeCode", ContactFunctionCodeContentType.fromValue(code));
+		} catch (Exception e) {
+//			LOG.warning("Invalid Function code "+code);
+			throw new IllegalArgumentException("Invalid ContactType code "+code);
+		}
+	}
+	@Override
+	public String getContactType() {
+		return super.getTypeCode()==null ? null : getTypeCode().getValue().value();
+	}
+
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("[");

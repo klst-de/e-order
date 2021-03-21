@@ -101,7 +101,9 @@ public class OrderTest {
 		seller.setVATRegistrationId("FR 32 123 456 789");
 		order.setSeller(seller);
 		
-		order.setBuyer("Buyer", address, icontact); // OK
+		ContactInfo buyerContact = order.createContactInfo("buyerContact name", "buyerContact tel", null);
+		buyerContact.setContactType("LB");
+		order.setBuyer("Buyer", address, buyerContact);
 		
 		order.setBuyerAccountingReference(new ID("BUYER_ACCOUNT_REF"));
 		
