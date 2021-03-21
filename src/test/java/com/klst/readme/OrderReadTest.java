@@ -24,27 +24,28 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
-import com.klst.eorder.impl.Amount;
-import com.klst.eorder.impl.CrossIndustryOrder;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 
-import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
-
 public class OrderReadTest {
 
-//	private static final Logger LOG = Logger.getLogger(OrderReadTest.class.getName());
+	private static final String LOG_PROPERTIES = "testLogging.properties";
 	private static LogManager logManager = LogManager.getLogManager(); // Singleton
 	private static Logger LOG = null;
 	private static void initLogger() {
-    	URL url = OrderReadTest.class.getClassLoader().getResource("testLogging.properties");
-		try {
-	        File file = new File(url.toURI());
-			logManager.readConfiguration(new FileInputStream(file));
-		} catch (IOException | URISyntaxException e) {
+    	URL url = OrderReadTest.class.getClassLoader().getResource(LOG_PROPERTIES);
+    	if(url==null) {
 			LOG = Logger.getLogger(OrderReadTest.class.getName());
-			LOG.warning(e.getMessage());
-		}
+			LOG.warning("keine "+LOG_PROPERTIES);
+    	} else {
+    		try {
+    	        File file = new File(url.toURI()); //NPE wenn "testLogging.properties" nicht gefunden
+    			logManager.readConfiguration(new FileInputStream(file));
+    		} catch (IOException | URISyntaxException e) {
+    			LOG = Logger.getLogger(OrderReadTest.class.getName());
+    			LOG.warning(e.getMessage());
+    		}
+    	}
 		LOG = Logger.getLogger(OrderReadTest.class.getName());		
 	}
 	static private final String TESTDIR = "src/test/resources/";
@@ -77,20 +78,21 @@ public class OrderReadTest {
     public void cioEX01() {
 		testFile = getTestFile(TESTDIR+"ORDER-X_EX01_ORDER_FULL_DATA-BASIC.xml");
 		transformer = cioTransformer;
+		CoreOrder cio = null;
 		// toModel:
 		if(transformer.isValid(testFile)) {
 			try {
 				InputStream is = new FileInputStream(testFile);
 				object = transformer.toModel(is);
 				LOG.info(">>>>"+object);
+				Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
+				// dynamisch:
+				cio = CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				LOG.severe(ex.getMessage());
 			}
 		}
-		// ---- cii = CrossIndustryInvoice.create(invoice);
-		CoreOrder cio = new CrossIndustryOrder((SCRDMCCBDACIOMessageStructureType)object);
-		// TODO aus Object cio bzw TypeCode:220 
 		assertEquals(BG2_ProcessControl.PROFILE_BASIC, cio.getProfile());
 		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());
 		
@@ -107,7 +109,9 @@ public class OrderReadTest {
 		assertEquals("7", cio.getDeliveryFunctionCode()); // UNTDID 4055 7 Delivered by the supplier
 
 		assertEquals("PO123456789", cio.getPurchaseOrderReference());
-		// TODO ram:QuotationReferencedDocument  ram:ContractReferencedDocument  ram:BlanketOrderReferencedDocument
+		assertEquals("QUOT_125487", cio.getQuotationReference());
+		assertEquals("CONTRACT_2020-25987", cio.getContractReference());
+		assertEquals("BLANKET_ORDER_ID", cio.getBlanketOrderReference());
 
 		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
 		IPeriod deliveryPeriod = cio.getDeliveryPeriod();
