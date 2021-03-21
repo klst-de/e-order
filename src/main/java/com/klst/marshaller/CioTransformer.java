@@ -35,6 +35,8 @@ public class CioTransformer extends AbstactTransformer {
 	private static final String CIO_1_XSD = "/xsd/SCRDMCCBDACIOMessageStructure_1p0.xsd";
 	// CONTENT_PATH aka package name
 	private static final String CONTENT_PATH = "un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1"; 
+	// CONTENT_TYPE_NAME aka class name
+	public static final String CONTENT_TYPE_NAME = "com.klst.eorder.impl.CrossIndustryOrder"; 
 	
 	private CioTransformer() {
 		super(CONTENT_PATH, SINGLETON);
