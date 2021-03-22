@@ -75,8 +75,10 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 							<bmecat:ACADEMIC_TITLE>a</bmecat:ACADEMIC_TITLE>
 							<CONTACT_ROLE type="administrativ">a</CONTACT_ROLE>
 							<bmecat:CONTACT_DESCR>a</bmecat:CONTACT_DESCR>
+	<!-- Wert '$' ist nicht Facet-gültig in Bezug auf Muster 'mobile|office|private|\w{1,50}' für Typ '#AnonType_typePHONE'
 							<bmecat:PHONE type="$">a</bmecat:PHONE>
 							<bmecat:FAX type="$">a</bmecat:FAX>
+			-->
 							<bmecat:URL>a</bmecat:URL>
 							<bmecat:EMAILS>
 								<bmecat:EMAIL>a</bmecat:EMAIL>
@@ -200,24 +202,28 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 		<ORDER_ITEM>
 			<LINE_ITEM_ID>1</LINE_ITEM_ID>
 			<PRODUCT_ID>
-				<bmecat:SUPPLIER_PID type="$">a</bmecat:SUPPLIER_PID>
+				<bmecat:SUPPLIER_PID type="upc">a</bmecat:SUPPLIER_PID>
+<!--  Wert '$' ist nicht Facet-gültig in Bezug auf Muster 'buyer_specific|customer_specific|duns|iln|gln|party_specific|supplier_specific|\w{1,250}' für Typ '#AnonType_typetypePARTY_ID'.
 				<bmecat:SUPPLIER_IDREF type="$">a</bmecat:SUPPLIER_IDREF>
+		-->
 				<CONFIG_CODE_FIX>a</CONFIG_CODE_FIX>
 				<LOT_NUMBER>a</LOT_NUMBER>
 				<SERIAL_NUMBER>a</SERIAL_NUMBER>
-				<bmecat:INTERNATIONAL_PID type="$">a</bmecat:INTERNATIONAL_PID>
-				<bmecat:BUYER_PID type="$">a</bmecat:BUYER_PID>
+				<bmecat:INTERNATIONAL_PID type="gtin">a</bmecat:INTERNATIONAL_PID>
+				<bmecat:BUYER_PID type="buyer_specific">a</bmecat:BUYER_PID>
 				<bmecat:DESCRIPTION_SHORT lang="deu">a</bmecat:DESCRIPTION_SHORT>
 				<bmecat:DESCRIPTION_LONG lang="eng">a</bmecat:DESCRIPTION_LONG>
 				<MANUFACTURER_INFO>
-					<bmecat:MANUFACTURER_IDREF type="$">a</bmecat:MANUFACTURER_IDREF>
+					<bmecat:MANUFACTURER_IDREF type="duns">a</bmecat:MANUFACTURER_IDREF>
 					<bmecat:MANUFACTURER_PID>a</bmecat:MANUFACTURER_PID>
 					<bmecat:MANUFACTURER_TYPE_DESCR lang="eng">a</bmecat:MANUFACTURER_TYPE_DESCR>
 				</MANUFACTURER_INFO>
 				<bmecat:PRODUCT_TYPE>bundle</bmecat:PRODUCT_TYPE>
 			</PRODUCT_ID>
 			<PRODUCT_FEATURES>
+<!-- Wert '$' ist nicht Facet-gültig in Bezug auf Muster 'CPV-yyyy-mm-dd|ECLASS-x.y|EOTD-yyyy-mm-dd|ETIM-x.y|GPC-x.y|PROFICLASS-x.y|RNTD-x.y|RUS-x.y|UNSPSC-x.yyyy|udf_NAME-x.y|[\w\-\.]{1,80}' für Typ 'typeCLASSIFICATION_SYSTEM_NAME'.
 				<bmecat:REFERENCE_FEATURE_SYSTEM_NAME>$</bmecat:REFERENCE_FEATURE_SYSTEM_NAME>
+		-->
 				<bmecat:REFERENCE_FEATURE_GROUP_ID type="flat">a</bmecat:REFERENCE_FEATURE_GROUP_ID>
 				<bmecat:REFERENCE_FEATURE_GROUP_NAME>a</bmecat:REFERENCE_FEATURE_GROUP_NAME>
 				<bmecat:REFERENCE_FEATURE_GROUP_ID2 type="flat">a</bmecat:REFERENCE_FEATURE_GROUP_ID2>
@@ -288,7 +294,7 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 				<bmecat:PRICE_FLAG type="incl_assurance">TRUE</bmecat:PRICE_FLAG>
 				<TAX_DETAILS_FIX>
 					<bmecat:CALCULATION_SEQUENCE>1</bmecat:CALCULATION_SEQUENCE>
-					<bmecat:TAX_CATEGORY>$</bmecat:TAX_CATEGORY>
+					<bmecat:TAX_CATEGORY>standard_rate</bmecat:TAX_CATEGORY>
 					<bmecat:TAX_TYPE>vat</bmecat:TAX_TYPE>
 					<bmecat:TAX>0.0</bmecat:TAX>
 					<TAX_AMOUNT>0.0</TAX_AMOUNT>
