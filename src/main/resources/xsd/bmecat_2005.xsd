@@ -53,7 +53,7 @@
   more infos and full specification: http://www.bmecat.org
   e-mail contact: authors@bmecat.org
 -->
-<xsd:schema targetNamespace="http://www.bmecat.org/bmecat/2005fd" xmlns="http://www.bmecat.org/bmecat/2005fd" xmlns:blidoc="http://www.bli.uni-essen.de/docu/2005" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xsd:schema targetNamespace="http://www.bmecat.org/bmecat/2005" xmlns="http://www.bmecat.org/bmecat/2005" xmlns:blidoc="http://www.bli.uni-essen.de/docu/2005" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xsd:element name="BMECAT">
 		<xsd:complexType>
 			<xsd:sequence>
