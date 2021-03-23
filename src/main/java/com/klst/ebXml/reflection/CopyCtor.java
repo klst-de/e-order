@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
+
 public class CopyCtor {
 
 	private static final Logger LOG = Logger.getLogger(CopyCtor.class.getName());
@@ -76,25 +78,58 @@ public class CopyCtor {
 				// if(settersByName.containsKey(setterName)) false ==> es gibt keinen passenden Setter
 				// dann muss es ein member/field geben mit name==getterName (beginnend mit Kleinbuchstaben)
 				// ausser bei getID ==> dann ist fieldName="id"
-				String fieldName = getterName.substring(set.length(), set.length()+1).toLowerCase()+getterName.substring(set.length()+1);
+				String fieldName = getFieldnameLowerCaseFirstLetter(getterName);
 				if(getterName.equals("getID")) fieldName = "id";
 				
 				LOG.fine("List<?> "+fieldName+" = "+getterName);
 				if(fieldsByName.containsKey(fieldName)) {
 					Field field = fieldsByName.get(fieldName);
-				    try {
-				    	// see https://stackoverflow.com/questions/24094871/set-field-value-with-reflection
-				    	field.setAccessible(true);
-				    	field.set(obj, getter.invoke(doc));
-				    } catch (Exception e) {
-				        LOG.warning("List<?> "+fieldName+" = "+getterName + "Exception:"+e);
-				    }
+					setFieldValueWithReflection(obj, doc, field, getter);
 				} else {
-					LOG.warning("List<?> "+fieldName+" zu  "+getterName + " nicht gefunden.");
+					fieldName = getFieldnameLowerCase(getterName);
+					LOG.fine("opentrans List<?> "+fieldName+" = "+getterName);
+					if(fieldsByName.containsKey(fieldName)) {
+						Field field = fieldsByName.get(fieldName);
+						setFieldValueWithReflection(obj, doc, field, getter);
+					} else {
+						LOG.warning("List<?> "+fieldName+" zu  "+getterName + " nicht gefunden.");
+					}
 				}
 			}
 		} 
 		
 	}
 	
+	/*
+	 * in UNCEFACT und in UBL kann man aus <getterName> den <fieldName> ermitteln,
+	 * Beispiel:     getShipToTradeParty() { // bzw. List<IDType> getGlobalID()
+	 * liefert   return shipToTradeParty;                return this.globalID;
+	 * 
+	 * Bis auf "getID" geht es auf!
+	 * 
+	 * Bei anderen schemas gilt es nicht, Beispiel openTrans:
+	 *               getPAYMENT() {
+	 * liefert   return payment; 
+	 */
+	private static String getFieldnameLowerCaseFirstLetter(String getterName) {
+		int length = get.length();
+		return getterName.substring(length, length+1).toLowerCase()+getterName.substring(length+1);
+	}
+	private static String getFieldnameLowerCase(String getterName) {
+		int length = get.length();
+		return getterName.substring(length, getterName.length()).toLowerCase();
+	}
+	
+	// see https://stackoverflow.com/questions/24094871/set-field-value-with-reflection
+	// macht dynamisch: obj.setXXX( doc.getXXX() ) für Listen
+	//            also: obj.XXX = doc.getXXX(), d.h. XXX ist field und getXXX ist getter
+	private static void setFieldValueWithReflection(Object obj, Object doc, Field field, Method getter) {
+	    try {
+	    	field.setAccessible(true);
+	    	field.set(obj, getter.invoke(doc));
+	    } catch (Exception e) {
+	        LOG.warning("List<?> "+field.getName()+" = "+getter.getName() + "Exception:"+e);
+	    }
+	
+	}
 }
