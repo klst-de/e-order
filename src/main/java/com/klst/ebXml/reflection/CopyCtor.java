@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
-
 public class CopyCtor {
 
 	private static final Logger LOG = Logger.getLogger(CopyCtor.class.getName());
@@ -86,7 +84,10 @@ public class CopyCtor {
 					Field field = fieldsByName.get(fieldName);
 					setFieldValueWithReflection(obj, doc, field, getter);
 				} else {
+					// in openTrans ist es anders (auch mit Ausnahmen)
 					fieldName = getFieldnameLowerCase(getterName);
+					if(getterName.equals("getEMAILAndPUBLICKEY")) fieldName = "emailAndPUBLICKEY";
+					
 					LOG.fine("opentrans List<?> "+fieldName+" = "+getterName);
 					if(fieldsByName.containsKey(fieldName)) {
 						Field field = fieldsByName.get(fieldName);
