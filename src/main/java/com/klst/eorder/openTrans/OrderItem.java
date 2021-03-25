@@ -113,22 +113,15 @@ BG-32 +++ 0..n ITEM ATTRIBUTES
  * <p>
  * Similar to EN16931 business group BG-25
  */
-public class OrderItem extends ORDERITEM implements OrderLine, IQuantity {
+public class OrderItem extends ORDERITEM implements OrderLine {
 
 	@Override
-	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount,
-			IAmount priceAmount, String itemName) {
-//		return create(this.order, id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
-		return create(this.order, id
-				, quantity.getUnitCode(), quantity.getValue()
-				, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
+	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount, String itemName) {
+		return create(this.order, id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
 	}
 
-	static OrderItem create(CoreOrder order, String id
-			, String unitCode, BigDecimal quantity
-			, Amount lineTotalAmount, 
-			UnitPriceAmount priceAmount, String itemName) {
-		OrderItem orderLine =  new OrderItem(id, unitCode, quantity, lineTotalAmount, priceAmount, itemName);
+	static OrderItem create(CoreOrder order, String id, Quantity quantity, Amount lineTotalAmount,UnitPriceAmount priceAmount, String itemName) {
+		OrderItem orderLine =  new OrderItem(id, quantity, lineTotalAmount, priceAmount, itemName);
 		orderLine.order = order;
 		return orderLine;
 	}
@@ -161,7 +154,7 @@ public class OrderItem extends ORDERITEM implements OrderLine, IQuantity {
 	}
 
 	private OrderItem(String id
-			, String unitCode, BigDecimal quantity // Quantity quantity
+			, Quantity quantity
 			, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName) {
 //		super.setAssociatedDocumentLineDocument(new DocumentLineDocumentType()); // mit id
 //		super.setSpecifiedLineTradeAgreement(new LineTradeAgreementType()); // mit setUnitPriceAmount
@@ -169,7 +162,7 @@ public class OrderItem extends ORDERITEM implements OrderLine, IQuantity {
 //		super.setSpecifiedLineTradeSettlement(new LineTradeSettlementType());
 // optional		super.setSpecifiedTradeProduct(new TradeProductType()); // mit ItemName
 		setId(id);
-		setQuantity(unitCode, quantity); // setQuantity(quantity);
+		setQuantity(quantity);
 		setLineTotalAmount(lineTotalAmount);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
@@ -293,16 +286,13 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	
 	// BT-129 ++ 1..1 bestellte Menge
 	// BT-129+BT-130
-	// Quantity ist in CIO , in OT zwei elemente
-//	void setQuantity(Quantity quantity) { 
-//	}
-	void setQuantity(String unitCode, BigDecimal quantity) {
-		super.setORDERUNIT(unitCode); // required
-		super.setQUANTITY(quantity); // required		
+	void setQuantity(Quantity quantity) { 
+		super.setORDERUNIT(quantity.getUnitCode()); // required
+		super.setQUANTITY(quantity.getValue()); // required		
 	}
 	@Override
 	public IQuantity getQuantity() {
-		return createQuantity(super.getORDERUNIT(), super.getQUANTITY());
+		return Quantity.create(super.getORDERUNIT(), super.getQUANTITY());
 	}
 
 	/* BT-131 ++ 1..1 Nettobetrag der Rechnungsposition / PRICE_LINE_AMOUNT
@@ -580,24 +570,6 @@ realistisches Beispiel:
 	public boolean isPartialDeliveryAllowed() {
 		IndicatorType indicator = super.getSpecifiedLineTradeDelivery().getPartialDeliveryAllowedIndicator();
 		return indicator!=null && indicator.isIndicator().equals(YES);
-	}
-
-	// implements IQuantity:
-	public static final int SCALE = 4;
-	@Override
-	public IQuantity createQuantity(String unitCode, BigDecimal quantity) {
-		setQuantity(unitCode, quantity);
-		return this;
-	}
-
-	@Override
-	public BigDecimal getValue(RoundingMode roundingMode) {
-		super.getQUANTITY().setScale(SCALE, roundingMode);
-	}
-
-	@Override
-	public String getUnitCode() {
-		super.getORDERUNIT();
 	}
 
 }
