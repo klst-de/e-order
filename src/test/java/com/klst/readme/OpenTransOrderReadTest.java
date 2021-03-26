@@ -1,11 +1,14 @@
 package com.klst.readme;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -13,8 +16,15 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
+import com.klst.eorder.api.OrderLine;
 import com.klst.marshaller.AbstactTransformer;
+import com.klst.marshaller.CioTransformer;
 import com.klst.marshaller.OpenTransTransformer;
 
 public class OpenTransOrderReadTest {
@@ -42,6 +52,7 @@ public class OpenTransOrderReadTest {
 	static private final String EUR = "EUR";
 
 	static private AbstactTransformer cioTransformer;
+	static private AbstactTransformer otTransformer;
 	static private AbstactTransformer transformer;
 
     @BeforeClass
@@ -54,7 +65,8 @@ public class OpenTransOrderReadTest {
 	
 	@Before 
     public void setup() {
-	   	cioTransformer = OpenTransTransformer.getInstance();
+	   	cioTransformer = CioTransformer.getInstance();
+	   	otTransformer = OpenTransTransformer.getInstance();
 	   	object = null;
     }
 
@@ -65,17 +77,22 @@ public class OpenTransOrderReadTest {
 	}
 
 	@Test
-    public void otOrder() {
-		testFile = getTestFile(TESTDIR+"sample_order_opentrans_2_1.xml");
-		transformer = cioTransformer;
+    public void cioEX01() {
+		testFile = getTestFile(TESTDIR+"ORDER-X_EX01_ORDER_FULL_DATA-BASIC.xml");
+		transformer = otTransformer;
 		CoreOrder cio = null;
 		// toModel:
+		if(transformer.isValid(testFile)) {
+			// expected not valid
+		}
+		// not valid
+		transformer = cioTransformer;
 		if(transformer.isValid(testFile)) {
 			try {
 				InputStream is = new FileInputStream(testFile);
 				object = transformer.toModel(is);
 				LOG.info(">>>>"+object);
-				Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
+				Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 				// dynamisch:
 				cio = CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
 			} catch (Exception ex) {
@@ -83,11 +100,11 @@ public class OpenTransOrderReadTest {
 				LOG.severe(ex.getMessage());
 			}
 		}
-//		assertEquals(BG2_ProcessControl.PROFILE_BASIC, cio.getProfile());
-//		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());
-//		
-//		assertEquals("BUYER_REF_BU123", cio.getBuyerReferenceValue());
-//		
+		assertEquals(BG2_ProcessControl.PROFILE_BASIC, cio.getProfile());
+		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());
+		
+		assertEquals("BUYER_REF_BU123", cio.getBuyerReferenceValue());
+		
 //		BusinessParty seller = cio.getSeller();
 //		BusinessParty buyer = cio.getBuyer();
 //		BusinessParty shipToParty = cio.getShipToParty();
@@ -149,6 +166,91 @@ public class OpenTransOrderReadTest {
 //		assertEquals(EUR, taxTotal.getCurrencyID());
 //		assertEquals(0, new BigDecimal(360).compareTo(cio.getTotalTaxInclusive().getValue(RoundingMode.UNNECESSARY)));
 //		assertEquals("BUYER_ACCOUNT_REF", cio.getBuyerAccountingReference().getName());
+
+	}
+
+	// ein paar Beispiele: https://github.com/zdavatz/yopenedi/tree/master/yopenedi_dokumentation/Musternachrichten%20OpenTrans%202.1
+	@Test
+    public void pldOrder() {
+		testFile = getTestFile(TESTDIR+"PLD_257444_Order_example.XML");
+		transformer = otTransformer;
+		CoreOrder cio = null;	
+		if(transformer.isValid(testFile)) {
+			try { // toModel:
+				InputStream is = new FileInputStream(testFile);
+				object = transformer.toModel(is);
+				LOG.info(">>>>"+object);
+				Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
+				// dynamisch:
+				cio = CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				LOG.severe(ex.getMessage());
+			}
+		}
+		
+		BusinessParty seller = cio.getSeller();
+		LOG.info("seller:"+seller);
+		BusinessParty buyer = cio.getBuyer();
+		LOG.info("buyer:"+buyer);
+	
+		LOG.info("\n");
+	}
+	
+	@Test
+    public void otOrder() {
+		testFile = getTestFile(TESTDIR+"sample_order_opentrans_2_1.xml");
+		transformer = otTransformer;
+		CoreOrder cio = null;	
+		if(transformer.isValid(testFile)) {
+			try { // toModel:
+				InputStream is = new FileInputStream(testFile);
+				object = transformer.toModel(is);
+				LOG.info(">>>>"+object);
+				Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
+				// dynamisch:
+				cio = CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				LOG.severe(ex.getMessage());
+			}
+		}
+		
+		BusinessParty seller = cio.getSeller();
+		LOG.info("seller:"+seller);
+		BusinessParty buyer = cio.getBuyer();
+		LOG.info("buyer:"+buyer);
+//	<ADDRESS>
+//		<bmecat:NAME>ADDRESS.NAME</bmecat:NAME>
+//		<bmecat:NAME2>ADDRESS.NAME2</bmecat:NAME2>
+//		<bmecat:NAME3>ADDRESS.NAME3</bmecat:NAME3>
+//		<bmecat:DEPARTMENT>ADDRESS.DEPARTMENT</bmecat:DEPARTMENT> <----------- ContactInfoExt.ContactDepartment TODO
+		assertEquals("ADDRESS.NAME", buyer.getAddress().getAddressLine1());
+		assertEquals("ADDRESS.NAME2", buyer.getAddress().getAddressLine2());
+		assertEquals("ADDRESS.NAME3", buyer.getAddress().getAddressLine3());
+		LOG.info("VATRegistrationId/Umsatzsteuer-ID:"+buyer.getVATRegistrationId()); // mit vorangestelltem Ländercode
+		// ??? Steuernummer : Steuernummer
+// Das Format der Steuernummer beim Finanzamt variiert ab und an  von Bundesland zu Bundesland. Sie beinhaltet mal 10 und mal 11 Zahlen, die durch Schrägstriche in 3 Teile zerlegt wird. 
+		
+		
+		LOG.info("getIssueDateAsTimestamp:"+cio.getIssueDateAsTimestamp());
+		
+		PostalAddress pa = buyer.getAddress();
+				pa.setAddressLine1("AddressLine1");
+		LOG.info("pa.AddressLine1:"+pa.getAddressLine1());
+		
+		List<OrderLine> lines = cio.getLines();
+		assertEquals(1, lines.size());
+		OrderLine line = lines.get(0);
+		assertEquals("1", line.getId());               // BT-126
+		assertEquals("a", line.getSellerAssignedID()); // BG-31.BT-155 0..1 ohne type/Schema : upc
+		List<Identifier> stdIDs = line.getStandardIdentifier(); // BG-31.BT-157 0..n
+		LOG.info("StandardIdentifier:"+stdIDs.get(0));          // ... mit type/Schema
+		assertEquals("gtin", stdIDs.get(0).getSchemeIdentifier());
+		assertEquals("a", stdIDs.get(0).getContent());
+		assertEquals(1, stdIDs.size());
+		
+		LOG.info("\n");
 	}
 	
 }

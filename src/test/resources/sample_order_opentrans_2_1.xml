@@ -60,10 +60,10 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 					<bmecat:PARTY_ID type="PredefinedOrCustomType">a</bmecat:PARTY_ID>
 					<PARTY_ROLE>buyer</PARTY_ROLE>
 					<ADDRESS>
-						<bmecat:NAME>a</bmecat:NAME>
-						<bmecat:NAME2>a</bmecat:NAME2>
-						<bmecat:NAME3>a</bmecat:NAME3>
-						<bmecat:DEPARTMENT>a</bmecat:DEPARTMENT>
+						<bmecat:NAME>ADDRESS.NAME</bmecat:NAME>
+						<bmecat:NAME2>ADDRESS.NAME2</bmecat:NAME2>
+						<bmecat:NAME3>ADDRESS.NAME3</bmecat:NAME3>
+						<bmecat:DEPARTMENT>ADDRESS.DEPARTMENT</bmecat:DEPARTMENT>
 						<CONTACT_DETAILS>
 							<bmecat:CONTACT_ID>a</bmecat:CONTACT_ID>
 							<bmecat:CONTACT_NAME>a</bmecat:CONTACT_NAME>
@@ -104,7 +104,7 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 						<bmecat:STATE>a</bmecat:STATE>
 						<bmecat:COUNTRY>a</bmecat:COUNTRY>
 						<bmecat:COUNTRY_CODED>DE</bmecat:COUNTRY_CODED>
-						<bmecat:VAT_ID>a</bmecat:VAT_ID>
+						<bmecat:VAT_ID>DE 000 000 000</bmecat:VAT_ID>
 						<TAX_NUMBER>a</TAX_NUMBER>
 						<bmecat:PHONE type="office">a</bmecat:PHONE>
 						<bmecat:FAX type="office">a</bmecat:FAX>
