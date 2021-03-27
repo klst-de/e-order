@@ -11,9 +11,20 @@
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
+  <xsd:complexType name="BinaryObjectType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:base64Binary">
+        <xsd:attribute name="mimeCode" type="xsd:token" use="required"/>
+        <xsd:attribute name="filename" type="xsd:string" use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
   <xsd:complexType name="CodeType">
     <xsd:simpleContent>
-      <xsd:extension base="xsd:token"/>
+      <xsd:extension base="xsd:token">
+        <xsd:attribute name="listID" type="xsd:token" use="optional"/>
+        <xsd:attribute name="listVersionID" type="xsd:token"/>
+      </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
   <xsd:complexType name="DateTimeType">
@@ -49,10 +60,27 @@
       <xsd:element name="Indicator" type="xsd:boolean"/>
     </xsd:choice>
   </xsd:complexType>
+  <xsd:complexType name="MeasureType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:decimal">
+        <xsd:attribute name="unitCode" type="xsd:token"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="NumericType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:decimal"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="PercentType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:decimal"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
   <xsd:complexType name="QuantityType">
     <xsd:simpleContent>
       <xsd:extension base="xsd:decimal">
-        <xsd:attribute name="unitCode" type="xsd:token" use="required"/>
+        <xsd:attribute name="unitCode" type="xsd:token"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
