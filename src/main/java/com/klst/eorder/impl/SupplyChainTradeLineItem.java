@@ -1,6 +1,7 @@
 package com.klst.eorder.impl;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -8,9 +9,11 @@ import java.util.logging.Logger;
 import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
@@ -23,33 +26,35 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ProductClassificationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SpecifiedPeriodType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainEventType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
-
+import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
 
 /*
-BG-25 + 1..n INVOICE LINE
-BT-126 ++ 1..1 Invoice line identifier
-BT-127 ++ 0..1 Invoice line note
-BT-128 ++ 0..1 Invoice line object identifier
-          0..1 Scheme identifier
-BT-129 ++ 1..1 Invoiced quantity
-BT-130 ++ 1..1 Invoiced quantity unit of measure code
-BT-131 ++ 1..1 Invoice line net amount
-BT-132 ++ 0..1 Referenced purchase order line reference
-BT-133 ++ 0..1 Invoice line Buyer accounting reference
+BG-25 1..n LINE
+BT-126 1..1 line identifier
+BT-127 0..1 line note
+BT-128 0..1 line object identifier
+       0..1 Scheme identifier
+BT-129 1..1 quantity
+BT-130 1..1 quantity unit of measure code
+BT-131 1..1 line net amount
+BT-132 0..1 Referenced purchase order line reference
+BT-133 0..1 line Buyer accounting reference
 
-BG-26 ++ 0..1 INVOICE LINE PERIOD
+BG-26  0..1 LINE PERIOD
 ...
-BG-27 ++ 0..n INVOICE LINE ALLOWANCES
+BG-27  0..n LINE ALLOWANCES
 ...
-BG-28 ++ 0..n INVOICE LINE CHARGES
+BG-28  0..n LINE CHARGES
 ...
 BG-29 ++ 1..1 PRICE DETAILS               ------> ram:SpecifiedLineTradeAgreement 
 BT-146 +++ 1..1 Item net price                                ram:NetPriceProductTradePrice ram:ChargeAmount
@@ -145,7 +150,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		<ram:IncludedSupplyChainTradeLineItem>
 			<ram:AssociatedDocumentLineDocument>
 				<ram:LineID>1</ram:LineID>                                    <!-- BG.25.BT-126 1..1
-				<ram:IncludedNote>
+				<ram:IncludedNote>                                            <!-- BT-127 0..1 line note
 					<ram:Content>Content of Note</ram:Content>
 					<ram:SubjectCode>AAI</ram:SubjectCode>
 				</ram:IncludedNote>
@@ -296,6 +301,67 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	public String getBuyerAccountingReference() {
 		TradeAccountingAccountType taa = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount();
 		return taa==null ? null : new ID(taa.getID()).getName();		
+	}
+
+/*
+               <ram:SpecifiedLineTradeDelivery>
+                    <ram:PartialDeliveryAllowedIndicator>
+                         <udt:Indicator>true</udt:Indicator>
+                    </ram:PartialDeliveryAllowedIndicator>
+                    <ram:RequestedQuantity unitCode="C62">6</ram:RequestedQuantity>
+                    <ram:PackageQuantity unitCode="C62">3</ram:PackageQuantity>
+                    <ram:PerPackageUnitQuantity unitCode="C62">2</ram:PerPackageUnitQuantity>
+                    <ram:RequestedDeliverySupplyChainEvent>  <!-- BG-26 0..1
+                         <ram:OccurrenceSpecifiedPeriod>
+                              <ram:StartDateTime>            <!-- BG-26.BT-134
+                                   <udt:DateTimeString format="102">20200415</udt:DateTimeString>
+                              </ram:StartDateTime>
+                              <ram:EndDateTime>              <!-- BG-26.BT-135
+                                   <udt:DateTimeString format="102">20200430</udt:DateTimeString>
+                              </ram:EndDateTime>
+                         </ram:OccurrenceSpecifiedPeriod>
+                    </ram:RequestedDeliverySupplyChainEvent>
+               </ram:SpecifiedLineTradeDelivery>
+ */
+	public void setLineDeliveryDate(Timestamp ts) {
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
+		Mapper.newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", ts);
+		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
+			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
+	}
+	public Timestamp getLineDeliveryDate() {
+		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
+		if(list.isEmpty()) return null;
+		DateTimeType dateTime = list.get(0).getOccurrenceDateTime(); 
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
+	// BG-26 0..1 Period on which Delivery is requested
+	public void setLineDeliveryPeriod(IPeriod period) {
+		Mapper.newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", period);
+		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
+			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
+//		Mapper.set(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent(), "occurrenceSpecifiedPeriod", period);
+//		// TODO 
+//		List<SupplyChainEventType> list =
+//			super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
+//		list.get(0).setOccurrenceSpecifiedPeriod((Period)period);
+	}
+	@Override
+	public IPeriod getLineDeliveryPeriod() {
+		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
+		if(list.isEmpty()) return null;
+		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();
+		return period==null ? null : Period.create(period); 
+	}
+	
+	@Override
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return Period.create(start, end);
 	}
 
 /*
