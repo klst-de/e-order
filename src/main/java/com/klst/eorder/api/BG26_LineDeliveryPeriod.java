@@ -7,10 +7,9 @@ import com.klst.edoc.api.IPeriodFactory;
 import com.klst.edoc.untdid.DateTimeFormats;
 
 /**
- * BG-26 LINE PERIOD with BT-134 line period start date and BT-135 line period end date
+ * BG-26 DELIVERY PERIOD with BT-134 line period start date and BT-135 line period end date
  * <p>
- * A group of business terms providing information about the period relevant for the Order line.
- * Is also called line delivery period
+ * A group of business terms providing information about the delivery period relevant for the Order line.
  * <p>
  * Cardinality: 	0..1
  * <br>EN16931-ID: 	BG-26
@@ -22,7 +21,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-public interface BG26_OrderLinePeriod extends IPeriodFactory {
+public interface BG26_LineDeliveryPeriod extends IPeriodFactory {
 
 	public void setLineDeliveryDate(Timestamp timestamp);
 	default void setLineDeliveryDate(String ymd) {

@@ -22,7 +22,7 @@ import com.klst.edoc.untdid.DocumentNameCode;
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
 public interface OrderLine extends OrderLineFactory, OrderNoteFactory, 
-	BG26_OrderLinePeriod, BG27_LineLevelAllowences, BG28_LineLevelCharges {
+	BG26_LineDeliveryPeriod, BG27_LineLevelAllowences, BG28_LineLevelCharges {
 
 	/**
 	 * Line identifier
