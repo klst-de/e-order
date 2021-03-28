@@ -28,7 +28,7 @@ public interface BG26_OrderLinePeriod extends IPeriodFactory {
 	default void setLineDeliveryDate(String ymd) {
 		if(ymd!=null) setLineDeliveryDate(DateTimeFormats.ymdToTs(ymd));
 	}
-	public Timestamp getLineDeliveryDate();
+	public Timestamp getLineDeliveryDateAsTimestamp();
 
 	public void setLineDeliveryPeriod(IPeriod period);
 	default void setLineDeliveryPeriod(Timestamp start, Timestamp end) {

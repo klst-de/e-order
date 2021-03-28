@@ -33,7 +33,7 @@ public interface BG14_OrderPeriod extends IPeriodFactory {
 	default void setDeliveryDate(String ymd) {
 		if(ymd!=null) setDeliveryDate(DateTimeFormats.ymdToTs(ymd));
 	}
-	public Timestamp getDeliveryDate();
+	public Timestamp getDeliveryDateAsTimestamp();
 
 	public void setDeliveryPeriod(IPeriod period);
 	default void setDeliveryPeriod(Timestamp start, Timestamp end) {

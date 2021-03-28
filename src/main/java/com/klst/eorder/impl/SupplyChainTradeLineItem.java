@@ -331,7 +331,7 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		}
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
-	public Timestamp getLineDeliveryDate() {
+	public Timestamp getLineDeliveryDateAsTimestamp() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
 		if(list.isEmpty()) return null;
 		DateTimeType dateTime = list.get(0).getOccurrenceDateTime(); 
