@@ -1,45 +1,29 @@
 package com.klst.eorder.openTrans;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bmecat.bmecat._2005.DESCRIPTIONLONG;
+import org.bmecat.bmecat._2005.DESCRIPTIONSHORT;
+import org.bmecat.bmecat._2005.INTERNATIONALPID;
 import org.opentrans.xmlschema._2.ORDERITEM;
 
 import com.klst.ebXml.reflection.CopyCtor;
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
-import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
-import com.klst.eorder.impl.Code;
 import com.klst.eorder.impl.ID;
-import com.klst.eorder.impl.Note;
-import com.klst.eorder.impl.ReferencedDocument;
-import com.klst.eorder.impl.Text;
-import com.klst.eorder.impl.TradeAllowanceCharge;
-
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.DocumentLineDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeAgreementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeDeliveryType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeSettlementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ProductClassificationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAccountingAccountType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAllowanceChargeType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePriceType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementLineMonetarySummationType;
-
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
-import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
+import com.klst.eorder.openTrans.reflection.Mapper;
 
 /*
     "lineitemid",                BT-126 ++ 1..1 Invoice line identifier
@@ -142,15 +126,18 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	private static final Logger LOG = Logger.getLogger(OrderItem.class.getName());
 
 	private CoreOrder order; // order this orderLine belongs to
+//	OrderHeader orderHeader;
+	Productid productid;
 	
 	// copy ctor
 	private OrderItem(ORDERITEM line) {
 		super();
 		if(line!=null) {
 			CopyCtor.invokeCopy(this, line);
-			LOG.fine("copy ctor:"+this);
 		}
 		this.order = null;
+		productid = Productid.create(super.getPRODUCTID());
+		LOG.config("copy ctor:"+this);
 	}
 
 	private OrderItem(String id
@@ -161,6 +148,8 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 //		super.setSpecifiedLineTradeDelivery(new LineTradeDeliveryType()); // mit quantity
 //		super.setSpecifiedLineTradeSettlement(new LineTradeSettlementType());
 // optional		super.setSpecifiedTradeProduct(new TradeProductType()); // mit ItemName
+		productid = Productid.create();
+		super.setPRODUCTID(productid);
 		setId(id);
 		setQuantity(quantity);
 		setLineTotalAmount(lineTotalAmount);
@@ -277,6 +266,7 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	}
 	@Override
 	public Identifier getLineObjectIdentifier() {
+		return null;
 //		List<ReferencedDocumentType> rds = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getAdditionalReferencedDocument();
 //		if(rds==null || rds.isEmpty()) return null;
 //		// A Line MUST NOT HAVE more than 1 Object Identifier BT-128
@@ -323,6 +313,7 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 //		Mapper.set(getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument(), "lineID", id);
 	}
 	public String getOrderLineID() {
+		return null;
 //		ReferencedDocumentType referencedDocument = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument();
 //		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
 	}
@@ -333,8 +324,42 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 //		Mapper.set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), "id", text);
 	}
 	public String getBuyerAccountingReference() {
+		return null;
 //		TradeAccountingAccountType taa = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount();
 //		return taa==null ? null : new ID(taa.getID()).getName();		
+	}
+
+//---------------- BG-26 0..1 BG-26.BT-134 + BG-26.BT-135
+	@Override // factory
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return DeliveryDate.create(start, end);
+	}	
+	@Override
+	public void setLineDeliveryPeriod(IPeriod period) {
+		super.setDELIVERYDATE((DeliveryDate)period);
+	}
+	@Override
+	public void setLineDeliveryDate(Timestamp timestamp) {
+		setLineDeliveryPeriod(DeliveryDate.create(timestamp, timestamp));
+	}
+	@Override
+	public Timestamp getLineDeliveryDateAsTimestamp() {
+		if(super.getDELIVERYDATE()==null) return null;
+		if(getDELIVERYDATE().getDELIVERYSTARTDATE().equals(getDELIVERYDATE().getDELIVERYENDDATE())) {
+			// DELIVERYDATE ist Zeitpunkt
+			return DateTimeFormats.dtDATETIMEToTs(getDELIVERYDATE().getDELIVERYSTARTDATE()); 
+		}
+		return null;
+	}
+	@Override
+	public IPeriod getLineDeliveryPeriod() {
+		if(super.getDELIVERYDATE()==null) return null;
+		if(getDELIVERYDATE().getDELIVERYSTARTDATE().equals(getDELIVERYDATE().getDELIVERYENDDATE())) {
+			// DELIVERYDATE ist Zeitpunkt
+			return null;
+		}
+		// DELIVERYDATE ist Zeitraum
+		return DeliveryDate.create(getDELIVERYDATE());
 	}
 
 /*
@@ -363,32 +388,38 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	/*
 	 * BG-27 0..n LINE ALLOWANCES
 	 * BG-28 0..n LINE CHARGES
+	 * 
+	 * 
+	 * TODO in PRODUCTPRICEFIX :   List<ALLOWORCHARGE> alloworcharge
 	 */
 	@Override
 	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
+		return null;
 		// delegieren:
-		return TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+//		return TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
 	@Override
 	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
+		return null;
 		// delegieren:
-		return TradeAllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
+//		return TradeAllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
 
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
-		if(allowanceOrCharge==null) return; // optional
-		super.getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
+//		if(allowanceOrCharge==null) return; // optional
+//		super.getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
 	}
 
 	@Override
 	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-		List<TradeAllowanceChargeType> allowanceChargeList = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge();
-		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
-		allowanceChargeList.forEach(allowanceOrCharge -> {
-			res.add(TradeAllowanceCharge.create(allowanceOrCharge));
-		});
-		return res;
+		return null;
+//		List<TradeAllowanceChargeType> allowanceChargeList = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge();
+//		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+//		allowanceChargeList.forEach(allowanceOrCharge -> {
+//			res.add(TradeAllowanceCharge.create(allowanceOrCharge));
+//		});
+//		return res;
 	}
 
 	/*
@@ -421,9 +452,8 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	// BG-29.BT-150 + BG-29.BT-149 0..1 / PRODUCTPRICEFIX.pricequantity
 	@Override
 	public IQuantity getUnitPriceQuantity() {
-		pricequantity
-		TradePriceType tradePrice = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
-		return tradePrice==null ? null : Quantity.create(tradePrice.getBasisQuantity());
+		if(super.getPRODUCTPRICEFIX()==null) return null;
+		return getPRODUCTPRICEFIX().getPRICEQUANTITY()==null ? null : Quantity.create(getPRODUCTPRICEFIX().getPRICEQUANTITY());
 	}
 	@Override
 	public void setUnitPriceQuantity(IQuantity basisQuantity) {
@@ -434,49 +464,50 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	private static final String FIELD_specifiedTradeProduct = "specifiedTradeProduct";
 	// BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, text);
-		Mapper.set(getSpecifiedTradeProduct(), "name", text);
+		Mapper.add(productid.getDESCRIPTIONSHORT(), new DESCRIPTIONSHORT(), text);
 	}
 	@Override
 	public String getItemName() {
-		if(super.getSpecifiedTradeProduct()==null) return null;
-		return Text.create(super.getSpecifiedTradeProduct().getName()).getValue();
+		return productid.getDESCRIPTIONSHORT().isEmpty() ? null : productid.getDESCRIPTIONSHORT().get(0).getValue();
 	}
 
 	// BG-31.BT-154 0..1 Item description
 	@Override
 	public void setDescription(String text) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, text);
-		Mapper.set(getSpecifiedTradeProduct(), "description", text);
+		Mapper.add(productid.getDESCRIPTIONLONG(), new DESCRIPTIONLONG(), text);
 	}
 	@Override
 	public String getDescription() {
-		if(super.getSpecifiedTradeProduct()==null) return null;
-		return Text.create(super.getSpecifiedTradeProduct().getDescription()).getValue();
+		return productid.getDESCRIPTIONLONG().isEmpty() ? null : productid.getDESCRIPTIONLONG().get(0).getValue();
 	}
 	
 	// BG-31.BT-155 0..1 SpecifiedTradeProduct.sellerAssignedID
 	@Override
 	public void setSellerAssignedID(String id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		Mapper.set(getSpecifiedTradeProduct(), "sellerAssignedID", id);
+//		productid.getSUPPLIERPID() mit value und type/ean,gtin,...  TODO
+//		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+//		Mapper.set(getSpecifiedTradeProduct(), "sellerAssignedID", id);
 	}
 	@Override
 	public String getSellerAssignedID() {
-		if(super.getSpecifiedTradeProduct()==null) return null;
-		return new ID(super.getSpecifiedTradeProduct().getSellerAssignedID()).getContent();
+		if(productid.getSUPPLIERPID()==null) return null;
+//		return new ID(super.getSpecifiedTradeProduct().getSellerAssignedID()).getContent();
+		return productid.getSUPPLIERPID().getValue();
 	}
 
 	// BG-31.BT-156 0..1 SpecifiedTradeProduct.buyerAssignedID
 	@Override
 	public void setBuyerAssignedID(String id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		Mapper.set(getSpecifiedTradeProduct(), "buyerAssignedID", id);		
+//		productid.getBUYERPID() LIST TODO
+//		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+//		Mapper.set(getSpecifiedTradeProduct(), "buyerAssignedID", id);		
 	}
 	@Override
 	public String getBuyerAssignedID() {
-		if(super.getSpecifiedTradeProduct()==null) return null;
-		return new ID(super.getSpecifiedTradeProduct().getBuyerAssignedID()).getContent();
+		if(productid.getBUYERPID().isEmpty()) return null;
+//		if(super.getSpecifiedTradeProduct()==null) return null;
+//		return new ID(super.getSpecifiedTradeProduct().getBuyerAssignedID()).getContent();
+		return productid.getBUYERPID().get(0).getValue();
 	}
 
 	// BG-31.BT-157 0..n SpecifiedTradeProduct.GlobalID
@@ -486,16 +517,17 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	}
 	@Override
 	public void addStandardIdentifier(Identifier id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		super.getSpecifiedTradeProduct().getGlobalID().add((ID)id);
+		// TODO
+//		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+//		super.getSpecifiedTradeProduct().getGlobalID().add((ID)id);
 	}
 	@Override
 	public List<Identifier> getStandardIdentifier() {
-		if(super.getSpecifiedTradeProduct()==null) return null;
-		List<IDType> list = getSpecifiedTradeProduct().getGlobalID();
+		if(productid.getINTERNATIONALPID().isEmpty()) return null;
+		List<INTERNATIONALPID> list = productid.getINTERNATIONALPID();
 		List<Identifier> result = new ArrayList<Identifier>(list.size());
 		list.forEach(id -> {
-			result.add(new ID(id));
+			result.add(new ID(id.getValue(), id.getType()));
 		});
 		return result;
 	}
@@ -520,56 +552,50 @@ realistisches Beispiel:
 	 */
 	@Override
 	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText) {
-		// ignore idText TODO
-		return new Code(classCode, listID, listVersionID);
+		return null;
+//		// ignore idText TODO
+//		return new Code(classCode, listID, listVersionID);
 	}
 	@Override
 	public void addClassificationIdentifier(IdentifierExt id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		ProductClassificationType productClassificationType = new ProductClassificationType();
-		productClassificationType.setClassCode((Code)id);
-		super.getSpecifiedTradeProduct().getDesignatedProductClassification().add(productClassificationType);		
+//		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+//		ProductClassificationType productClassificationType = new ProductClassificationType();
+//		productClassificationType.setClassCode((Code)id);
+//		super.getSpecifiedTradeProduct().getDesignatedProductClassification().add(productClassificationType);		
 	}
 	@Override
 	public List<IdentifierExt> getClassifications() {
-		if(super.getSpecifiedTradeProduct()==null) return null;
-		List<ProductClassificationType> list = getSpecifiedTradeProduct().getDesignatedProductClassification();
-		List<IdentifierExt> result = new ArrayList<IdentifierExt>(list.size());
-		list.forEach(producClass -> {
-			IdentifierExt idExt= new Code(producClass.getClassCode());
-			//idExt.setIdText(producClass.getClassName().getValue());
-			result.add(idExt);
-		});
-		return result;
+		return null;
+//		if(super.getSpecifiedTradeProduct()==null) return null;
+//		List<ProductClassificationType> list = getSpecifiedTradeProduct().getDesignatedProductClassification();
+//		List<IdentifierExt> result = new ArrayList<IdentifierExt>(list.size());
+//		list.forEach(producClass -> {
+//			IdentifierExt idExt= new Code(producClass.getClassCode());
+//			//idExt.setIdText(producClass.getClassName().getValue());
+//			result.add(idExt);
+//		});
+//		return result;
 	}
 
-	// BG-31.BT-159 0..1 Item country of origin
-/*
-                    <ram:OriginTradeCountry>
-                         <ram:ID>FR</ram:ID>
-                    </ram:OriginTradeCountry>
- */
+	// BG-31.BT-159 0..1 Item country of origin / nicht in opentrans
 	@Override
 	public void setCountryOfOrigin(String code) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, code);
-		Mapper.newFieldInstance(getSpecifiedTradeProduct(), "originTradeCountry", code);		
-		Mapper.set(getSpecifiedTradeProduct().getOriginTradeCountry(), "id", ISOTwoletterCountryCodeContentType.fromValue(code));
 	}
 	@Override
 	public String getCountryOfOrigin() {
-		if(super.getSpecifiedTradeProduct()==null) return null;
-		return getSpecifiedTradeProduct().getOriginTradeCountry()==null ? null : getSpecifiedTradeProduct().getOriginTradeCountry().getID().getValue().value();
+		return null;
 	}
 
 	// --------------------------- CIO only:
 	@Override
 	public void setPartialDeliveryIndicator(boolean indicator) {
-		Mapper.set(getSpecifiedLineTradeDelivery(), "partialDeliveryAllowedIndicator", indicator);		
+//		super.setPARTIALSHIPMENTALLOWED(String    TRUE ); TODO
+//		Mapper.set(getSpecifiedLineTradeDelivery(), "partialDeliveryAllowedIndicator", indicator);		
 	}
 	@Override
 	public boolean isPartialDeliveryAllowed() {
-		IndicatorType indicator = super.getSpecifiedLineTradeDelivery().getPartialDeliveryAllowedIndicator();
-		return indicator!=null && indicator.isIndicator().equals(YES);
+		String indicator = super.getPARTIALSHIPMENTALLOWED();
+		return indicator!=null && indicator.equals("TRUE");
 	}
 
 }

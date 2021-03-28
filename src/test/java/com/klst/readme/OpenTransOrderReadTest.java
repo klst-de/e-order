@@ -1,6 +1,8 @@
 package com.klst.readme;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,8 +19,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
@@ -169,24 +173,29 @@ public class OpenTransOrderReadTest {
 
 	}
 
+	private CoreOrder getCoreOrder(File testFile) {
+		try {
+			InputStream is = new FileInputStream(testFile);
+			object = transformer.toModel(is);
+			LOG.info(">>>>"+object);
+			Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // openTrans.Order aus jar laden
+//			Class<?> type = Class.forName(transformer.getCONTENT_TYPE_NAME); // ????? openTrans.Order aus jar laden
+			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			LOG.severe(ex.getMessage());
+		}
+		return null;
+	}
+
 	// ein paar Beispiele: https://github.com/zdavatz/yopenedi/tree/master/yopenedi_dokumentation/Musternachrichten%20OpenTrans%202.1
 	@Test
     public void pldOrder() {
-		testFile = getTestFile(TESTDIR+"PLD_257444_Order_example.XML");
+		File testFile = getTestFile(TESTDIR+"PLD_257444_Order_example.XML");
 		transformer = otTransformer;
 		CoreOrder cio = null;	
 		if(transformer.isValid(testFile)) {
-			try { // toModel:
-				InputStream is = new FileInputStream(testFile);
-				object = transformer.toModel(is);
-				LOG.info(">>>>"+object);
-				Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
-				// dynamisch:
-				cio = CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				LOG.severe(ex.getMessage());
-			}
+			cio = getCoreOrder(testFile);
 		}
 		
 		BusinessParty seller = cio.getSeller();
@@ -199,21 +208,11 @@ public class OpenTransOrderReadTest {
 	
 	@Test
     public void otOrder() {
-		testFile = getTestFile(TESTDIR+"sample_order_opentrans_2_1.xml");
+		File testFile = getTestFile(TESTDIR+"sample_order_opentrans_2_1.xml");
 		transformer = otTransformer;
 		CoreOrder cio = null;	
 		if(transformer.isValid(testFile)) {
-			try { // toModel:
-				InputStream is = new FileInputStream(testFile);
-				object = transformer.toModel(is);
-				LOG.info(">>>>"+object);
-				Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
-				// dynamisch:
-				cio = CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				LOG.severe(ex.getMessage());
-			}
+			cio = getCoreOrder(testFile);
 		}
 		
 		BusinessParty seller = cio.getSeller();
@@ -234,6 +233,11 @@ public class OpenTransOrderReadTest {
 		
 		
 		LOG.info("getIssueDateAsTimestamp:"+cio.getIssueDateAsTimestamp());
+		// 2009-05-13 07:20:00.0 test ohne Time:
+		assertEquals("20090513", DateTimeFormats.tsToCCYYMMDD(cio.getIssueDateAsTimestamp()));
+		assertEquals("2009-05-13T07:20:00+02:00", DateTimeFormats.tsTodtDATETIME(cio.getIssueDateAsTimestamp()));
+		assertNotNull(cio.getDeliveryDateAsTimestamp());
+		assertEquals("20090520", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
 		
 		PostalAddress pa = buyer.getAddress();
 				pa.setAddressLine1("AddressLine1");
@@ -249,7 +253,10 @@ public class OpenTransOrderReadTest {
 		assertEquals("gtin", stdIDs.get(0).getSchemeIdentifier());
 		assertEquals("a", stdIDs.get(0).getContent());
 		assertEquals(1, stdIDs.size());
-		
+		IPeriod lineDeliveryPeriod = line.getLineDeliveryPeriod();
+		assertEquals("20200130", DateTimeFormats.tsToCCYYMMDD(lineDeliveryPeriod.getStartDateAsTimestamp()));
+		assertEquals(DateTimeFormats.ymdToTs("2020-02-15"), lineDeliveryPeriod.getEndDateAsTimestamp());
+ 
 		LOG.info("\n");
 	}
 	

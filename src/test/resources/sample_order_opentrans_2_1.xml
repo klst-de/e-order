@@ -202,7 +202,7 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 		<ORDER_ITEM>
 			<LINE_ITEM_ID>1</LINE_ITEM_ID>
 			<PRODUCT_ID>
-				<bmecat:SUPPLIER_PID type="upc">a</bmecat:SUPPLIER_PID>
+				<bmecat:SUPPLIER_PID>a</bmecat:SUPPLIER_PID>
 <!--  Wert '$' ist nicht Facet-gültig in Bezug auf Muster 'buyer_specific|customer_specific|duns|iln|gln|party_specific|supplier_specific|\w{1,250}' für Typ '#AnonType_typetypePARTY_ID'.
 				<bmecat:SUPPLIER_IDREF type="$">a</bmecat:SUPPLIER_IDREF>
 		-->
@@ -266,7 +266,7 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 					-->
 			</PRODUCT_COMPONENTS>
 			<QUANTITY>1.0</QUANTITY>
-			<bmecat:ORDER_UNIT>04</bmecat:ORDER_UNIT>
+			<bmecat:ORDER_UNIT>EA</bmecat:ORDER_UNIT>
 			<PRODUCT_PRICE_FIX>
 				<bmecat:PRICE_AMOUNT>0.0</bmecat:PRICE_AMOUNT>
 				<ALLOW_OR_CHARGES_FIX>
@@ -311,7 +311,13 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 			</PRODUCT_PRICE_FIX>
 			<PRICE_LINE_AMOUNT>1111</PRICE_LINE_AMOUNT>
 			<PARTIAL_SHIPMENT_ALLOWED>FALSE</PARTIAL_SHIPMENT_ALLOWED>
-			<!--
+<!-- BG-26 0..1 Zeitraum Wunschtermin == optional -->
+			<DELIVERY_DATE type="optional"> 
+				<DELIVERY_START_DATE>2020-01-30</DELIVERY_START_DATE>
+				<DELIVERY_END_DATE>2020-02-15</DELIVERY_END_DATE>
+			</DELIVERY_DATE>
+		
+			<!-- Fixer Liefertermin == fixed 
 			<DELIVERY_DATE type="fixed">
 				... is defined in the header this time ...
 			</DELIVERY_DATE>
