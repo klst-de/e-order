@@ -12,7 +12,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
-	BG14_OrderPeriod, BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
+	BG14_DeliveryPeriod, BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG24_AdditionalSupportingDocs, BG25_OrderLine, 	
 	ShipTo, ShipFrom,
 	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory, IPeriodFactory {
@@ -61,28 +61,16 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 		if(ymd!=null) setIssueDate(DateTimeFormats.ymdToTs(ymd));
 	}
 
-	/*
-	 * The Requested Date or Period on which Delivery is requested
-	 * for Delivery, mutually exclusive with Pick up = Despatch
-	 * (nicht in CII)
+	/* BG-14 0..1 DELIVERY PERIOD with BT-73 start date and BT-74 end date
 	 * 
+	 * The Requested Date or Period on which Delivery is requested for Delivery, 
+	 * mutually exclusive with Pick up = Despatch (not in CII)
+	 * 
+	 * contains
 	 * Requested Delivery Date
-	 * Requested Delivery Period, at least 1 StartDate or 1 EndDate
+	 * Requested Delivery Period, at least 1 StartDate BT-73 or 1 EndDate BT-74
 	 *
 	 */
-	public void setDeliveryDate(Timestamp timestamp);
-	public Timestamp getDeliveryDateAsTimestamp();
-	default void setDeliveryDate(String ymd) {
-		if(ymd!=null) setDeliveryDate(DateTimeFormats.ymdToTs(ymd));
-	}
-	public void setDeliveryPeriod(IPeriod period);
-	public IPeriod getDeliveryPeriod();
-	default void setDeliveryPeriod(Timestamp start, Timestamp end) {
-		setDeliveryPeriod(createPeriod(start, end));
-	}
-	default void setDeliveryPeriod(String ymdStart, String ymdEnd) {
-		setDeliveryPeriod(createPeriod(ymdStart, ymdEnd));
-	}
 	
 	/**
 	 * The Document TypeCode (BT-3) MUST be:

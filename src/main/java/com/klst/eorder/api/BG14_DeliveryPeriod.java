@@ -7,14 +7,13 @@ import com.klst.edoc.api.IPeriodFactory;
 import com.klst.edoc.untdid.DateTimeFormats;
 
 /**
- * BG-14 ORDER PERIOD with BT-73 start date and BT-74 end date
+ * BG-14 DELIVERY PERIOD with BT-73 start date and BT-74 end date
  * <p>
  * The Requested Date or Period on which Delivery is requested, 
  * mutually exclusive with Pick up = Despatch (not in CII)
  * <p>
  * Requested Delivery Date
  * Requested Delivery Period, at least 1 StartDate or 1 EndDate
- * Also called delivery period.
  * <p>
  * Cardinality: 	0..1
  * <br>EN16931-ID: 	BG-14
@@ -27,7 +26,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
 
-public interface BG14_OrderPeriod extends IPeriodFactory {
+public interface BG14_DeliveryPeriod extends IPeriodFactory {
 	
 	public void setDeliveryDate(Timestamp timestamp);
 	default void setDeliveryDate(String ymd) {
