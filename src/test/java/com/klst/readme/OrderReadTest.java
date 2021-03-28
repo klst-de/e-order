@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -25,6 +26,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
+import com.klst.eorder.api.OrderLine;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 
@@ -75,8 +77,8 @@ public class OrderReadTest {
 		return file;
 	}
 
-	@Test
-    public void cioEX01() {
+//	@Test
+    public void cioEX01_BASIC() {
 		testFile = getTestFile(TESTDIR+"ORDER-X_EX01_ORDER_FULL_DATA-BASIC.xml");
 		transformer = cioTransformer;
 		CoreOrder cio = null;
@@ -160,6 +162,56 @@ public class OrderReadTest {
 		assertEquals(EUR, taxTotal.getCurrencyID());
 		assertEquals(0, new BigDecimal(360).compareTo(cio.getTotalTaxInclusive().getValue(RoundingMode.UNNECESSARY)));
 		assertEquals("BUYER_ACCOUNT_REF", cio.getBuyerAccountingReference().getName());
+		
+		List<OrderLine> lines = cio.getLines();
+		assertEquals(3, lines.size());
+		lines.forEach(line -> {
+			assertNull(line.getLineDeliveryPeriod());
+		});
 	}
 	
+	public CoreOrder getCoreOrder(File testFile) {
+		try {
+			InputStream is = new FileInputStream(testFile);
+			object = transformer.toModel(is);
+			LOG.info(">>>>"+object);
+			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
+			// dynamisch:
+			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			LOG.severe(ex.getMessage());
+		}
+		return null;
+	}
+	
+	@Test
+    public void cioEX01_COMFORT() {
+		File testFile = getTestFile(TESTDIR+"ORDER-X_EX01_ORDER_FULL_DATA-COMFORT.xml");
+		transformer = cioTransformer;
+		CoreOrder cio = null;
+		// toModel:
+		if(transformer.isValid(testFile)) {
+			cio = getCoreOrder(testFile);
+		}
+		
+		assertEquals(BG2_ProcessControl.PROFILE_COMFORT, cio.getProfile());
+		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());
+
+		List<OrderLine> lines = cio.getLines();
+		assertEquals(3, lines.size());
+		OrderLine line = lines.get(0);
+		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(line.getLineDeliveryPeriod().getStartDateAsTimestamp()));
+		assertEquals("20200430", DateTimeFormats.tsToCCYYMMDD(line.getLineDeliveryPeriod().getEndDateAsTimestamp()));
+		line.setLineDeliveryDate("20210101");
+		
+		line = lines.get(1);
+		assertNull(line.getLineDeliveryPeriod());
+		line.setLineDeliveryPeriod("20200415", "20200430");
+		
+//		lines.forEach(line -> {
+//			assertNull(line.getStartDateAsTimestamp());
+//		});
+	}
+
 }

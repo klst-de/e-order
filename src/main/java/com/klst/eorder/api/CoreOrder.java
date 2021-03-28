@@ -12,14 +12,15 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
-	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
+	BG14_OrderPeriod, BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG24_AdditionalSupportingDocs, BG25_OrderLine, 	
 	ShipTo, ShipFrom,
 	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory, IPeriodFactory {
 
 	/**
-	 * Invoice number   - A unique identification of the Invoice.
+	 * Document number   - A unique identification of the Document.
 	 * <p>
+	 * Similar to Invoice number.
 	 * The sequential number required in Article 226(2) of the directive 2006/112/EC [2],
 	 * to uniquely identify the Invoice within the business context, time-frame, operating systems and records of the Seller. 
 	 * It may be based on one or more series of numbers, which may include alphanumeric characters. 
@@ -36,9 +37,9 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public String getId();
 
 	/**
-	 * Invoice issue date
+	 * Document issue date
 	 * <p>
-	 * The date when the Invoice was issued
+	 * The date when the Document was issued
 	 * <p>
 	 * Cardinality: 1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-2
@@ -51,7 +52,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public Timestamp getIssueDateAsTimestamp();
 	
 	/**
-	 * Invoice issue date
+	 * Document issue date
 	 * 
 	 * @param ymd - String in UNTDID 2379 Format "102" : CCYYMMDD = "yyyyMMdd" or "yyyy-MM-dd" 
 	 * @see #setIssueDate(Timestamp)
