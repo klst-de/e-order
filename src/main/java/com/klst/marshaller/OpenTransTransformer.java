@@ -33,7 +33,7 @@ public class OpenTransTransformer extends AbstactTransformer {
 	// CONTENT_PATH aka package name
 	private static final String CONTENT_PATH = "org.opentrans.xmlschema._2"; 
 	// CONTENT_TYPE_NAME aka class name
-	public static final String CONTENT_TYPE_NAME = "com.klst.eorder.impl.OpenTrans"; 
+	public static final String CONTENT_TYPE_NAME = "com.klst.eorder.openTrans.Order"; 
 	
 	private OpenTransTransformer() {
 		super(CONTENT_PATH, SINGLETON);
@@ -48,7 +48,7 @@ public class OpenTransTransformer extends AbstactTransformer {
 		Class<?> type = null;
 		try {
 			// dynamisch die CIO  Klasse laden 
-			type = Class.forName(CONTENT_PATH+".OPENTRANS");
+			type = Class.forName(CONTENT_PATH+".ORDER");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

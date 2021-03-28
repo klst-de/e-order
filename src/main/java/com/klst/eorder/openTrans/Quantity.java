@@ -7,6 +7,9 @@ import com.klst.edoc.api.IQuantity;
 
 public class Quantity implements IQuantity {
 
+	static Quantity create(BigDecimal quantity) {
+		return new Quantity(null, quantity);
+	}
 	static Quantity create(String unitCode, BigDecimal quantity) {
 		return new Quantity(unitCode, quantity);
 	}
@@ -35,6 +38,11 @@ public class Quantity implements IQuantity {
 	@Override
 	public String getUnitCode() {
 		return unitCode;
+	}
+
+	@Override
+	public String toString() {
+		return getValue(RoundingMode.HALF_UP) + ":" + (getUnitCode()==null ? "" : getUnitCode());
 	}
 
 }
