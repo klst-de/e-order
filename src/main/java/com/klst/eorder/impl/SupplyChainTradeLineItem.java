@@ -15,6 +15,7 @@ import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
@@ -418,7 +419,7 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		return res;
 	}
 
-	/*
+	/* ------------------------------------------------------------------------------
 	 * BG-29 1..1 PRICE DETAILS
 	 * 
 	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
@@ -458,8 +459,55 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", basisQuantity);
 		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", basisQuantity);
 	}
-	
-	// BG-31 SpecifiedTradeProduct
+
+	// BG-29.BT-147 0..1 Item price discount
+	@Override
+	public IAmount getPriceDiscount() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setPriceDiscount(IAmount grossPrice) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	// BG-29.BT-147 0..1 Item gross price
+	@Override
+	public IAmount getGrossPrice() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setGrossPrice(IAmount grossPrice) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	// BG-30 LINE VAT INFORMATION -------------------------------------------------------
+	// BG-30.BT-151 1..1 item VAT category code
+	@Override
+	public void setTaxCategory(TaxCategoryCode codeEnum) {
+		// TODO Auto-generated method stub		
+	}
+	@Override
+	public TaxCategoryCode getTaxCategory() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// BG-30.BT-152 0..1 item VAT rate
+	@Override
+	public void setTaxRate(BigDecimal taxRate) {
+		// TODO Auto-generated method stub		
+	}
+	@Override
+	public BigDecimal getTaxRate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// BG-31 SpecifiedTradeProduct -------------------------------------------------------
 	private static final String FIELD_specifiedTradeProduct = "specifiedTradeProduct";
 	// BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) {
