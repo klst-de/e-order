@@ -68,7 +68,7 @@ public interface BG31_ItemInformation {
 	/*
 	 * OT: SUPPLIER_PID + 'type'
 	 * Dieses Element enthält die Artikelnummer des Lieferanten. Sie ist damit maßgeblich für die Bestellung. 
-	 * In Geschäftsdokumenten eines Lieferanten identifiziert sie das Produkt eindeutig. 
+	 * In Geschäftsdokumenten eines Lieferanten identifiziert sie das Produkt eindeutig. 
 	 * In Multi-Lieferantendokumenten dagegen ist die Kombination 
 	 * aus Artikelnummer SUPPLIER_PID und SUPPLIER_IDREF der Identifikator.
 	 */
