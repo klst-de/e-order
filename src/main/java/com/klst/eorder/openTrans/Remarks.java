@@ -12,6 +12,8 @@ import com.klst.eorder.api.OrderNoteFactory;
 /* implements BG-1 NOTE
  * 
  * also implements BG-25.BT-127 0..n IncludedNote.Content
+ * 
+ * super class REMARKS extends TypeMLSTRING64000 extends DtMLSTRING
  */
 public class Remarks extends REMARKS implements OrderNote, OrderNoteFactory {
 
@@ -54,6 +56,8 @@ public class Remarks extends REMARKS implements OrderNote, OrderNoteFactory {
 		super();
 		if(note!=null) {
 			CopyCtor.invokeCopy(this, note);
+			// BUG: note ist type REMARKS, aber set/getValue ist in DtMLSTRING , workaround:
+			this.setValue(note.getValue());
 		}
 	}
 
