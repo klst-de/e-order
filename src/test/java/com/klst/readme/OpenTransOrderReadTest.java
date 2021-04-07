@@ -2,7 +2,6 @@ package com.klst.readme;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -35,7 +34,6 @@ import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.impl.Percent;
-import com.klst.eorder.openTrans.OrderItem;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 import com.klst.marshaller.OpenTransTransformer;
@@ -336,7 +334,6 @@ public class OpenTransOrderReadTest {
 		
 		// BG-32 0..n ARTIKELATTRIBUTE
 		// BT-160 1..1 Artikelattributname + BT-161 1..1 Wert
-//		OrderItem item = (OrderItem)line;
 		Properties attributes = line.getItemAttributes();
 		assertEquals(2, attributes.size());
 		assertEquals(a, attributes.getProperty(a));
