@@ -237,11 +237,11 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 					<bmecat:FVALUE_DETAILS lang="aar">a</bmecat:FVALUE_DETAILS>
 					<bmecat:FVALUE_TYPE>choice</bmecat:FVALUE_TYPE>
 				</FEATURE>
-				<!-- maybe some additional FEATUREs ...
-					<FEATURE>
-						...
-					</FEATURE>
-					-->
+				<!-- maybe some additional FEATUREs ... -->
+				<FEATURE>
+					<bmecat:FNAME>countryoforigin</bmecat:FNAME>
+					<bmecat:FVALUE>IT</bmecat:FVALUE>
+				</FEATURE>
 			</PRODUCT_FEATURES>
 			<PRODUCT_COMPONENTS>
 				<PRODUCT_COMPONENT>

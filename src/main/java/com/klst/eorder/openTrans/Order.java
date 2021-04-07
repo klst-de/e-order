@@ -147,7 +147,9 @@ public class Order extends ORDER implements CoreOrder {
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		// TODO Auto-generated method stub
-		
+		// in OT werden ALLOW_OR_CHARGES_FIX (Festgelegte Zu- oder Abschläge)
+		// benutzt in PRODUCT_PRICE_FIX auf Positionsebene
+		// und TIME_FOR_PAYMENT auf Belegebene
 	}
 
 	@Override

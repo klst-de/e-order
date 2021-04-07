@@ -6,6 +6,7 @@ import java.util.List;
 import org.opentrans.xmlschema._2.REMARKS;
 
 import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.OrderNoteFactory;
 
@@ -55,9 +56,10 @@ public class Remarks extends REMARKS implements OrderNote, OrderNoteFactory {
 	private Remarks(REMARKS note) {
 		super();
 		if(note!=null) {
-			CopyCtor.invokeCopy(this, note);
-			// BUG: note ist type REMARKS, aber set/getValue ist in DtMLSTRING , workaround:
-			this.setValue(note.getValue());
+			SCopyCtor.getInstance().invokeCopy(this, note);
+//			CopyCtor.invokeCopy(this, note);
+//			// BUG: note ist type REMARKS, aber set/getValue ist in DtMLSTRING , workaround:
+//			this.setValue(note.getValue());
 		}
 	}
 

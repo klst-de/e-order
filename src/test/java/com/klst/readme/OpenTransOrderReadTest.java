@@ -3,14 +3,18 @@ package com.klst.readme;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -20,13 +24,18 @@ import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.impl.Percent;
+import com.klst.eorder.openTrans.OrderItem;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 import com.klst.marshaller.OpenTransTransformer;
@@ -243,19 +252,94 @@ public class OpenTransOrderReadTest {
 				pa.setAddressLine1("AddressLine1");
 		LOG.info("pa.AddressLine1:"+pa.getAddressLine1());
 		
+		String a ="a";
 		List<OrderLine> lines = cio.getLines();
 		assertEquals(1, lines.size());
-		OrderLine line = lines.get(0);
-		assertEquals("1", line.getId());               // BT-126
-		assertEquals("a", line.getSellerAssignedID()); // BG-31.BT-155 0..1 ohne type/Schema : upc
-		List<Identifier> stdIDs = line.getStandardIdentifier(); // BG-31.BT-157 0..n
-		LOG.info("StandardIdentifier:"+stdIDs.get(0));          // ... mit type/Schema
-		assertEquals("gtin", stdIDs.get(0).getSchemeIdentifier());
-		assertEquals("a", stdIDs.get(0).getContent());
-		assertEquals(1, stdIDs.size());
+		OrderLine line = lines.get(0); // die einzige Zeile
+		assertEquals("1", line.getId());               // BT-126 1..1 Kennung der Position
+		assertEquals(1, line.getNotes().size());	   // BT-127 0..1 Freitext zur Position
+		assertEquals(a, line.getNotes().get(0).getNote()); // <REMARKS type="customRemark" lang="deu">a</REMARKS>
+		// TODO unklar BG.25.BT-128 0..1 Objektkennung
+		LOG.info("getQuantity:"+line.getQuantity());   // BT-129 1..1 bestellte Menge
+		assertEquals(0, new BigDecimal(1).compareTo(line.getQuantity().getValue(RoundingMode.UNNECESSARY)));
+		assertEquals("EA", line.getQuantity().getUnitCode()); // BT-130 1..1
+		// BT-131 1..1 Nettobetrag der Position <PRICE_LINE_AMOUNT>1111</PRICE_LINE_AMOUNT>
+		assertEquals(0, new BigDecimal(1111).compareTo(line.getLineTotalAmount().getValue(RoundingMode.UNNECESSARY)));
+		// TODO BT-132 0..1 Referenz zur Bestellposition , nicht in CIO, nur in CIOR/CIOC
+		// BT-133 0..1 Buchungsreferenz des Käufers <bmecat:ACCOUNTING_INFO> ...
+		assertEquals(a, line.getBuyerAccountingReference());
+		
+		// BG.26 0..1 POSITIONSZEITRAUM : BT-134 0..1 Anfangsdatum + BT-135
 		IPeriod lineDeliveryPeriod = line.getLineDeliveryPeriod();
 		assertEquals("20200130", DateTimeFormats.tsToCCYYMMDD(lineDeliveryPeriod.getStartDateAsTimestamp()));
 		assertEquals(DateTimeFormats.ymdToTs("2020-02-15"), lineDeliveryPeriod.getEndDateAsTimestamp());
+		
+		// BG-27 0..n ABSCHLÄGE AUF EBENE DER POSITION, BG-28 0..n LINE CHARGES / ZUSCHLÄGE
+		// BG-27.BT-136 Betrag des Abschlags
+		//      ...
+		// BG-27.BT-140 Code
+		// BG-28.BT-141 Betrag des Zuschlags
+		//      ...
+		// BG-28.BT-145 Code
+		List<AllowancesAndCharges> aoc = line.getAllowancesAndCharges();
+		assertEquals(2, aoc.size());  // zwei elemente, beide sind BG-27 ABSCHLÄGE
+		assertTrue(aoc.get(0).isAllowance());
+//		LOG.info(">>>>>>"+aoc.get(0).getPercentage().setScale(Percent.SCALE, RoundingMode.HALF_UP));
+		assertEquals(new BigDecimal(0.0800).setScale(Percent.SCALE, RoundingMode.HALF_UP)
+			   , aoc.get(0).getPercentage().setScale(Percent.SCALE, RoundingMode.HALF_UP));
+		assertEquals(a, aoc.get(0).getReasonText());
+// IST allowOrCharge:[allowance, AmountWithoutTax:null, AssessmentBase:null, %rate:0.07999999821186066, tax:null/null, tax%:null, Reasoncode:small_order, ReasonText:a]
+/* SOLL:
+					<ALLOW_OR_CHARGE type="allowance">
+						<ALLOW_OR_CHARGE_SEQUENCE>1</ALLOW_OR_CHARGE_SEQUENCE>
+						<ALLOW_OR_CHARGE_NAME>a</ALLOW_OR_CHARGE_NAME>
+						<ALLOW_OR_CHARGE_TYPE>small_order</ALLOW_OR_CHARGE_TYPE>
+						<ALLOW_OR_CHARGE_DESCR>a</ALLOW_OR_CHARGE_DESCR>
+						<ALLOW_OR_CHARGE_VALUE>
+							<AOC_PERCENTAGE_FACTOR>0.08</AOC_PERCENTAGE_FACTOR>
+						</ALLOW_OR_CHARGE_VALUE>
+					</ALLOW_OR_CHARGE>
+		
+ */
+		// BG-29 1..1 DETAILINFORMATIONEN ZUM PREIS
+		// BG-29.BT-146 1..1 UnitPriceAmount
+		assertEquals(0, new BigDecimal(0.0).compareTo(line.getUnitPriceAmount().getValue(RoundingMode.UNNECESSARY)));
+		// BG-29.BT-147 0..1 PriceDiscount   !!! nicht in OT?
+		// BG-29.BT-148 0..1 GrossPrice      !!! nicht in OT?
+		
+		// BG-29.BT-149 0..1 base quantity, UnitPriceQuantity
+		// BG-29.BT-150 0..1 Item price unit
+		IQuantity qty = line.getUnitPriceQuantity();
+		LOG.info("UnitPriceQuantity:"+qty); // <bmecat:PRICE_QUANTITY>1</bmecat:PRICE_QUANTITY>
+//		LOG.info("UnitPriceQuantity:"+qty.getValue());
+//		LOG.info("UnitPriceQuantity:"+qty.getUnitCode());
+
+		// BG-30 1..1 UMSATZSTEUERINFORMATIONEN
+		// BG-30.BT-151 1..1 Code der Umsatzsteuerkategorie
+		assertEquals(TaxCategoryCode.StandardRate, line.getTaxCategory());
+		// BG-30.BT-152 0..1 item VAT rate
+		LOG.info("TaxRate:"+line.getTaxRate());
+
+		// BG-31 1..1 ARTIKELINFORMATIONEN
+		assertEquals(a, line.getItemName()); // BG-31.BT-153 1..1 Artikelname <bmecat:DESCRIPTION_SHORT lang="deu">a
+		// BG-31.BT-154 0..1 Artikelbeschreibung : <bmecat:DESCRIPTION_LONG lang="eng">a</bmecat:DESCRIPTION_LONG>
+		assertEquals(a, line.getDescription()); 
+		assertEquals(a, line.getSellerAssignedID()); // BG-31.BT-155 0..1 ohne type/Schema : upc
+		assertEquals(a, line.getBuyerAssignedID());  // BG-31.BT-156 0..1
+		List<Identifier> stdIDs = line.getStandardIdentifier(); // BG-31.BT-157 0..n
+		LOG.info("StandardIdentifier:"+stdIDs.get(0));          // ... mit type/Schema
+		assertEquals("gtin", stdIDs.get(0).getSchemeIdentifier());
+		assertEquals(a, stdIDs.get(0).getContent());
+		assertEquals(1, stdIDs.size());
+		// BG-31.BT-159 0..1 Artikelherkunftsland fehlt in OT, ===> "countryoforigin" als ARTIKELATTRIBUTE
+		assertEquals("IT", line.getCountryOfOrigin());
+		
+		// BG-32 0..n ARTIKELATTRIBUTE
+		// BT-160 1..1 Artikelattributname + BT-161 1..1 Wert
+//		OrderItem item = (OrderItem)line;
+		Properties attributes = line.getItemAttributes();
+		assertEquals(2, attributes.size());
+		assertEquals(a, attributes.getProperty(a));
  
 		LOG.info("\n");
 	}
