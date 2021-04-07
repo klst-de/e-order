@@ -1,10 +1,10 @@
-﻿
-<rsm:SCRDMCCBDACIOMessageStructure
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103"
-xmlns:rsm="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:103"
-xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:103"
-xsi:schemaLocation="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:103 SCRDMCCBDACIOMessageStructure_103p0.xsd">
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<rsm:SCRDMCCBDACIOMessageStructure 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103"
+	xmlns:rsm="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:1"
+	xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:103"
+	xsi:schemaLocation="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:103 SCRDMCCBDACIOMessageStructure_1p0.xsd">
      <rsm:ExchangedDocumentContext>
           <ram:TestIndicator>
                <udt:Indicator>false</udt:Indicator>

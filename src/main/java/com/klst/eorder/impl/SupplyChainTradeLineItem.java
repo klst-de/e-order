@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.CopyCtor;
@@ -25,6 +26,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LineTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ProductCharacteristicType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ProductClassificationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SpecifiedPeriodType;
@@ -636,6 +638,28 @@ realistisches Beispiel:
 	public String getCountryOfOrigin() {
 		if(super.getSpecifiedTradeProduct()==null) return null;
 		return getSpecifiedTradeProduct().getOriginTradeCountry()==null ? null : getSpecifiedTradeProduct().getOriginTradeCountry().getID().getValue().value();
+	}
+
+	// BG-32 0..n ITEM ATTRIBUTES, BT-160 + BT-161 (both terms mandatory)
+	@Override
+	public void addItemAttribute(String name, String value) {
+		if(name==null) return; // darf nicht sein, denn BT-160 + BT-161 sind mandatory
+		// TODO Mapper nutzen
+		ProductCharacteristicType productCharacteristics = new ProductCharacteristicType();
+		productCharacteristics.getDescription().add(Text.create(name)); //nur eine wg. 1..1
+		productCharacteristics.getValue().add(Text.create(value)); //nur eine wg. 1..1
+		specifiedTradeProduct.getApplicableProductCharacteristic().add(productCharacteristics);
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public Properties getItemAttributes() {
+		List<ProductCharacteristicType> productCharacteristics = specifiedTradeProduct.getApplicableProductCharacteristic();
+		Properties result = new Properties();
+		productCharacteristics.forEach(pc -> {
+			result.put(pc.getDescription().get(0).getValue(), pc.getValue().get(0).getValue());			
+		});
+		return result;
 	}
 
 	// --------------------------- CIO only:
