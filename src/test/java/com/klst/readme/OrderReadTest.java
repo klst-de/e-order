@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -205,9 +206,13 @@ public class OrderReadTest {
 		assertEquals("20200430", DateTimeFormats.tsToCCYYMMDD(line.getLineDeliveryPeriod().getEndDateAsTimestamp()));
 		line.setLineDeliveryDate("20210101");
 		
-		line = lines.get(1);
+		line = lines.get(1); // the second! the first has index 0!
 		assertNull(line.getLineDeliveryPeriod());
 		line.setLineDeliveryPeriod("20200415", "20200430");
+		assertEquals("FR", line.getCountryOfOrigin());
+		Properties attributes = line.getItemAttributes();
+		assertEquals(1, attributes.size());
+		assertEquals("3 meters", attributes.getProperty("Characteristic Description"));
 		
 //		lines.forEach(line -> {
 //			assertNull(line.getStartDateAsTimestamp());
