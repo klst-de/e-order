@@ -23,7 +23,7 @@ import com.klst.edoc.untdid.DocumentNameCode;
  */
 public interface OrderLine extends OrderLineFactory, OrderNoteFactory, 
 	BG26_LineDeliveryPeriod, BG27_LineLevelAllowences, BG28_LineLevelCharges,
-	BG29_PriceDetails, BG30_LineVATInformation, BG31_ItemInformation {
+	BG29_PriceDetails, BG30_LineVATInformation, BG31_ItemInformation, BG32_ItemAttributes {
 
 	/**
 	 * Line identifier
