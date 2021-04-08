@@ -2,7 +2,7 @@ package com.klst.eorder.impl;
 
 import java.sql.Timestamp;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IPeriod;
@@ -34,7 +34,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 	private HeaderTradeDelivery(HeaderTradeDeliveryType object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

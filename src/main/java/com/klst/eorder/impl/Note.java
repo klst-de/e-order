@@ -3,7 +3,7 @@ package com.klst.eorder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.OrderNoteFactory;
 
@@ -54,7 +54,7 @@ public class Note extends NoteType implements OrderNote, OrderNoteFactory {
 	private Note(NoteType note) {
 		super();
 		if(note!=null) {
-			CopyCtor.invokeCopy(this, note);
+			SCopyCtor.getInstance().invokeCopy(this, note);
 		}
 	}
 

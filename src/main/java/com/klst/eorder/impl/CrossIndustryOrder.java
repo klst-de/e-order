@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
-import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
@@ -51,7 +51,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 	public CrossIndustryOrder(SCRDMCCBDACIOMessageStructureType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 //			LOG.info("copy ctor:"+this); // toString liefert hier NPE wg.getLines
 		}
 

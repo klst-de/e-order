@@ -1,7 +1,7 @@
 package com.klst.eorder.impl;
 
-import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
 
 import un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31.ISO3AlphaCurrencyCodeContentType;
@@ -28,7 +28,7 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 	private HeaderTradeSettlement(HeaderTradeSettlementType object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

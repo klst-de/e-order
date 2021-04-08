@@ -3,8 +3,8 @@ package com.klst.eorder.impl;
 import java.math.BigDecimal;
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
@@ -72,7 +72,7 @@ public class TradeTax extends TradeTaxType implements ITaxCategory {
 	private TradeTax(TradeTaxType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.config("copy ctor:"+this);
 		}
 	}

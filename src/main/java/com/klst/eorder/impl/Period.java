@@ -2,7 +2,7 @@ package com.klst.eorder.impl;
 
 import java.sql.Timestamp;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.untdid.DateTimeFormats;
 
@@ -33,7 +33,7 @@ public class Period extends SpecifiedPeriodType implements IPeriod {
 	// copy ctor
 	private Period(SpecifiedPeriodType object) {
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

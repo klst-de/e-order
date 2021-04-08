@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
@@ -116,7 +116,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	private SupplyChainTradeLineItem(SupplyChainTradeLineItemType line) {
 		super();
 		if(line!=null) {
-			CopyCtor.invokeCopy(this, line);
+			SCopyCtor.getInstance().invokeCopy(this, line);
 			LOG.fine("copy ctor:"+this);
 		}
 		this.order = null;

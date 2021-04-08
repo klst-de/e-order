@@ -1,6 +1,6 @@
 package com.klst.eorder.impl;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
 
@@ -37,7 +37,7 @@ public class Text extends TextType {
 	private Text(TextType object) {
 		super();
 		if (object != null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

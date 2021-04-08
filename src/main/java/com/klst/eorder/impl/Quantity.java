@@ -3,7 +3,7 @@ package com.klst.eorder.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IQuantity;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.QuantityType;
@@ -57,7 +57,7 @@ public class Quantity extends QuantityType implements IQuantity {
 	private Quantity(QuantityType object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 
