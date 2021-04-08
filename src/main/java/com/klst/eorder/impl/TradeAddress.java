@@ -2,8 +2,8 @@ package com.klst.eorder.impl;
 
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.PostalAddress;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAddressType;
@@ -41,7 +41,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	private TradeAddress(TradeAddressType address) {
 		super();
 		if(address!=null) {
-			CopyCtor.invokeCopy(this, address);
+			SCopyCtor.getInstance().invokeCopy(this, address);
 		}
 	}
 	

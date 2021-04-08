@@ -3,7 +3,7 @@ package com.klst.eorder.impl;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.BusinessPartyContact;
@@ -51,7 +51,7 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 	private TradeParty(TradePartyType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.config("copy ctor:"+this);
 		}
 	}

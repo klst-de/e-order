@@ -3,7 +3,7 @@ package com.klst.eorder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 
@@ -34,7 +34,7 @@ public class SupplyChainTradeTransaction extends SupplyChainTradeTransactionType
 	private SupplyChainTradeTransaction(SupplyChainTradeTransactionType object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

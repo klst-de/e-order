@@ -2,8 +2,8 @@ package com.klst.eorder.impl;
 
 import java.sql.Timestamp;
 
-import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
@@ -15,7 +15,6 @@ import un.unece.uncefact.data.standard.qualifieddatatype._103.FormattedDateTimeT
 import un.unece.uncefact.data.standard.qualifieddatatype._103.ReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._103.BinaryObjectType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
 
 public class ReferencedDocument extends ReferencedDocumentType implements SupportingDocument {
 // in CII: implements BG24_AdditionalSupportingDocs, PrecedingInvoice
@@ -116,7 +115,7 @@ Beispiel:
 	private ReferencedDocument(ReferencedDocumentType object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

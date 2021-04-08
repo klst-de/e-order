@@ -1,7 +1,7 @@
 package com.klst.eorder.impl;
 
-import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.eorder.api.ContactInfoExt;
 
@@ -38,7 +38,7 @@ public class TradeContact extends TradeContactType implements ContactInfoExt {
 	private TradeContact(TradeContactType contact) {
 		super();
 		if(contact!=null) {
-			CopyCtor.invokeCopy(this, contact);
+			SCopyCtor.getInstance().invokeCopy(this, contact);
 		}
 	}
 

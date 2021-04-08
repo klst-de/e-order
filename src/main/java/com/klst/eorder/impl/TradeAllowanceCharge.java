@@ -3,8 +3,8 @@ package com.klst.eorder.impl;
 import java.math.BigDecimal;
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.CopyCtor;
 import com.klst.ebXml.reflection.Mapper;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
@@ -63,7 +63,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	private TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		super();
 		if(tradeAllowanceCharge!=null) {
-			CopyCtor.invokeCopy(this, tradeAllowanceCharge);
+			SCopyCtor.getInstance().invokeCopy(this, tradeAllowanceCharge);
 			if(getCategoryTradeTax()==null) {
 				LOG.warning(NO_TRADETAX_ELEMENT);
 			}

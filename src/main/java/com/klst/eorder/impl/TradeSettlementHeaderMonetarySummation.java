@@ -1,6 +1,6 @@
 package com.klst.eorder.impl;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.eorder.api.BG22_DocumentTotals;
 
@@ -33,7 +33,7 @@ public class TradeSettlementHeaderMonetarySummation extends TradeSettlementHeade
 	private TradeSettlementHeaderMonetarySummation(TradeSettlementHeaderMonetarySummationType object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 	
