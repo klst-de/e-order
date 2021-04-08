@@ -10,7 +10,7 @@ import org.bmecat.bmecat._2005.COSTCATEGORYID;
 import org.opentrans.xmlschema._2.FEATURE;
 import org.opentrans.xmlschema._2.ORDERITEM;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
@@ -133,7 +133,7 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	private OrderItem(ORDERITEM line) {
 		super();
 		if(line!=null) {
-			CopyCtor.invokeCopy(this, line);
+			SCopyCtor.getInstance().invokeCopy(this, line);
 		}
 		this.order = null;
 		productid = Productid.create(super.getPRODUCTID());

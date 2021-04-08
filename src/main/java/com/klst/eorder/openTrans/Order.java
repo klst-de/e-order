@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import org.opentrans.xmlschema._2.ORDER;
 import org.opentrans.xmlschema._2.ORDERITEM;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
@@ -24,7 +24,6 @@ import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
-import com.klst.eorder.impl.Period;
 
 /* alle drei elemente sind required:
     "orderheader",
@@ -44,7 +43,7 @@ public class Order extends ORDER implements CoreOrder {
 	public Order(ORDER doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 		}
 
 		LOG.info("Type:"+super.getType());

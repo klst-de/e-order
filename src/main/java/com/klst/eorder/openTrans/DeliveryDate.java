@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 import org.opentrans.xmlschema._2.DELIVERYDATE;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.untdid.DateTimeFormats;
 
@@ -32,7 +32,7 @@ public class DeliveryDate extends DELIVERYDATE implements IPeriod {
 	// copy ctor
 	private DeliveryDate(DELIVERYDATE object) {
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

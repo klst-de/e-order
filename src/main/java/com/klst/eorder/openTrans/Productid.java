@@ -7,18 +7,13 @@ import org.bmecat.bmecat._2005.BUYERPID;
 import org.bmecat.bmecat._2005.DESCRIPTIONLONG;
 import org.bmecat.bmecat._2005.DESCRIPTIONSHORT;
 import org.bmecat.bmecat._2005.INTERNATIONALPID;
-import org.bmecat.bmecat._2005.SUPPLIERPID;
 import org.opentrans.xmlschema._2.PRODUCTID;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
-import com.klst.edoc.api.Reference;
 import com.klst.eorder.api.BG31_ItemInformation;
-import com.klst.eorder.impl.ID;
 import com.klst.eorder.openTrans.reflection.Mapper;
-
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
 
 /* Kandidat für
 BG-31 ++ 1..1 ITEM INFORMATION            ------> ram:SpecifiedTradeProduct
@@ -65,7 +60,7 @@ public class Productid extends PRODUCTID implements BG31_ItemInformation {
 	private Productid(PRODUCTID object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 	

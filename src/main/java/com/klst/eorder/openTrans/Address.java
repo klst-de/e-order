@@ -10,7 +10,7 @@ import org.bmecat.bmecat._2005.STATE;
 import org.bmecat.bmecat._2005.ZIP;
 import org.opentrans.xmlschema._2.ADDRESS;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.openTrans.reflection.Mapper;
 
@@ -75,7 +75,7 @@ public class Address extends ADDRESS implements PostalAddress {
 	private Address(ADDRESS address) {
 		super();
 		if(address!=null) {
-			CopyCtor.invokeCopy(this, address);
+			SCopyCtor.getInstance().invokeCopy(this, address);
 		}
 	}
 	

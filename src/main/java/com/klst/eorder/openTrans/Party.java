@@ -4,13 +4,12 @@ import java.util.logging.Logger;
 
 import org.opentrans.xmlschema._2.PARTY;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
-import com.klst.eorder.impl.ID;
 
 public class Party extends PARTY implements BusinessParty /*, BusinessPartyAddress, BusinessPartyContact*/ {
 
@@ -42,7 +41,7 @@ public class Party extends PARTY implements BusinessParty /*, BusinessPartyAddre
 	private Party(PARTY doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.config("copy ctor:"+this);
 		}
 	}

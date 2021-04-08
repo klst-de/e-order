@@ -8,7 +8,7 @@ import org.bmecat.bmecat._2005.DtCURRENCIES;
 import org.opentrans.xmlschema._2.ORDERINFO;
 import org.opentrans.xmlschema._2.PARTY;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IPeriod;
@@ -16,7 +16,6 @@ import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
-import com.klst.eorder.api.OrderNote;
 
 public class OrderInfo extends ORDERINFO implements BG4_Seller, BG7_Buyer {
 
@@ -42,7 +41,7 @@ public class OrderInfo extends ORDERINFO implements BG4_Seller, BG7_Buyer {
 	private OrderInfo(ORDERINFO object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

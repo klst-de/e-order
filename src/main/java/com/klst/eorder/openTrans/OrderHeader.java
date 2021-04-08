@@ -1,14 +1,8 @@
 package com.klst.eorder.openTrans;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
-
-import org.opentrans.xmlschema._2.AGREEMENT;
-import org.opentrans.xmlschema._2.CATALOGREFERENCE;
 import org.opentrans.xmlschema._2.ORDERHEADER;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.eorder.api.CoreOrder;
 
 public class OrderHeader extends ORDERHEADER {
@@ -35,7 +29,7 @@ public class OrderHeader extends ORDERHEADER {
 	private OrderHeader(ORDERHEADER object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 

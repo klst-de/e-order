@@ -1,10 +1,8 @@
 package com.klst.eorder.openTrans;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -15,7 +13,7 @@ import org.opentrans.xmlschema._2.ALLOWORCHARGE;
 import org.opentrans.xmlschema._2.PRODUCTPRICEFIX;
 import org.opentrans.xmlschema._2.TAXDETAILSFIX;
 
-import com.klst.ebXml.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.untdid.TaxCategoryCode;
@@ -126,7 +124,7 @@ public class Productpricefix extends PRODUCTPRICEFIX implements BG29_PriceDetail
 	private Productpricefix(PRODUCTPRICEFIX object) {
 		super();
 		if(object!=null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 	
