@@ -186,12 +186,18 @@
 			<bmecat:ORDER_UNIT>C62</bmecat:ORDER_UNIT>
 			<PRODUCT_PRICE_FIX>
 				<bmecat:PRICE_AMOUNT>5.16</bmecat:PRICE_AMOUNT>
+				<TAX_DETAILS_FIX>
+					<bmecat:CALCULATION_SEQUENCE>1</bmecat:CALCULATION_SEQUENCE>
+					<bmecat:TAX_CATEGORY>exemption</bmecat:TAX_CATEGORY>
+					<bmecat:TAX_TYPE>vat</bmecat:TAX_TYPE>
+					<bmecat:TAX>0.0</bmecat:TAX>
+				</TAX_DETAILS_FIX>
 				<bmecat:PRICE_QUANTITY>100</bmecat:PRICE_QUANTITY>
-	<!-- 		<TAX_DETAILS>
-					<TAX_TYPE>VAT</TAX_TYPE>
+	<!-- ???    <TAX_DETAILS_FIX>   !!!Fehler: namespace bmecat fehlt
+					<TAX_TYPE>vat</TAX_TYPE>
 					<TAX>0</TAX>
 					<TAX_CATEGORY>exemption</TAX_CATEGORY>
-				</TAX_DETAILS>  -->	
+				</TAX_DETAILS_FIX>  -->
 			</PRODUCT_PRICE_FIX>
 			<PRICE_LINE_AMOUNT>103.2</PRICE_LINE_AMOUNT>
 			<PARTIAL_SHIPMENT_ALLOWED>TRUE</PARTIAL_SHIPMENT_ALLOWED>

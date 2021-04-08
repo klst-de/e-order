@@ -19,7 +19,9 @@ import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IPeriod;
@@ -38,6 +40,7 @@ import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 import com.klst.marshaller.OpenTransTransformer;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OpenTransOrderReadTest {
 
 	private static final String LOG_PROPERTIES = "testLogging.properties";
@@ -115,69 +118,7 @@ public class OpenTransOrderReadTest {
 		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());
 		
 		assertEquals("BUYER_REF_BU123", cio.getBuyerReferenceValue());
-		
-//		BusinessParty seller = cio.getSeller();
-//		BusinessParty buyer = cio.getBuyer();
-//		BusinessParty shipToParty = cio.getShipToParty();
-//		BusinessParty shipFromParty = cio.getShipFromParty();
-//		LOG.info("Seller:"+seller);
-//		LOG.info("Buyer:"+buyer);
-//		
-//		assertEquals("FCA", cio.getDeliveryType()); // UNTDID 4053 FCA : Free Carrier
-//		assertEquals("7", cio.getDeliveryFunctionCode()); // UNTDID 4055 7 Delivered by the supplier
-//
-//		assertEquals("PO123456789", cio.getPurchaseOrderReference());
-//		assertEquals("QUOT_125487", cio.getQuotationReference());
-//		assertEquals("CONTRACT_2020-25987", cio.getContractReference());
-//		assertEquals("BLANKET_ORDER_ID", cio.getBlanketOrderReference());
-///*
-//               <ram:PreviousOrderChangeReferencedDocument>
-//                    <ram:IssuerAssignedID>PREV_ORDER_C_ID</ram:IssuerAssignedID>
-//               </ram:PreviousOrderChangeReferencedDocument>
-//               <ram:PreviousOrderResponseReferencedDocument>
-//                    <ram:IssuerAssignedID>PREV_ORDER_R_ID</ram:IssuerAssignedID>
-//               </ram:PreviousOrderResponseReferencedDocument>
-//               <ram:SpecifiedProcuringProject>                     <!-- BT-11 nicht in BASIC / TODO test COMFORT
-//                    <ram:ID>PROJECT_ID</ram:ID>
-//                    <ram:Name>Project Reference</ram:Name>
-//               </ram:SpecifiedProcuringProject>
-// */
-//		assertEquals("PREV_ORDER_C_ID", cio.getPreviousOrderChangeReference());
-//		assertEquals("PREV_ORDER_R_ID", cio.getPreviousOrderResponseReference());
-//		assertNull(cio.getProjectReference());
-//		
-//		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
-//		IPeriod deliveryPeriod = cio.getDeliveryPeriod();
-//		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getStartDateAsTimestamp()));
-//		assertEquals("20200430", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getEndDateAsTimestamp()));
-//		
-///*
-//		<ram:ApplicableHeaderTradeSettlement>
-//			<ram:OrderCurrencyCode>EUR</ram:OrderCurrencyCode>
-//			<ram:SpecifiedTradeSettlementHeaderMonetarySummation>
-//				<ram:LineTotalAmount>310.00</ram:LineTotalAmount>
-//				<ram:ChargeTotalAmount>21.00</ram:ChargeTotalAmount>
-//				<ram:AllowanceTotalAmount>31.00</ram:AllowanceTotalAmount>
-//				<ram:TaxBasisTotalAmount>300.00</ram:TaxBasisTotalAmount>
-//				<ram:TaxTotalAmount currencyID="EUR">60.00</ram:TaxTotalAmount>
-//				<ram:GrandTotalAmount>360.00</ram:GrandTotalAmount>
-//			</ram:SpecifiedTradeSettlementHeaderMonetarySummation>
-//			<ram:ReceivableSpecifiedTradeAccountingAccount>
-//				<ram:ID>BUYER_ACCOUNT_REF</ram:ID>
-//			</ram:ReceivableSpecifiedTradeAccountingAccount>
-//		</ram:ApplicableHeaderTradeSettlement>
-// */
-//		assertEquals(EUR, cio.getDocumentCurrency());
-//		assertEquals(0, new BigDecimal(310).compareTo(cio.getLineNetTotal().getValue(RoundingMode.UNNECESSARY)));
-//		assertEquals(0, new BigDecimal( 21).compareTo(cio.getChargesTotal().getValue(RoundingMode.UNNECESSARY)));
-//		assertEquals(0, new BigDecimal( 31).compareTo(cio.getAllowancesTotal().getValue(RoundingMode.UNNECESSARY)));
-//		assertEquals(0, new BigDecimal(300).compareTo(cio.getTotalTaxExclusive().getValue(RoundingMode.UNNECESSARY)));
-//		IAmount taxTotal = cio.getTaxTotal();		
-//		assertEquals(0, new BigDecimal( 60).compareTo(taxTotal.getValue(RoundingMode.UNNECESSARY)));
-//		assertEquals(EUR, taxTotal.getCurrencyID());
-//		assertEquals(0, new BigDecimal(360).compareTo(cio.getTotalTaxInclusive().getValue(RoundingMode.UNNECESSARY)));
-//		assertEquals("BUYER_ACCOUNT_REF", cio.getBuyerAccountingReference().getName());
-
+		assertEquals(3, cio.getLines().size());
 	}
 
 	private CoreOrder getCoreOrder(File testFile) {
@@ -186,7 +127,6 @@ public class OpenTransOrderReadTest {
 			object = transformer.toModel(is);
 			LOG.info(">>>>"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // openTrans.Order aus jar laden
-//			Class<?> type = Class.forName(transformer.getCONTENT_TYPE_NAME); // ????? openTrans.Order aus jar laden
 			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -200,31 +140,56 @@ public class OpenTransOrderReadTest {
     public void pldOrder() {
 		File testFile = getTestFile(TESTDIR+"PLD_257444_Order_example.XML");
 		transformer = otTransformer;
-		CoreOrder cio = null;	
-		if(transformer.isValid(testFile)) {
-			cio = getCoreOrder(testFile);
-		}
+		CoreOrder co = null;	
+		if(!transformer.isValid(testFile)) return; // not valid
+		co = getCoreOrder(testFile);
 		
-		BusinessParty seller = cio.getSeller();
+		BusinessParty seller = co.getSeller();
 		LOG.info("seller:"+seller);
-		BusinessParty buyer = cio.getBuyer();
+		BusinessParty buyer = co.getBuyer();
 		LOG.info("buyer:"+buyer);
-	
-		LOG.info("\n");
+
+		assertEquals(11, co.getLines().size());
+		OrderLine line = co.getLines().get(0);
+		assertEquals("1", line.getId());               // BT-126 1..1 <LINE_ITEM_ID>1</LINE_ITEM_ID>
+/*
+			<PRODUCT_ID>
+				<bmecat:SUPPLIER_PID type="supplier_specific">G4525220</bmecat:SUPPLIER_PID>
+				<bmecat:INTERNATIONAL_PID type="ean">7611577104836</bmecat:INTERNATIONAL_PID>
+				<bmecat:BUYER_PID type="buyer_specific">907216725</bmecat:BUYER_PID>
+				<bmecat:DESCRIPTION_SHORT>BLISTOM25K</bmecat:DESCRIPTION_SHORT>
+				<bmecat:DESCRIPTION_LONG>BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs</bmecat:DESCRIPTION_LONG>
+			</PRODUCT_ID>		
+ */
+		assertEquals("G4525220", line.getSellerAssignedID());     // BG-31.BT-155 0..1 ohne type/Schema
+		assertEquals("907216725", line.getBuyerAssignedID());     // BG-31.BT-156 0..1
+		List<Identifier> stdId = line.getStandardIdentifier();    // BG-31.BT-157 0..n
+		assertEquals("ean", stdId.get(0).getSchemeIdentifier());
+		assertEquals("7611577104836", stdId.get(0).getContent());
+		assertEquals("BLISTOM25K", line.getItemName());           // BG-31.BT-153 1..1 Artikelname
+		assertEquals("BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs", line.getDescription()); // BG-31.BT-154
+/*
+			<QUANTITY>2000</QUANTITY>
+			<bmecat:ORDER_UNIT>C62</bmecat:ORDER_UNIT>		
+ */
+		assertEquals("2000.0000:C62", line.getQuantity().toString());       // BT-129 1..1 bestellte Menge
+		assertEquals(TaxCategoryCode.ExemptFromTax, line.getTaxCategory()); // BG-30.BT-151 1..1 Code der UStCat
+		
+		LOG.info("fertig.\n");
 	}
 	
 	@Test
     public void otOrder() {
 		File testFile = getTestFile(TESTDIR+"sample_order_opentrans_2_1.xml");
 		transformer = otTransformer;
-		CoreOrder cio = null;	
+		CoreOrder co = null;	
 		if(transformer.isValid(testFile)) {
-			cio = getCoreOrder(testFile);
+			co = getCoreOrder(testFile);
 		}
 		
-		BusinessParty seller = cio.getSeller();
+		BusinessParty seller = co.getSeller();
 		LOG.info("seller:"+seller);
-		BusinessParty buyer = cio.getBuyer();
+		BusinessParty buyer = co.getBuyer();
 		LOG.info("buyer:"+buyer);
 //	<ADDRESS>
 //		<bmecat:NAME>ADDRESS.NAME</bmecat:NAME>
@@ -239,19 +204,19 @@ public class OpenTransOrderReadTest {
 // Das Format der Steuernummer beim Finanzamt variiert ab und an  von Bundesland zu Bundesland. Sie beinhaltet mal 10 und mal 11 Zahlen, die durch Schrägstriche in 3 Teile zerlegt wird. 
 		
 		
-		LOG.info("getIssueDateAsTimestamp:"+cio.getIssueDateAsTimestamp());
+		LOG.info("getIssueDateAsTimestamp:"+co.getIssueDateAsTimestamp());
 		// 2009-05-13 07:20:00.0 test ohne Time:
-		assertEquals("20090513", DateTimeFormats.tsToCCYYMMDD(cio.getIssueDateAsTimestamp()));
-		assertEquals("2009-05-13T07:20:00+02:00", DateTimeFormats.tsTodtDATETIME(cio.getIssueDateAsTimestamp()));
-		assertNotNull(cio.getDeliveryDateAsTimestamp());
-		assertEquals("20090520", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
+		assertEquals("20090513", DateTimeFormats.tsToCCYYMMDD(co.getIssueDateAsTimestamp()));
+		assertEquals("2009-05-13T07:20:00+02:00", DateTimeFormats.tsTodtDATETIME(co.getIssueDateAsTimestamp()));
+		assertNotNull(co.getDeliveryDateAsTimestamp());
+		assertEquals("20090520", DateTimeFormats.tsToCCYYMMDD(co.getDeliveryDateAsTimestamp()));
 		
 		PostalAddress pa = buyer.getAddress();
 				pa.setAddressLine1("AddressLine1");
 		LOG.info("pa.AddressLine1:"+pa.getAddressLine1());
 		
 		String a ="a";
-		List<OrderLine> lines = cio.getLines();
+		List<OrderLine> lines = co.getLines();
 		assertEquals(1, lines.size());
 		OrderLine line = lines.get(0); // die einzige Zeile
 		assertEquals("1", line.getId());               // BT-126 1..1 Kennung der Position
