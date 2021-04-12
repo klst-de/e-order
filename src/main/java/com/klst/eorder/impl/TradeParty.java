@@ -1,5 +1,6 @@
 package com.klst.eorder.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -250,20 +251,25 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 		getSpecifiedLegalOrganization().setID(new ID(name, schemeID));
 	}
 
-	// BT-31 ++ 0..1 Seller VAT identifier                    / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
+	// BT-31 0..1 Seller VAT identifier / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
 	@Override
-	public Identifier getTaxRegistrationIdentifier() {
-//		return super.getSpecifiedTaxRegistration()==null ? null : new ID(getSpecifiedTaxRegistration().getID());
-		return super.getSpecifiedTaxRegistration().isEmpty() ? null : new ID(getSpecifiedTaxRegistration().get(0).getID());
+	public List<Identifier> getTaxRegistrationIdentifier() {
+		List<Identifier> result = new ArrayList<Identifier>();
+		if(super.getSpecifiedTaxRegistration().isEmpty()) return result;
+		getSpecifiedTaxRegistration().forEach( taxRegistration -> {
+			result.add(new ID(taxRegistration.getID()));
+		});
+		return result;
 	}
 	
 	@Override
 	public void setTaxRegistrationId(String name, String schemeID) {
+		addTaxRegistrationId(name, schemeID);
+	}
+
+	@Override
+	public void addTaxRegistrationId(String name, String schemeID) {
 		if(name==null) return;
-//		if(super.getSpecifiedTaxRegistration()==null) {
-//			setSpecifiedTaxRegistration(new TaxRegistrationType());
-//		}
-//		getSpecifiedTaxRegistration().setID(new ID(name, schemeID));
 		if(super.getSpecifiedTaxRegistration().isEmpty()) {
 			TaxRegistrationType taxRegistrationType = new TaxRegistrationType();
 			taxRegistrationType.setID(new ID(name, schemeID));
