@@ -152,7 +152,7 @@ public class OrderTransformerTest {
 			fail("UnmarshalException not thrown");
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			LOG.severe(ex.getMessage());
+			LOG.warning("expected ex:"+ex.getMessage());
 		}
 
     }
