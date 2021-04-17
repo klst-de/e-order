@@ -23,9 +23,17 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 * of this class.
 * <p>
 * Requires dependency on JAXB implementation jars
-* </p>
+*
 */
-public class CioNamespacePrefixMapper extends NamespacePrefixMapper {
+public class CioNamespacePrefixMapper extends NamespacePrefixMapper implements NamespacePrefixMapperFactory {
+
+	@Override // implements Factory
+	public NamespacePrefixMapper createNamespacePrefixMapper() {
+		return getNamespacePrefixMapper();
+	}
+	static NamespacePrefixMapper getNamespacePrefixMapper() {
+		return new CioNamespacePrefixMapper();
+	}
 
 	/**
 	 * REQUIREMENTS SPECIFICATION MAPPING for Cross Industry Order (CIO)

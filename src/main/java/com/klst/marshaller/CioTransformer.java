@@ -3,10 +3,6 @@ package com.klst.marshaller;
 import java.io.InputStream;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
-
-//import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 @Named
 /* Notice 
@@ -16,7 +12,7 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
  * @see https://stackoverflow.com/questions/26832051/singleton-vs-applicationscope
  * @see https://github.com/javax-inject/javax-inject
  */
-@Singleton
+@javax.inject.Singleton
 public class CioTransformer extends AbstactTransformer {
 
 	public static AbstactTransformer SINGLETON = new CioTransformer();
@@ -35,6 +31,8 @@ public class CioTransformer extends AbstactTransformer {
 	private static final String CIO_1_XSD = "/xsd/SCRDMCCBDACIOMessageStructure_1p0.xsd";
 	// CONTENT_PATH aka package name
 	private static final String CONTENT_PATH = "un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1"; 
+	// CONTENT_SUPERTYPE_NAME aka class name
+	private static final String CONTENT_SUPERTYPE_NAME = CONTENT_PATH+".SCRDMCCBDACIOMessageStructureType"; 
 	// CONTENT_TYPE_NAME aka class name
 	public static final String CONTENT_TYPE_NAME = "com.klst.eorder.impl.CrossIndustryOrder"; 
 	
@@ -51,24 +49,19 @@ public class CioTransformer extends AbstactTransformer {
 		Class<?> type = null;
 		try {
 			// dynamisch die CIO  Klasse laden 
-			type = Class.forName(CONTENT_PATH+".SCRDMCCBDACIOMessageStructureType");
+			type = Class.forName(CONTENT_SUPERTYPE_NAME);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return type;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Object> T toModel(InputStream xmlInputStream) {
 		Class<?> type = loadClass();
 		Object result = this.toModel(xmlInputStream, type);
 		return (T) result;
-	}
-
-	@Override
-	NamespacePrefixMapper getNamespacePrefixMapper() {
-		return new CioNamespacePrefixMapper();
 	}
 
 }

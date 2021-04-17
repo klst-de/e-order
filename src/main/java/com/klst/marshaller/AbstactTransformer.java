@@ -13,7 +13,6 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -22,18 +21,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
-
-/* in java 1.8 'NamespacePrefixMapper' is not in API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
- * to compile in eclipse define access rule.
- * 
- * Proposal JEP-320(http://openjdk.java.net/jeps/320) to remove the Java EE and CORBA modules from the JDK.
- * In Java SE 11, the module has been removed. To use JAX-WS and JAXB you need to add them to your project as separate libraries.
- * 
- * @see https://jesperdj.com/2018/09/30/jaxb-on-java-9-10-11-and-beyond/
- */
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-
-//import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
 
 @Named
 /* Notice 
@@ -44,7 +31,7 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
  * @see https://github.com/javax-inject/javax-inject
  */
 @javax.inject.Singleton
-public abstract class AbstactTransformer {
+public abstract class AbstactTransformer implements NamespacePrefixMapperFactory {
 
 	private static final Logger LOG = Logger.getLogger(AbstactTransformer.class.getName());
 	
@@ -112,6 +99,10 @@ public abstract class AbstactTransformer {
 		try {
 			Marshaller marshaller = createMarshaller();
 			marshaller.marshal(type.cast(document), outputStream);
+			// REMARK objects that doesn't have @XmlRootElement on it:
+			// - UBL InvoiceType and CreditNoteType
+			// - CrossIndustryInvoiceType
+			// see 5.3.3. Marshalling a non-element in file:///C:/proj/jaxb-ri/docs/ch03.html#marshalling
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.MARSHALLING_ERROR, ex);
 		}
@@ -130,26 +121,28 @@ public abstract class AbstactTransformer {
 		return schema.newValidator();
 	}
 
-	abstract NamespacePrefixMapper getNamespacePrefixMapper();
-	
-	// -- private
-	
 	private Unmarshaller createUnmarshaller() throws JAXBException {
 		return jaxbContext.createUnmarshaller();
 	}
 
-	// override the default namespace prefixes ns1, ns2, ... created by the Marshaller.
-	// @see http://hwellmann.blogspot.com/2011/03/jaxb-marshalling-with-custom-namespace.html
-	private Marshaller createMarshaller() throws JAXBException {
+	/*
+	 * some REMARKS on Properties:
+	 * 
+	 * https://stackoverflow.com/questions/277996/remove-standalone-yes-from-generated-xml
+		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE); 
+		marshaller.setProperty("com.sun.xml.internal.bind.xmlDeclaration", Boolean.FALSE);
+		marshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders", "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+		
+	 * https://stackoverflow.com/questions/2161350/jaxb-xjc-code-generation-schemalocation-missing-in-xml-generated-by-marshall
+		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/maindoc/UBL-Invoice-2.1.xsd");
+		
+	 *
+	 */
+	protected Marshaller createMarshaller() throws JAXBException {
 		Marshaller marshaller = jaxbContext.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formatXmlOutput());
 		
-        try {
-        	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", getNamespacePrefixMapper());
-        } catch(PropertyException ex) {
-            // In case another JAXB implementation is used
-			throw new TransformationException(TransformationException.NAMESPACE_PREFIX_MAPPER_ERROR, ex);
-        }
+		registerNamespacePrefixMapper(marshaller);
 
 		return marshaller;
 	}
