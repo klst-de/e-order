@@ -6,7 +6,7 @@
 //
 
 
-package un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31;
+package un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d20a;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31 package. 
+ * generated in the un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d20a package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -30,7 +30,7 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d20a
      * 
      */
     public ObjectFactory() {
