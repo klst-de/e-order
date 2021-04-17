@@ -47,6 +47,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
     "exchangedDocument",
     "supplyChainTradeTransaction"
 })
+@XmlRootElement(name = "SCRDMCCBDACIOMessageStructure")
 public class SCRDMCCBDACIOMessageStructureType {
 
     @XmlElement(name = "ExchangedDocumentContext", required = true)
