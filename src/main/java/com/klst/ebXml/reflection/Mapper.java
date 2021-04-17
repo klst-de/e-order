@@ -5,9 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.AmountType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.QuantityType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.AmountType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.IDType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.QuantityType;
 
 public class Mapper {
 

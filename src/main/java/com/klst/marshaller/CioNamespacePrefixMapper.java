@@ -40,22 +40,22 @@ public class CioNamespacePrefixMapper extends NamespacePrefixMapper implements N
 	 * <p>
 	 * CIO is based on Supply Chain REFERENCE DATA MODEL (SCRDM)
 	 */
-	private static final String RSM="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:1";
+	private static final String RSM="urn:un:unece:uncefact:data:SCRDMCCBDACIOMessageStructure:100";
 
 	/**
 	 * Reusable Aggregate Model for Aggregate Business Information Entities (ABIE)
 	 */
-	private static final String RAM="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:103";
+	private static final String RAM="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:128";
 
 	/**
 	 * Unqualified Data Type
 	 */
-	private static final String UDT="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103";
+	private static final String UDT="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128";
 	
 	/**
 	 * Qualified Data Type
 	 */
-	private static final String QDT="urn:un:unece:uncefact:data:standard:QualifiedDataType:103";
+	private static final String QDT="urn:un:unece:uncefact:data:standard:QualifiedDataType:128";
 	
 	private Map<String, String> namespaceMap = new HashMap<>();
 	 

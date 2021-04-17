@@ -28,9 +28,9 @@ public class CioTransformer extends AbstactTransformer {
 	 * CCBDA : Core Component Business Document Assembly 
 	 * CIO   : Cross Industry Order
 	 */
-	private static final String CIO_1_XSD = "/xsd/SCRDMCCBDACIOMessageStructure_1p0.xsd";
+	private static final String CIO_1_XSD = "/xsd/SCRDMCCBDACIOMessageStructure_100pD20B.xsd";
 	// CONTENT_PATH aka package name
-	private static final String CONTENT_PATH = "un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1"; 
+	private static final String CONTENT_PATH = "un.unece.uncefact.data.scrdmccbdaciomessagestructure._100"; 
 	// CONTENT_SUPERTYPE_NAME aka class name
 	private static final String CONTENT_SUPERTYPE_NAME = CONTENT_PATH+".SCRDMCCBDACIOMessageStructureType"; 
 	// CONTENT_TYPE_NAME aka class name

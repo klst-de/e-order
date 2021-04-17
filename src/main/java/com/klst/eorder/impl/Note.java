@@ -7,8 +7,8 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.OrderNoteFactory;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.NoteType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.NoteType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.CodeType;
 
 /* implements BG-1 NOTE
  * 

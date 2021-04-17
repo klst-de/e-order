@@ -2,7 +2,7 @@ package com.klst.eorder.impl;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.TextType;
 
 /**
  * Text

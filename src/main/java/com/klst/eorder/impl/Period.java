@@ -6,8 +6,8 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.untdid.DateTimeFormats;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SpecifiedPeriodType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SpecifiedPeriodType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.DateTimeType;
 
 public class Period extends SpecifiedPeriodType implements IPeriod {
 

@@ -11,9 +11,9 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.eorder.api.ShipFrom;
 import com.klst.eorder.api.ShipTo;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeDeliveryType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainEventType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.HeaderTradeDeliveryType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SupplyChainEventType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.DateTimeType;
 
 public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements ShipTo, ShipFrom {
 

@@ -3,7 +3,7 @@ package com.klst.eorder.impl;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.Reference;
 
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.IDType;
 
 /*
  

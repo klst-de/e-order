@@ -6,7 +6,7 @@ import java.math.RoundingMode;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.AmountType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.AmountType;
 
 /* Mit diesem Datentyp wird ein Betrag in numerischer Form abgebildet. 
  * 

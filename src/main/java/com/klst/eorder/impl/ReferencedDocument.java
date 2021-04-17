@@ -9,12 +9,12 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.SupportingDocument;
 
-import un.unece.uncefact.codelist.standard.unece.referencetypecode.d19b.ReferenceTypeCodeContentType;
-import un.unece.uncefact.data.standard.qualifieddatatype._103.DocumentCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._103.FormattedDateTimeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._103.ReferenceCodeType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.BinaryObjectType;
+import un.unece.uncefact.codelist.standard.unece.referencetypecode.d20a.ReferenceTypeCodeContentType;
+import un.unece.uncefact.data.standard.qualifieddatatype._128.DocumentCodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._128.FormattedDateTimeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._128.ReferenceCodeType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.ReferencedDocumentType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.BinaryObjectType;
 
 public class ReferencedDocument extends ReferencedDocumentType implements SupportingDocument {
 // in CII: implements BG24_AdditionalSupportingDocs, PrecedingInvoice

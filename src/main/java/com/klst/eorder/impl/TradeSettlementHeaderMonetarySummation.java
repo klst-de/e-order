@@ -4,7 +4,7 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.eorder.api.BG22_DocumentTotals;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeSettlementHeaderMonetarySummationType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeSettlementHeaderMonetarySummationType;
 
 public class TradeSettlementHeaderMonetarySummation extends TradeSettlementHeaderMonetarySummationType implements BG22_DocumentTotals {
 
