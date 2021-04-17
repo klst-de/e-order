@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103"
+<xsd:schema xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103"
+    targetNamespace="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128"
     elementFormDefault="qualified"
-    version="103.0">
+    version="128.0">
   <xsd:complexType name="AmountType">
     <xsd:simpleContent>
       <xsd:extension base="xsd:decimal">

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:103"
+<xsd:schema xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:128"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:103"
-    xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103"
-    targetNamespace="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:103"
+    xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:128"
+    xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128"
+    targetNamespace="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:128"
     elementFormDefault="qualified"
-    version="103.0">
-  <xsd:import namespace="urn:un:unece:uncefact:data:standard:QualifiedDataType:103" schemaLocation="SCRDMCCBDACIOMessageStructure_1p0_urn_un_unece_uncefact_data_standard_QualifiedDataType_103.xsd"/>
-  <xsd:import namespace="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103" schemaLocation="SCRDMCCBDACIOMessageStructure_1p0_urn_un_unece_uncefact_data_standard_UnqualifiedDataType_103.xsd"/>
+    version="128.0">
+  <xsd:import namespace="urn:un:unece:uncefact:data:standard:QualifiedDataType:128" schemaLocation="SCRDMCCBDACIOMessageStructure_100pD20B_urn_un_unece_uncefact_data_standard_QualifiedDataType_128.xsd"/>
+  <xsd:import namespace="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128" schemaLocation="SCRDMCCBDACIOMessageStructure_100pD20B_urn_un_unece_uncefact_data_standard_UnqualifiedDataType_128.xsd"/>
   <xsd:complexType name="DocumentContextParameterType">
     <xsd:annotation>
       <xsd:documentation source="BN/BN">Document Context Parameter</xsd:documentation>
@@ -187,6 +187,11 @@
       <xsd:element name="AdditionalReferencedDocument" type="ram:ReferencedDocumentType" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation source="BN/BN">Additional Document</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="BuyerAgentTradeParty" type="ram:TradePartyType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation source="BN/BN">Buyer Agent</xsd:documentation>
         </xsd:annotation>
       </xsd:element>
       <xsd:element name="CatalogueReferencedDocument" type="ram:ReferencedDocumentType" minOccurs="0">
@@ -1144,7 +1149,7 @@
           <xsd:documentation source="BN/BN">Maximum Quantity</xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="AppliedTradeAllowanceCharge" type="ram:TradeAllowanceChargeType" minOccurs="0">
+      <xsd:element name="AppliedTradeAllowanceCharge" type="ram:TradeAllowanceChargeType" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation source="BN/BN">Applied Allowance/Charge</xsd:documentation>
         </xsd:annotation>

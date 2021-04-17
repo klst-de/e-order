@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:clm61373="urn:un:unece:uncefact:codelist:standard:UNECE:DocumentStatusCode:D19B"
+<xsd:schema xmlns:clm61373="urn:un:unece:uncefact:codelist:standard:UNECE:DocumentStatusCode:D20A"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="urn:un:unece:uncefact:codelist:standard:UNECE:DocumentStatusCode:D19B"
+    targetNamespace="urn:un:unece:uncefact:codelist:standard:UNECE:DocumentStatusCode:D20A"
     elementFormDefault="qualified"
     version="3.7">
   <xsd:simpleType name="DocumentStatusCodeContentType">

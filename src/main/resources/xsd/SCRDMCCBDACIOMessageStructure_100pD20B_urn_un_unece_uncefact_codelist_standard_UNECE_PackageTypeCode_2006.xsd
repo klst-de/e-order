@@ -3,7 +3,7 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     targetNamespace="urn:un:unece:uncefact:codelist:standard:UNECE:PackageTypeCode:2006"
     elementFormDefault="qualified"
-    version="2.1">
+    version="2.2">
   <xsd:simpleType name="PackageTypeCodeContentType">
     <xsd:restriction base="xsd:token">
       <xsd:enumeration value="43"/>
@@ -204,6 +204,9 @@
       <xsd:enumeration value="O4"/>
       <xsd:enumeration value="O5"/>
       <xsd:enumeration value="O6"/>
+      <xsd:enumeration value="O7"/>
+      <xsd:enumeration value="O8"/>
+      <xsd:enumeration value="O9"/>
       <xsd:enumeration value="OA"/>
       <xsd:enumeration value="OB"/>
       <xsd:enumeration value="OC"/>
@@ -229,7 +232,10 @@
       <xsd:enumeration value="OX"/>
       <xsd:enumeration value="OY"/>
       <xsd:enumeration value="OZ"/>
+      <xsd:enumeration value="P1"/>
       <xsd:enumeration value="P2"/>
+      <xsd:enumeration value="P3"/>
+      <xsd:enumeration value="P4"/>
       <xsd:enumeration value="PA"/>
       <xsd:enumeration value="PB"/>
       <xsd:enumeration value="PC"/>

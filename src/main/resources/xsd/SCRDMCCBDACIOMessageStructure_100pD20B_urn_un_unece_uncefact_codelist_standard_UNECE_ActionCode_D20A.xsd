@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:clm64465AllowanceChargeReasonCode="urn:un:unece:uncefact:codelist:standard:UNECE:AllowanceChargeReasonCode:D19B"
+<xsd:schema xmlns:clm61229LineStatusCode="urn:un:unece:uncefact:codelist:standard:UNECE:ActionCode:D20A"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="urn:un:unece:uncefact:codelist:standard:UNECE:AllowanceChargeReasonCode:D19B"
+    targetNamespace="urn:un:unece:uncefact:codelist:standard:UNECE:ActionCode:D20A"
     elementFormDefault="qualified"
-    version="3.4">
-  <xsd:simpleType name="AllowanceChargeReasonCodeContentType">
+    version="3.1">
+  <xsd:simpleType name="ActionCodeContentType">
     <xsd:restriction base="xsd:token">
       <xsd:enumeration value="1"/>
       <xsd:enumeration value="2"/>
@@ -110,7 +110,20 @@
       <xsd:enumeration value="102"/>
       <xsd:enumeration value="103"/>
       <xsd:enumeration value="104"/>
-      <xsd:enumeration value="ZZZ"/>
+      <xsd:enumeration value="105"/>
+      <xsd:enumeration value="106"/>
+      <xsd:enumeration value="107"/>
+      <xsd:enumeration value="108"/>
+      <xsd:enumeration value="109"/>
+      <xsd:enumeration value="110"/>
+      <xsd:enumeration value="111"/>
+      <xsd:enumeration value="112"/>
+      <xsd:enumeration value="113"/>
+      <xsd:enumeration value="114"/>
+      <xsd:enumeration value="115"/>
+      <xsd:enumeration value="116"/>
+      <xsd:enumeration value="117"/>
+      <xsd:enumeration value="118"/>
     </xsd:restriction>
   </xsd:simpleType>
 </xsd:schema>
