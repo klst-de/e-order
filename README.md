@@ -12,3 +12,7 @@ Similar because
 - CII however is based on Version (100) [SCRDM 16B](https://unece.org/trade/uncefact/xml-schemas) released in 2016
 
 ### 2021-04-13 : Order-X Version 1.0 published
+
+### 2021-04-19 : jars Version 1.0.x released
+
+- download the [jars](../releases)
