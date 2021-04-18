@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="de.klst.orderx-api-0.2.0.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/e-order/de.klst.orderx-api.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="de.klst.orderx-api-1.0.0.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/e-order-CIO/de.klst.orderx-api.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,9 +11,7 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;com.klst.eorder.api"/>
-        <javaElement handleIdentifier="=e-order/e-doc-commons\/src\/main\/java"/>
-        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;com.klst.ebXml.reflection"/>
-        <javaElement handleIdentifier="=e-order/src\/main\/java&lt;com.klst.marshaller"/>
+        <javaElement handleIdentifier="=e-order-CIO/src\/main\/java&lt;com.klst.eorder.api"/>
+        <javaElement handleIdentifier="=e-order-CIO/e-doc-commons\/src\/main\/java&lt;com.klst.edoc.api"/>
     </selectedElements>
 </jardesc>
