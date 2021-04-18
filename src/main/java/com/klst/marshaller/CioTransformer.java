@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import javax.inject.Named;
 
+import com.klst.eorder.api.AbstactTransformer;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 @Named
@@ -43,11 +44,12 @@ public class CioTransformer extends AbstactTransformer {
 	}
 	
 	@Override
-	String getResource() {
+	protected String getResource() {
 		return CIO_1_XSD;
 	}
 
-	Class<?> loadClass() {
+	@Override
+	protected Class<?> loadClass() {
 		Class<?> type = null;
 		try {
 			// dynamisch die CIO  Klasse laden 

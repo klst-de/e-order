@@ -3,6 +3,7 @@ package com.klst.marshaller;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.klst.eorder.api.NamespacePrefixMapperFactory;
 /* in java 1.8 'NamespacePrefixMapper' is not in API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
  * to compile in eclipse define access rule.
  * 

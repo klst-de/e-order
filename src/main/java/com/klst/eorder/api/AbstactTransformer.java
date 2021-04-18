@@ -1,4 +1,4 @@
-package com.klst.marshaller;
+package com.klst.eorder.api;
 
 import static javax.xml.bind.JAXBContext.newInstance;
 
@@ -21,6 +21,8 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
+
+import com.klst.marshaller.TransformationException;
 
 /**
  * The transformer has two main features: 
@@ -90,7 +92,7 @@ public abstract class AbstactTransformer implements NamespacePrefixMapperFactory
 	
 	public abstract <T> T unmashal(InputStream xmlInputStream);
 	
-	<T extends Object> T unmarshal(InputStream xmlInputStream, Class<T> declaredType) {
+	protected <T extends Object> T unmarshal(InputStream xmlInputStream, Class<T> declaredType) {
 		try {
 			Unmarshaller unmarshaller = createUnmarshaller();
 			LOG.info("try unmarshal to "+declaredType.getName());
@@ -100,7 +102,7 @@ public abstract class AbstactTransformer implements NamespacePrefixMapperFactory
 		}
 	}
 
-	abstract Class<?> loadClass();
+	protected abstract Class<?> loadClass();
 	
 	public byte[] marshal(Object document) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(16000);
@@ -120,7 +122,7 @@ public abstract class AbstactTransformer implements NamespacePrefixMapperFactory
 		return outputStream.toByteArray();
 	}
 
-	abstract String getResource();
+	protected abstract String getResource();
 	
 	Validator getSchemaValidator(String resource) throws SAXException {
 		LOG.fine("resource:"+resource + " Class:"+this.getClass());

@@ -19,6 +19,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
+import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
@@ -32,7 +33,6 @@ import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.TradeContact;
 import com.klst.eorder.impl.TradeParty;
 import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
-import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 
 public class OrderTest {
