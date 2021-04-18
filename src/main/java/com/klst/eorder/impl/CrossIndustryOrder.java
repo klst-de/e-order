@@ -14,7 +14,6 @@ import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
-import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG22_DocumentTotals;
