@@ -220,8 +220,8 @@ public class SCopyCtor {
 			LOG.fine(e.getMessage());
 			return null;
 		} catch (ClassNotFoundException e) {
-			LOG.warning(e.getMessage());
-			// kann in e-order passieren, siehe com.klst.edoc.untdid.DocumentNameCode#valueOf // TODO config statt warning
+			LOG.config("ClassNotFound " + e.getMessage());
+			// kann in e-order passieren, siehe com.klst.edoc.untdid.DocumentNameCode#valueOf // config statt warning
 			return null;
 		}
 

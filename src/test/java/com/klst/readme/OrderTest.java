@@ -3,11 +3,18 @@ package com.klst.readme;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
@@ -37,7 +44,26 @@ import com.klst.marshaller.CioTransformer;
 
 public class OrderTest {
 	
-	private static final Logger LOG = Logger.getLogger(OrderTest.class.getName());
+	private static final String LOG_PROPERTIES = "testLogging.properties";
+	private static LogManager logManager = LogManager.getLogManager(); // Singleton
+	private static Logger LOG = null;
+	private static void initLogger() {
+    	URL url = OrderTest.class.getClassLoader().getResource(LOG_PROPERTIES);
+    	if(url==null) {
+			LOG = Logger.getLogger(OrderTest.class.getName());
+			LOG.warning("keine "+LOG_PROPERTIES);
+    	} else {
+    		try {
+    	        File file = new File(url.toURI()); //NPE wenn "testLogging.properties" nicht gefunden
+    			logManager.readConfiguration(new FileInputStream(file));
+    		} catch (IOException | URISyntaxException e) {
+    			LOG = Logger.getLogger(OrderTest.class.getName());
+    			LOG.warning(e.getMessage());
+    		}
+    	}
+		LOG = Logger.getLogger(OrderTest.class.getName());		
+	}
+//	private static final Logger LOG = Logger.getLogger(OrderTest.class.getName());
 
 	static final String EUR = "EUR";
 	static final String C62 = "C62";
@@ -46,6 +72,11 @@ public class OrderTest {
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
 	Object object;
+
+    @BeforeClass
+    public static void staticSetup() {
+    	initLogger();
+    }
 
 	@Before 
     public void setup() {
