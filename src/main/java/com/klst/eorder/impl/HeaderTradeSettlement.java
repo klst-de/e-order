@@ -53,11 +53,6 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 
 	// BT-19 + 0..1 Buyer accounting reference
 	public void setBuyerAccountingReference(Reference textReference) {
-//		if(textReference==null) return;
-//		if(super.getReceivableSpecifiedTradeAccountingAccount()==null) {
-//			setReceivableSpecifiedTradeAccountingAccount(new TradeAccountingAccountType());
-//		}
-//		getReceivableSpecifiedTradeAccountingAccount().setID((ID)textReference);
 		Mapper.set(this, "receivableSpecifiedTradeAccountingAccount", textReference);
 	}
 	public Reference getBuyerAccountingReference() {

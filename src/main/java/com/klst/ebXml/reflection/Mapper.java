@@ -47,7 +47,7 @@ public class Mapper {
 			setValue.invoke(field.get(obj), value.getClass().cast(value));
 			return;
 		} catch (NoSuchMethodException e) {
-			LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+			LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 //			e.printStackTrace();
 		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 			LOG.warning(obj.getClass().getSimpleName() +"."+fieldName + ": Exception:"+e);
@@ -62,7 +62,7 @@ public class Mapper {
 			setID.invoke(field.get(obj), IDType.class.cast(value));
 			return;
 		} catch (NoSuchMethodException e) {
-			LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+			LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 //			e.printStackTrace();
 		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 			LOG.warning(obj.getClass().getSimpleName() +"."+fieldName + ": Exception:"+e);
@@ -77,12 +77,14 @@ public class Mapper {
 				Object fo = field.get(obj); // IndicatorType?
 				Method setter = fo.getClass().getDeclaredMethod(methodName, Boolean.class);
 				setter.invoke(fo, Boolean.class.cast(value));
+				return;
 			} catch (NoSuchMethodException e) {
-				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+				LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 //				e.printStackTrace();
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return;
 			}
 		}
 		
@@ -93,21 +95,25 @@ public class Mapper {
 			try {
 				Method setter = obj.getClass().getDeclaredMethod(methodName, QuantityType.class);
 				setter.invoke(obj, QuantityType.class.cast(value));
+				return;
 			} catch (NoSuchMethodException e) {
-				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+				LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 //				e.printStackTrace();
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
+				return;
 			}
 			methodName = "setBasisQuantity"; 
 			try {
 				Method setter = obj.getClass().getDeclaredMethod(methodName, QuantityType.class);
 				setter.invoke(obj, QuantityType.class.cast(value));
+				return;
 			} catch (NoSuchMethodException e) {
-				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+				LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 //				e.printStackTrace();
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
+				return;
 			}
 		}
 
@@ -118,21 +124,25 @@ public class Mapper {
 			try {
 				Method setter = obj.getClass().getDeclaredMethod(methodName, AmountType.class);
 				setter.invoke(obj, AmountType.class.cast(value));
+				return;
 			} catch (NoSuchMethodException e) {
-				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+				LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 //				e.printStackTrace();
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
+				return;
 			}
 			methodName = "setChargeAmount"; 
 			try {
 				Method setter = obj.getClass().getDeclaredMethod(methodName, AmountType.class);
 				setter.invoke(obj, AmountType.class.cast(value));
+				return;
 			} catch (NoSuchMethodException e) {
 				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 //				e.printStackTrace();
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
+				return;
 			}
 		}
 

@@ -32,8 +32,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.IndicatorType;
 
-public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType 
-	implements CoreOrder {
+public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implements CoreOrder {
 
 	// factory
 	public static CoreOrder getFactory() {
@@ -51,7 +50,6 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 		super();
 		if(doc!=null) {
 			SCopyCtor.getInstance().invokeCopy(this, doc);
-//			LOG.info("copy ctor:"+this); // toString liefert hier NPE wg.getLines
 		}
 
 		supplyChainTradeTransaction = SupplyChainTradeTransaction.create(super.getSupplyChainTradeTransaction(), this);
@@ -64,8 +62,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 			supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		}
-
-		LOG.config("copy ctor:"+this);
+		
 	}
 
 	/**
