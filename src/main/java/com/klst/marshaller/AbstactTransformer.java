@@ -22,6 +22,16 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+/**
+ * The transformer has two main features: 
+ * <p>
+ * - <a href="https://en.wikipedia.org/wiki/Marshalling_(computer_science)">marshal</a> Java objects into XML 
+ * <br>
+ * - and the inverse, unmarshal XML into Java objects
+ *
+ * @see https://en.wikipedia.org/wiki/Jakarta_XML_Binding
+ * @see https://de.wikipedia.org/wiki/Jakarta_XML_Binding
+ */
 @Named
 /* Notice 
  * that there are two @Singleton annotations, 
@@ -78,9 +88,9 @@ public abstract class AbstactTransformer implements NamespacePrefixMapperFactory
 		return getSchemaValidator(getResource());
 	}
 	
-	public abstract <T> T toModel(InputStream xmlInputStream);
+	public abstract <T> T unmashal(InputStream xmlInputStream);
 	
-	<T extends Object> T toModel(InputStream xmlInputStream, Class<T> declaredType) {
+	<T extends Object> T unmarshal(InputStream xmlInputStream, Class<T> declaredType) {
 		try {
 			Unmarshaller unmarshaller = createUnmarshaller();
 			LOG.info("try unmarshal to "+declaredType.getName());
@@ -92,7 +102,7 @@ public abstract class AbstactTransformer implements NamespacePrefixMapperFactory
 
 	abstract Class<?> loadClass();
 	
-	public byte[] fromModel(Object document) {
+	public byte[] marshal(Object document) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(16000);
 		Class<?> type = loadClass();
 		

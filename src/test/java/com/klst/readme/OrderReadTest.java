@@ -87,7 +87,7 @@ public class OrderReadTest {
 		if(transformer.isValid(testFile)) {
 			try {
 				InputStream is = new FileInputStream(testFile);
-				object = transformer.toModel(is);
+				object = transformer.unmashal(is);
 				LOG.info(">>>>"+object);
 				Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 				// dynamisch:
@@ -175,7 +175,7 @@ public class OrderReadTest {
 	public CoreOrder getCoreOrder(File testFile) {
 		try {
 			InputStream is = new FileInputStream(testFile);
-			object = transformer.toModel(is);
+			object = transformer.unmashal(is);
 			LOG.info(">>>>"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 			// dynamisch:

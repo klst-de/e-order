@@ -60,9 +60,9 @@ public class CioTransformer extends AbstactTransformer {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Object> T toModel(InputStream xmlInputStream) {
+	public <T extends Object> T unmashal(InputStream xmlInputStream) {
 		Class<?> type = loadClass();
-		Object result = this.toModel(xmlInputStream, type);
+		Object result = this.unmarshal(xmlInputStream, type);
 		return (T) result;
 	}
 	

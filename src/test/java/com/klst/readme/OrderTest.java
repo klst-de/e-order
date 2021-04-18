@@ -209,7 +209,7 @@ public class OrderTest {
 	void commercialOrderTest() {
 		LOG.info("object.Class:"+object.getClass());
 		
-		byte[] xml = transformer.fromModel(object);
+		byte[] xml = transformer.marshal(object);
 		LOG.info(new String(xml));
 	}
 
