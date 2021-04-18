@@ -4,6 +4,8 @@ import java.io.InputStream;
 
 import javax.inject.Named;
 
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+
 @Named
 /* Notice 
  * that there are two @Singleton annotations, 
@@ -22,7 +24,7 @@ public class CioTransformer extends AbstactTransformer {
 	}
 	
 	/* xsd file name in the output folder started with "/" == project_loc
-	 * actually the cross industry order version is 103, not 100 as the corresponding CII!
+	 * actually the cross industry order version is 100.D20B, not 100.D16B as the corresponding CII!
 	 * 
 	 * SCRDM : Supply Chain REFERENCE DATA MODEL
 	 * CCBDA : Core Component Business Document Assembly 
@@ -62,6 +64,10 @@ public class CioTransformer extends AbstactTransformer {
 		Class<?> type = loadClass();
 		Object result = this.toModel(xmlInputStream, type);
 		return (T) result;
+	}
+	
+	public NamespacePrefixMapper createNamespacePrefixMapper() {
+		return CioNamespacePrefixMapper.getNamespacePrefixMapper();
 	}
 
 }

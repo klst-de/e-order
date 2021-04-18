@@ -62,7 +62,7 @@ public class CioNamespacePrefixMapper extends NamespacePrefixMapper implements N
 	/**
 	 * Create mappings.
 	 */
-	public CioNamespacePrefixMapper() {
+	private CioNamespacePrefixMapper() {
 		namespaceMap.put(RSM, "rsm");
 		namespaceMap.put(RAM, "ram");
 		namespaceMap.put(UDT, "udt");
