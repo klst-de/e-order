@@ -31,12 +31,12 @@ import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.impl.Percent;
-import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 import com.klst.marshaller.OpenTransTransformer;
 
@@ -104,7 +104,7 @@ public class OpenTransOrderReadTest {
 		if(transformer.isValid(testFile)) {
 			try {
 				InputStream is = new FileInputStream(testFile);
-				object = transformer.toModel(is);
+				object = transformer.unmashal(is);
 				LOG.info(">>>>"+object);
 				Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 				// dynamisch:
@@ -124,7 +124,7 @@ public class OpenTransOrderReadTest {
 	private CoreOrder getCoreOrder(File testFile) {
 		try {
 			InputStream is = new FileInputStream(testFile);
-			object = transformer.toModel(is);
+			object = transformer.unmashal(is);
 			LOG.info(">>>>"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // openTrans.Order aus jar laden
 			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));

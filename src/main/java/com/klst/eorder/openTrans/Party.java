@@ -1,5 +1,6 @@
 package com.klst.eorder.openTrans;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.opentrans.xmlschema._2.PARTY;
@@ -253,9 +254,9 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 //		getSpecifiedLegalOrganization().setID(new ID(name, schemeID));
 	}
 
-	// BT-31 ++ 0..1 Seller VAT identifier                    / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
+	// BT-31 ++ 0..1 Seller VAT identifier / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
 	@Override
-	public Identifier getTaxRegistrationIdentifier() {
+	public List<Identifier> getTaxRegistrationIdentifier() {
 		return null;
 //		Address address = (Address)getAddress();
 //		return address==null ? null : new ID(address.getVATID(), "VAT"); // ID aus CIO
@@ -265,6 +266,9 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 		return address==null ? null : address.getVATID();
 	}
 	
+	public void addTaxRegistrationId(String name, String schemeID) {
+		// TODO
+	}
 	@Override
 	public void setTaxRegistrationId(String name, String schemeID) {
 		if(name==null) return;
