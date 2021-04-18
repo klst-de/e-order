@@ -13,6 +13,14 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._128.DateTimeType;
 // - FormattedDateTimeType.DateTimeString
 public class DateTimeFormatStrings extends DateTimeFormats {
 
+	static Timestamp getDateAsTimestamp(DateTimeType dateTime) {
+		if(dateTime==null) return null;
+		String format = dateTime.getDateTimeString()==null ? null : dateTime.getDateTimeString().getFormat();
+		return format.equals(DateTimeFormats.CCYYMMDDHHMM_QUALIFIER) ? 
+			  DateTimeFormats.yyyyMMddhhmmToTs(dateTime.getDateTimeString().getValue()) 
+			: DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
 	static DateTimeType toDateTime(Timestamp ts) {
 		if(ts==null) return null;
 		

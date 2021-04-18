@@ -134,6 +134,7 @@ public class OrderReadTest {
 		
 		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
 		IPeriod deliveryPeriod = cio.getDeliveryPeriod();
+		LOG.info("deliveryPeriod:"+deliveryPeriod);
 		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getStartDateAsTimestamp()));
 		assertEquals("20200430", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getEndDateAsTimestamp()));
 		
@@ -197,13 +198,15 @@ public class OrderReadTest {
 		}
 		
 		assertEquals(BG2_ProcessControl.PROFILE_COMFORT, cio.getProfile());
-		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());
+		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());	
+		assertEquals("202003311232", DateTimeFormats.tsToCCYYMMDDHHMM(cio.getIssueDateAsTimestamp()));
 
 		List<OrderLine> lines = cio.getLines();
 		assertEquals(3, lines.size());
 		OrderLine line = lines.get(0);
-		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(line.getLineDeliveryPeriod().getStartDateAsTimestamp()));
-		assertEquals("20200430", DateTimeFormats.tsToCCYYMMDD(line.getLineDeliveryPeriod().getEndDateAsTimestamp()));
+		LOG.info("LineDeliveryPeriod:"+line.getLineDeliveryPeriod().getEndDateAsTimestamp());
+		assertEquals("202004150900", DateTimeFormats.tsToCCYYMMDDHHMM(line.getLineDeliveryPeriod().getStartDateAsTimestamp()));
+		assertEquals("202004301800", DateTimeFormats.tsToCCYYMMDDHHMM(line.getLineDeliveryPeriod().getEndDateAsTimestamp()));
 		line.setLineDeliveryDate("20210101");
 		
 		line = lines.get(1); // the second! the first has index 0!

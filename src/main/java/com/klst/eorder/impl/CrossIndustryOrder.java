@@ -183,8 +183,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 
 	@Override
 	public Timestamp getIssueDateAsTimestamp() {
-		DateTimeType dateTime = super.getExchangedDocument().getIssueDateTime();
-		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+		return DateTimeFormatStrings.getDateAsTimestamp(super.getExchangedDocument().getIssueDateTime());
 	}
 
 	@Override

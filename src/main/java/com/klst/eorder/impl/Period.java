@@ -50,8 +50,7 @@ public class Period extends SpecifiedPeriodType implements IPeriod {
 
 	@Override
 	public Timestamp getStartDateAsTimestamp() {
-		DateTimeType dateTime = getStartDateTime();
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+		return DateTimeFormatStrings.getDateAsTimestamp(super.getStartDateTime());
 	}
 
 	void setEndDate(Timestamp ts) {
@@ -62,8 +61,7 @@ public class Period extends SpecifiedPeriodType implements IPeriod {
 
 	@Override
 	public Timestamp getEndDateAsTimestamp() {
-		DateTimeType dateTime = super.getEndDateTime();
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+		return DateTimeFormatStrings.getDateAsTimestamp(super.getEndDateTime());
 	}
 
 }

@@ -1,10 +1,11 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<rsm:SCRDMCCBDACIOMessageStructure 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103"
-	xmlns:rsm="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:1"
-	xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:103"
-	xsi:schemaLocation="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:103 SCRDMCCBDACIOMessageStructure_1p0.xsd">
+﻿
+<!--Sample file Order-x.xml - COMFORT Profile, created by Cyrille Sautereau, Admarel-->
+<rsm:SCRDMCCBDACIOMessageStructure
+xmlns:rsm="urn:un:unece:uncefact:data:SCRDMCCBDACIOMessageStructure:100"
+xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128"
+xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:128"
+xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:128"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
      <rsm:ExchangedDocumentContext>
           <ram:TestIndicator>
                <udt:Indicator>false</udt:Indicator>
@@ -21,7 +22,7 @@
           <ram:Name>Doc Name</ram:Name>
           <ram:TypeCode>220</ram:TypeCode>
           <ram:IssueDateTime>
-               <udt:DateTimeString format="102">20200331</udt:DateTimeString>
+               <udt:DateTimeString format="203">202003311232</udt:DateTimeString>
           </ram:IssueDateTime>
           <ram:CopyIndicator>
                <udt:Indicator>false</udt:Indicator>
@@ -46,8 +47,8 @@
                <ram:AssociatedDocumentLineDocument>
                     <ram:LineID>1</ram:LineID>
                     <ram:IncludedNote>
-                         <ram:Content>Content of Note</ram:Content>
-                         <ram:SubjectCode>AAI</ram:SubjectCode>
+                         <ram:Content>WEEE Tax of 0,50 euros per item included</ram:Content>
+                         <ram:SubjectCode>TXD</ram:SubjectCode>
                     </ram:IncludedNote>
                </ram:AssociatedDocumentLineDocument>
                <ram:SpecifiedTradeProduct>
@@ -61,7 +62,6 @@
                     <ram:ApplicableProductCharacteristic>
                          <ram:TypeCode>Characteristic_Code</ram:TypeCode>
                          <ram:Description>Characteristic Description</ram:Description>
-                         <ram:ValueMeasure unitCode="MTR">5</ram:ValueMeasure>
                          <ram:Value>5 meters</ram:Value>
                     </ram:ApplicableProductCharacteristic>
                     <ram:DesignatedProductClassification>
@@ -111,13 +111,23 @@
                          <ram:ReferenceTypeCode>AWV</ram:ReferenceTypeCode>
                     </ram:AdditionalReferencedDocument>
                     <ram:GrossPriceProductTradePrice>
-                         <ram:ChargeAmount>11.00</ram:ChargeAmount>
+                         <ram:ChargeAmount>10.50</ram:ChargeAmount>
                          <ram:BasisQuantity unitCode="C62">1.00</ram:BasisQuantity>
                          <ram:AppliedTradeAllowanceCharge>
                               <ram:ChargeIndicator>
                                    <udt:Indicator>false</udt:Indicator>
                               </ram:ChargeIndicator>
                               <ram:ActualAmount>1.00</ram:ActualAmount>
+                              <ram:ReasonCode>95</ram:ReasonCode>
+                              <ram:Reason>DISCOUNT</ram:Reason>
+                         </ram:AppliedTradeAllowanceCharge>
+                         <ram:AppliedTradeAllowanceCharge>
+                              <ram:ChargeIndicator>
+                                   <udt:Indicator>true</udt:Indicator>
+                              </ram:ChargeIndicator>
+                              <ram:ActualAmount>0.50</ram:ActualAmount>
+                              <ram:ReasonCode>AEW</ram:ReasonCode>
+                              <ram:Reason>WEEE</ram:Reason>
                          </ram:AppliedTradeAllowanceCharge>
                     </ram:GrossPriceProductTradePrice>
                     <ram:NetPriceProductTradePrice>
@@ -142,10 +152,10 @@
                     <ram:RequestedDeliverySupplyChainEvent>
                          <ram:OccurrenceSpecifiedPeriod>
                               <ram:StartDateTime>
-                                   <udt:DateTimeString format="102">20200415</udt:DateTimeString>
+                                   <udt:DateTimeString format="203">202004150900</udt:DateTimeString>
                               </ram:StartDateTime>
                               <ram:EndDateTime>
-                                   <udt:DateTimeString format="102">20200430</udt:DateTimeString>
+                                   <udt:DateTimeString format="203">202004301800</udt:DateTimeString>
                               </ram:EndDateTime>
                          </ram:OccurrenceSpecifiedPeriod>
                     </ram:RequestedDeliverySupplyChainEvent>
@@ -173,7 +183,7 @@
                          <ram:CalculationPercent>10.00</ram:CalculationPercent>
                          <ram:BasisAmount>60.00</ram:BasisAmount>
                          <ram:ActualAmount>6.00</ram:ActualAmount>
-                         <ram:ReasonCode>64</ram:ReasonCode>
+                         <ram:ReasonCode>FC</ram:ReasonCode>
                          <ram:Reason>FREIGHT SERVICES</ram:Reason>
                     </ram:SpecifiedTradeAllowanceCharge>
                     <ram:SpecifiedTradeSettlementLineMonetarySummation>
@@ -188,8 +198,8 @@
                <ram:AssociatedDocumentLineDocument>
                     <ram:LineID>2</ram:LineID>
                     <ram:IncludedNote>
-                         <ram:Content>Content of Note</ram:Content>
-                         <ram:SubjectCode>AAI</ram:SubjectCode>
+                         <ram:Content>WEEE Tax of 0,50 euros per item included</ram:Content>
+                         <ram:SubjectCode>TXD</ram:SubjectCode>
                     </ram:IncludedNote>
                </ram:AssociatedDocumentLineDocument>
                <ram:SpecifiedTradeProduct>
@@ -203,7 +213,6 @@
                     <ram:ApplicableProductCharacteristic>
                          <ram:TypeCode>Characteristic_Code</ram:TypeCode>
                          <ram:Description>Characteristic Description</ram:Description>
-                         <ram:ValueMeasure unitCode="MTR">3</ram:ValueMeasure>
                          <ram:Value>3 meters</ram:Value>
                     </ram:ApplicableProductCharacteristic>
                     <ram:DesignatedProductClassification>
@@ -253,8 +262,16 @@
                          <ram:ReferenceTypeCode>AWV</ram:ReferenceTypeCode>
                     </ram:AdditionalReferencedDocument>
                     <ram:GrossPriceProductTradePrice>
-                         <ram:ChargeAmount>20.00</ram:ChargeAmount>
+                         <ram:ChargeAmount>19.50</ram:ChargeAmount>
                          <ram:BasisQuantity unitCode="C62">2</ram:BasisQuantity>
+                         <ram:AppliedTradeAllowanceCharge>
+                              <ram:ChargeIndicator>
+                                   <udt:Indicator>true</udt:Indicator>
+                              </ram:ChargeIndicator>
+                              <ram:ActualAmount>0.50</ram:ActualAmount>
+                              <ram:ReasonCode>AEW</ram:ReasonCode>
+                              <ram:Reason>WEEE TAX</ram:Reason>
+                         </ram:AppliedTradeAllowanceCharge>
                     </ram:GrossPriceProductTradePrice>
                     <ram:NetPriceProductTradePrice>
                          <ram:ChargeAmount>20.00</ram:ChargeAmount>
@@ -304,7 +321,7 @@
                          <ram:CalculationPercent>1.00</ram:CalculationPercent>
                          <ram:BasisAmount>100.00</ram:BasisAmount>
                          <ram:ActualAmount>1.00</ram:ActualAmount>
-                         <ram:ReasonCode>64</ram:ReasonCode>
+                         <ram:ReasonCode>FC</ram:ReasonCode>
                          <ram:Reason>FREIGHT SERVICES</ram:Reason>
                     </ram:SpecifiedTradeAllowanceCharge>
                     <ram:SpecifiedTradeSettlementLineMonetarySummation>
@@ -334,7 +351,6 @@
                     <ram:ApplicableProductCharacteristic>
                          <ram:TypeCode>Characteristic_Code</ram:TypeCode>
                          <ram:Description>Characteristic Description</ram:Description>
-                         <ram:ValueMeasure unitCode="MTR">3</ram:ValueMeasure>
                          <ram:Value>3 meters</ram:Value>
                     </ram:ApplicableProductCharacteristic>
                     <ram:DesignatedProductClassification>
@@ -446,7 +462,7 @@
                          <ram:CalculationPercent>10.00</ram:CalculationPercent>
                          <ram:BasisAmount>150.00</ram:BasisAmount>
                          <ram:ActualAmount>15.00</ram:ActualAmount>
-                         <ram:ReasonCode>64</ram:ReasonCode>
+                         <ram:ReasonCode>FC</ram:ReasonCode>
                          <ram:Reason>FREIGHT SERVICES</ram:Reason>
                     </ram:SpecifiedTradeAllowanceCharge>
                     <ram:SpecifiedTradeSettlementLineMonetarySummation>
@@ -656,7 +672,7 @@
                          <ram:URIID schemeID="EM">delivery@buyer.com</ram:URIID>
                     </ram:URIUniversalCommunication>
                     <ram:SpecifiedTaxRegistration>
-                         <ram:ID>FR 66 951 632 874</ram:ID>
+                         <ram:ID schemeID="VA">FR 66 951 632 874</ram:ID>
                     </ram:SpecifiedTaxRegistration>
                </ram:ShipToTradeParty>
                <ram:ShipFromTradeParty>
@@ -690,7 +706,7 @@
                          <ram:URIID>warehouse@seller.com</ram:URIID>
                     </ram:URIUniversalCommunication>
                     <ram:SpecifiedTaxRegistration>
-                         <ram:ID>FR 16 548 963 127</ram:ID>
+                         <ram:ID schemeID="VA">FR 16 548 963 127</ram:ID>
                     </ram:SpecifiedTaxRegistration>
                </ram:ShipFromTradeParty>
                <ram:RequestedDeliverySupplyChainEvent>
@@ -699,10 +715,10 @@
                     </ram:OccurrenceDateTime>
                     <ram:OccurrenceSpecifiedPeriod>
                          <ram:StartDateTime>
-                              <udt:DateTimeString format="102">20200415</udt:DateTimeString>
+                              <udt:DateTimeString format="203">202004150900</udt:DateTimeString>
                          </ram:StartDateTime>
                          <ram:EndDateTime>
-                              <udt:DateTimeString format="102">20200430</udt:DateTimeString>
+                              <udt:DateTimeString format="203">202004301800</udt:DateTimeString>
                          </ram:EndDateTime>
                     </ram:OccurrenceSpecifiedPeriod>
                </ram:RequestedDeliverySupplyChainEvent>
@@ -767,12 +783,12 @@
                </ram:SpecifiedTradeAllowanceCharge>
                <ram:SpecifiedTradeAllowanceCharge>
                     <ram:ChargeIndicator>
-                         <udt:Indicator>false</udt:Indicator>
+                         <udt:Indicator>true</udt:Indicator>
                     </ram:ChargeIndicator>
                     <ram:CalculationPercent>10.00</ram:CalculationPercent>
                     <ram:BasisAmount>210.00</ram:BasisAmount>
                     <ram:ActualAmount>21.00</ram:ActualAmount>
-                    <ram:ReasonCode>79</ram:ReasonCode>
+                    <ram:ReasonCode>FC</ram:ReasonCode>
                     <ram:Reason>FREIGHT SERVICES</ram:Reason>
                     <ram:CategoryTradeTax>
                          <ram:TypeCode>VAT</ram:TypeCode>
