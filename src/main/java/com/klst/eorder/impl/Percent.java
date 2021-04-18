@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 
 import com.klst.edoc.api.Rounding;
 
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.PercentType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.PercentType;
 
 /**
  * Percentage: 

@@ -6,8 +6,8 @@ import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.PostalAddress;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAddressType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAddressType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.TextType;
 import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
 
 public class TradeAddress extends TradeAddressType implements PostalAddress {

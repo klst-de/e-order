@@ -2,7 +2,7 @@ package com.klst.eorder.impl;
 
 import com.klst.edoc.api.IdentifierExt;
 
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.CodeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.CodeType;
 
 /* similar to Identifier, with version identifier
  

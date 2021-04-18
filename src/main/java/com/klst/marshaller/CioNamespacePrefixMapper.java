@@ -3,6 +3,7 @@ package com.klst.marshaller;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.klst.eorder.api.NamespacePrefixMapperFactory;
 /* in java 1.8 'NamespacePrefixMapper' is not in API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
  * to compile in eclipse define access rule.
  * 
@@ -23,38 +24,46 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 * of this class.
 * <p>
 * Requires dependency on JAXB implementation jars
-* </p>
+*
 */
-public class CioNamespacePrefixMapper extends NamespacePrefixMapper {
+public class CioNamespacePrefixMapper extends NamespacePrefixMapper implements NamespacePrefixMapperFactory {
+
+	@Override // implements Factory
+	public NamespacePrefixMapper createNamespacePrefixMapper() {
+		return getNamespacePrefixMapper();
+	}
+	static NamespacePrefixMapper getNamespacePrefixMapper() {
+		return new CioNamespacePrefixMapper();
+	}
 
 	/**
 	 * REQUIREMENTS SPECIFICATION MAPPING for Cross Industry Order (CIO)
 	 * <p>
 	 * CIO is based on Supply Chain REFERENCE DATA MODEL (SCRDM)
 	 */
-	private static final String RSM="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:1";
+	private static final String RSM="urn:un:unece:uncefact:data:SCRDMCCBDACIOMessageStructure:100";
 
 	/**
 	 * Reusable Aggregate Model for Aggregate Business Information Entities (ABIE)
 	 */
-	private static final String RAM="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:103";
+	private static final String RAM="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:128";
 
 	/**
 	 * Unqualified Data Type
 	 */
-	private static final String UDT="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:103";
+	private static final String UDT="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128";
 	
 	/**
 	 * Qualified Data Type
 	 */
-	private static final String QDT="urn:un:unece:uncefact:data:standard:QualifiedDataType:103";
+	private static final String QDT="urn:un:unece:uncefact:data:standard:QualifiedDataType:128";
 	
 	private Map<String, String> namespaceMap = new HashMap<>();
 	 
 	/**
 	 * Create mappings.
 	 */
-	public CioNamespacePrefixMapper() {
+	private CioNamespacePrefixMapper() {
 		namespaceMap.put(RSM, "rsm");
 		namespaceMap.put(RAM, "ram");
 		namespaceMap.put(UDT, "udt");

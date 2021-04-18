@@ -13,14 +13,14 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.LegalOrganizationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TaxRegistrationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAddressType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeContactType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradePartyType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.UniversalCommunicationType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IDType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.TextType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.LegalOrganizationType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TaxRegistrationType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAddressType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeContactType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradePartyType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.UniversalCommunicationType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.IDType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.TextType;
 
 public class TradeParty extends TradePartyType implements BusinessParty, BusinessPartyAddress, BusinessPartyContact {
 

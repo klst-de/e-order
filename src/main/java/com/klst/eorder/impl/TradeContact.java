@@ -5,9 +5,9 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.eorder.api.ContactInfoExt;
 
-import un.unece.uncefact.codelist.standard.unece.contactfunctioncode.d19b.ContactFunctionCodeContentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeContactType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.UniversalCommunicationType;
+import un.unece.uncefact.codelist.standard.unece.contactfunctioncode.d20a.ContactFunctionCodeContentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeContactType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.UniversalCommunicationType;
 
 public class TradeContact extends TradeContactType implements ContactInfoExt {
 

@@ -5,7 +5,7 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
 
 import un.unece.uncefact.codelist.standard.iso.iso3alphacurrencycode._2012_08_31.ISO3AlphaCurrencyCodeContentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.HeaderTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.HeaderTradeSettlementType;
 
 public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 

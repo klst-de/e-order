@@ -11,10 +11,10 @@ import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.ITaxCategory;
 
-import un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d19b.DutyorTaxorFeeCategoryCodeContentType;
-import un.unece.uncefact.codelist.standard.unece.dutytaxfeetypecode.d19b.DutyTaxFeeTypeCodeContentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAllowanceChargeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
+import un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d20a.DutyorTaxorFeeCategoryCodeContentType;
+import un.unece.uncefact.codelist.standard.unece.dutytaxfeetypecode.d20a.DutyTaxFeeTypeCodeContentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAllowanceChargeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.IndicatorType;
 
 public class TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges {
 	

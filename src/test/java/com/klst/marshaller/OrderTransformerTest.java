@@ -23,6 +23,7 @@ import org.junit.runners.MethodSorters;
 import org.xml.sax.SAXException;
 
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.CoreOrder;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -110,7 +111,7 @@ public class OrderTransformerTest {
 			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder laden
 //			CoreOrder order = new CrossIndustryOrder(transformer.toModel(is));
 			// dynamisch:
-			Object o = transformer.toModel(is);
+			Object o = transformer.unmashal(is);
 			CoreOrder order = CoreOrder.class.cast(type.getConstructor(o.getClass()).newInstance(o));
 			assertEquals(DocumentNameCode.Order, order.getDocumentCode());
 		} catch (Exception ex) {
@@ -147,12 +148,12 @@ public class OrderTransformerTest {
 		try {
 			InputStream is = new FileInputStream(file);
 //			Object o = 
-					transformer.toModel(is);
+					transformer.unmashal(is);
 			// expected Exception because input is not CIO
 			fail("UnmarshalException not thrown");
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			LOG.severe(ex.getMessage());
+			LOG.warning("expected ex:"+ex.getMessage());
 		}
 
     }

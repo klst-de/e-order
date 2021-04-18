@@ -25,10 +25,10 @@ import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
-import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CioTransformer;
 
 public class OrderReadTest {
@@ -87,7 +87,7 @@ public class OrderReadTest {
 		if(transformer.isValid(testFile)) {
 			try {
 				InputStream is = new FileInputStream(testFile);
-				object = transformer.toModel(is);
+				object = transformer.unmashal(is);
 				LOG.info(">>>>"+object);
 				Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 				// dynamisch:
@@ -134,6 +134,7 @@ public class OrderReadTest {
 		
 		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(cio.getDeliveryDateAsTimestamp()));
 		IPeriod deliveryPeriod = cio.getDeliveryPeriod();
+		LOG.info("deliveryPeriod:"+deliveryPeriod);
 		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getStartDateAsTimestamp()));
 		assertEquals("20200430", DateTimeFormats.tsToCCYYMMDD(deliveryPeriod.getEndDateAsTimestamp()));
 		
@@ -174,7 +175,7 @@ public class OrderReadTest {
 	public CoreOrder getCoreOrder(File testFile) {
 		try {
 			InputStream is = new FileInputStream(testFile);
-			object = transformer.toModel(is);
+			object = transformer.unmashal(is);
 			LOG.info(">>>>"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 			// dynamisch:
@@ -197,13 +198,15 @@ public class OrderReadTest {
 		}
 		
 		assertEquals(BG2_ProcessControl.PROFILE_COMFORT, cio.getProfile());
-		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());
+		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());	
+		assertEquals("202003311232", DateTimeFormats.tsToCCYYMMDDHHMM(cio.getIssueDateAsTimestamp()));
 
 		List<OrderLine> lines = cio.getLines();
 		assertEquals(3, lines.size());
 		OrderLine line = lines.get(0);
-		assertEquals("20200415", DateTimeFormats.tsToCCYYMMDD(line.getLineDeliveryPeriod().getStartDateAsTimestamp()));
-		assertEquals("20200430", DateTimeFormats.tsToCCYYMMDD(line.getLineDeliveryPeriod().getEndDateAsTimestamp()));
+		LOG.info("LineDeliveryPeriod:"+line.getLineDeliveryPeriod().getEndDateAsTimestamp());
+		assertEquals("202004150900", DateTimeFormats.tsToCCYYMMDDHHMM(line.getLineDeliveryPeriod().getStartDateAsTimestamp()));
+		assertEquals("202004301800", DateTimeFormats.tsToCCYYMMDDHHMM(line.getLineDeliveryPeriod().getEndDateAsTimestamp()));
 		line.setLineDeliveryDate("20210101");
 		
 		line = lines.get(1); // the second! the first has index 0!

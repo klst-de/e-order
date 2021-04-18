@@ -10,7 +10,7 @@ import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.ITaxCategory;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeTaxType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeTaxType;
 
 public class TradeTax extends TradeTaxType implements ITaxCategory {
 

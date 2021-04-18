@@ -7,8 +7,8 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeLineItemType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.SupplyChainTradeTransactionType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SupplyChainTradeLineItemType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SupplyChainTradeTransactionType;
 
 public class SupplyChainTradeTransaction extends SupplyChainTradeTransactionType {
 

@@ -24,14 +24,14 @@ import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
 
-import un.unece.uncefact.data.standard.qualifieddatatype._103.DocumentCodeType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.DocumentContextParameterType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ExchangedDocumentContextType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.ExchangedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._103.TradeAllowanceChargeType;
-import un.unece.uncefact.data.standard.scrdmccbdaciomessagestructure._1.SCRDMCCBDACIOMessageStructureType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.IndicatorType;
+import un.unece.uncefact.data.scrdmccbdaciomessagestructure._100.SCRDMCCBDACIOMessageStructureType;
+import un.unece.uncefact.data.standard.qualifieddatatype._128.DocumentCodeType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.DocumentContextParameterType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.ExchangedDocumentContextType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.ExchangedDocumentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAllowanceChargeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.DateTimeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.IndicatorType;
 
 public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType 
 	implements CoreOrder {
@@ -183,8 +183,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType
 
 	@Override
 	public Timestamp getIssueDateAsTimestamp() {
-		DateTimeType dateTime = super.getExchangedDocument().getIssueDateTime();
-		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+		return DateTimeFormatStrings.getDateAsTimestamp(super.getExchangedDocument().getIssueDateTime());
 	}
 
 	@Override

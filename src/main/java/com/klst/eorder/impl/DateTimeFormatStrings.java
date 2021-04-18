@@ -4,30 +4,22 @@ import java.sql.Timestamp;
 
 import com.klst.edoc.untdid.DateTimeFormats;
 
-import un.unece.uncefact.data.standard.qualifieddatatype._103.FormattedDateTimeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.DateTimeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._128.FormattedDateTimeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.DateTimeType;
 
-//import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
-//import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
-//import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType;
-
-// in CII werden mehrere ähnliche Klassen verwendet, die Date(Time)String als inner Klasse haben
+// in CII/CIO werden mehrere ähnliche Klassen verwendet, die Date(Time)String als inner Klasse haben
 // - DateType.DateString
 // - DateTimeType.DateTimeString
 // - FormattedDateTimeType.DateTimeString
 public class DateTimeFormatStrings extends DateTimeFormats {
 
-//	static DateTimeType toDate(Timestamp ts) {
-//		if(ts==null) return null;
-//		
-//		DateType.DateString ds = new DateType.DateString();
-//		ds.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-//		ds.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
-//		
-//		DateType date = new DateType();
-//		date.setDateString(ds);
-//		return date;
-//	}
+	static Timestamp getDateAsTimestamp(DateTimeType dateTime) {
+		if(dateTime==null) return null;
+		String format = dateTime.getDateTimeString()==null ? null : dateTime.getDateTimeString().getFormat();
+		return format.equals(DateTimeFormats.CCYYMMDDHHMM_QUALIFIER) ? 
+			  DateTimeFormats.yyyyMMddhhmmToTs(dateTime.getDateTimeString().getValue()) 
+			: DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
 
 	static DateTimeType toDateTime(Timestamp ts) {
 		if(ts==null) return null;

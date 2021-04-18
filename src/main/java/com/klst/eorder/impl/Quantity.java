@@ -6,7 +6,7 @@ import java.math.RoundingMode;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IQuantity;
 
-import un.unece.uncefact.data.standard.unqualifieddatatype._103.QuantityType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._128.QuantityType;
 
 /* Mit diesem Datentyp wird die Mengenangabe zu einem Einzelposten abgebildet. 
  * 
