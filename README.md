@@ -31,11 +31,11 @@ PostalAddress address = order.createAddress("DE", "12345", "City");
 ContactInfo contact = order.createContactInfo("name", "tel", "mail");
 order.setSeller("SUPPLIER_NAME", address, contact, "CompanyId", null);
  ...
-OrderLine line = order.createOrderLine("1"    // order line number
-		  , new Quantity("C62", new BigDecimal(6))              // one unit/C62
-		  , new Amount(EUR, new BigDecimal(60.00))				// line net amount
-		  , new UnitPriceAmount(EUR, new BigDecimal(10.00))	    // price
-		  , "Zeitschrift [...]"									// itemName
+OrderLine line = order.createOrderLine("1"                            // order line number
+		  , new Quantity("C62", new BigDecimal(6))                     // 6 units/C62
+		  , new Amount(EUR, new BigDecimal(60.00))                     // line net amount
+		  , new UnitPriceAmount(EUR, new BigDecimal(10.00))            // price
+		  , "Zeitschrift [...]"                                        // itemName
 		  );
 line.addNote("AAI", "Content of Note");
 line.setPartialDeliveryIndicator(true);
