@@ -24,7 +24,7 @@ CoreOrder order = CrossIndustryOrder.getFactory().createOrder
 	( BG2_ProcessControl.PROFILE_COMFORT  // or PROFILE_BASIC
 	, DocumentNameCode.Order);            // or OrderChange or OrderResponse
 order.setId("Order#-1"); // BT-1 Identifier (mandatory)
-order.addNote( order.createNote("AAI", "Content of Note") ); // BG-1 ORDER NOTE (optional)
+order.addNote( order.createNote("any unstructured information") );    // (optional)
 order.setDocumentCurrency("EUR");
  ...
 PostalAddress address = order.createAddress("DE", "12345", "City");
@@ -37,7 +37,7 @@ OrderLine line = order.createOrderLine("1"                            // order l
 		  , new UnitPriceAmount(EUR, new BigDecimal(10.00))            // price
 		  , "Zeitschrift [...]"                                        // itemName
 		  );
-line.addNote("AAI", "Content of Note");
+line.addNote("textual note with information relevant to the line.");
 line.setPartialDeliveryIndicator(true);
 line.addStandardIdentifier("1234567890123", GTIN);
 line.setSellerAssignedID("987654321");

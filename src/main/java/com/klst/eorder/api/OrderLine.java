@@ -3,11 +3,13 @@ package com.klst.eorder.api;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.eorder.impl.TradeProductInstance;
 
 /**
  * ORDER LINE
@@ -17,13 +19,18 @@ import com.klst.edoc.untdid.DocumentNameCode;
  * Cardinality: 1..n (mandatory)
  * <br>EN16931-ID: 	BG-25
  * <br>Rule ID: 	BR-16 
- * <br>Request ID: 	R17 R23 R27
+ * <br>Order-X-No: 	33
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
 public interface OrderLine extends OrderLineFactory, OrderNoteFactory, 
-	BG26_LineDeliveryPeriod, BG27_LineLevelAllowences, BG28_LineLevelCharges,
-	BG29_PriceDetails, BG30_LineVATInformation, BG31_ItemInformation, BG32_ItemAttributes {
+	BG26_LineDeliveryPeriod, 
+	BG27_LineLevelAllowences, 
+	BG28_LineLevelCharges,
+	BG29_PriceDetails, 
+	BG30_LineVATInformation, 
+	BG31_ItemInformation, 
+	BG32_ItemAttributes {
 
 	/**
 	 * Line identifier
@@ -33,49 +40,266 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * Cardinality: 1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-126
 	 * <br>Rule ID: 	BR-21
-	 * <br>Request ID: 	R44
+	 * <br>Order-X-No: 	35
 	 * 
-	 * @param id Identifier
+	 * @return id Identifier
 	 */
 //	public void setId(String id); // use factory
 	public String getId();
 
 	/**
+	 * Line status code
+	 * <p>
+	 * To be chosen from the entries in UNTDID 1229, Action code, in particular:
+1 : Order  line ADDED
+3 : Order  line CHANGED
+5 : Order line ACCEPTED WITHOUT AMENDMENT
+6 : Order line ACCEPTED WITH AMENDMENT
+7 : Order  line NOT ACCEPTED
+42 : Order  line ALREADY DELIVERED
+
+	 * TODO nur OOR OOC
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>Order-X-No: 	36
+	 * 
+	 * @return status code
+	 */
+	public void setStatus(String status);
+	public String getStatus();
+	
+	/**
 	 * line note
 	 * <p>
 	 * A textual note that gives unstructured information that is relevant to the line.
 	 * <p>
-	 * Cardinality: 0..1 (optional), extend to 0..n
-	 * <br>EN16931-ID: 	BT-127
+	 * Cardinality: 0..1 (optional), extended: 0..n
+	 * <br>EN16931-ID: 	BG-25.BT-127
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R28
+	 * <br>Order-X-No: 	37
 	 * 
-	 * @param text Text
+	 * @return List of Notes
 	 */
-//	public void setNote(String text);
-//	public String getNote();
-	// in Order-X wird 0..n vorgeschlagen, auch für CII
+	// in Order-X V.0 wird 0..n vorgeschlagen, auch für CII
 	public List<OrderNote> getNotes();
-	// factory methods aus OrderNoteFactory
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public OrderNote createNote(String subjectCode, String content);
+	
+	// factory method aus OrderNoteFactory
+//	public OrderNote createNote(String subjectCode, String content);
 	default OrderNote createNote(String content) {
 		return createNote((String)null, content);
 	}
 
-	// setter
+	/**
+	 * Add Note to Line
+	 * 
+	 * @param note
+	 */
 	public void addNote(OrderNote note);
+	
+	/**
+	 * Add Note to Line
+	 * 
+	 * @param subjectCode
+	 * @param content
+	 * 
+	 * @see OrderNoteFactory#createNote(String, String)
+	 * @see #addNote
+	 */
+//	38  SCT_LINE	EXTENDED  Line Note Content Code                               TODO
+//	39  SCT_LINE	BASIC	  Line Note Content
+//	40  SCT_LINE	BASIC	  Line Note Subject Code
 	default void addNote(String subjectCode, String content) {
 		addNote(createNote(subjectCode, content));
 	}
+	/**
+	 * Add Note to Line
+	 * 
+	 * @param content
+	 * 
+	 * @see #addNote(String, String)
+	 */
 	default void addNote(String content) {
 		addNote((String)null, content);
 	}
 	
+//  41: BG-31 SpecifiedTradeProduct ----------------------------------------------
+	
+	/**
+	 * Item (Trade Product) ID
+ 	 * <p>
+	 * A unique identifier for this trade product.
+	 * <p>
+	 * Cardinality: 	0..n (optional)
+	 * <br>Order-X-No: 	42
+	 * 
+	 * @param id
+	 */
+	public void setProductID(String id);
+	public String getProductID();
+
 	/*
+	 * GlobalID Kennung eines Artikels nach registriertem Schema
+	 * CII:
+	 * BG-31    1 .. 1   SpecifiedTradeProduct
+	 * BT-157   0 .. 1   GlobalID
+	 * BT-157-1          required schemeID
+	 * Codeliste: ISO 6523 :
+	 * 0002 : SIRENE (F) 9 characters ("SIREN"); 14=9+5 ("SIRET")
+	 * 0021 : SWIFT 
+	 * 0088 : EAN 
+	 * 0060 : DUNS
+	 * 0160 : GTIN , Global Trade Item Number https://www.gs1.org/standards/gs1-application-standard-usage-isoiec-6523-international-code-designator-icd-0209/current-standard#2-Purpose+2-1-Principles
+	 * 0177 : ODETTE automotive industry
+	 */
+	/**
+	 * Item standard (aka global) identifier (optional BT in BG-31 PRODUCT)
+ 	 * <p>
+	 * An item identifier based on a registered scheme.
+	 * <p>
+	 * Cardinality: 	0..n (optional)
+	 * <br>EN16931-ID: 	BG-31.BT-157 BG-31.BT-157-1
+	 * <br>Rule ID: 	CSCMUS GS1 : an Order must contain a GlobalID for the Product on line level
+	 * <br>Order-X-No: 	43+44
+	 * 
+	 * @param globalID
+	 * @param schemeID, The identification scheme shall be identified from the entries of the list published by the ISO/IEC 6523 maintenance agency.
+	 */
+	public Identifier createStandardIdentifier(String globalID, String schemeID);
+	public void addStandardIdentifier(Identifier id);
+	default void addStandardIdentifier(String globalID, String schemeID) {
+		addStandardIdentifier(createStandardIdentifier(globalID, schemeID));
+	}
+	public List<Identifier> getStandardIdentifier();
+
+	/**
+	 * Item Seller's identifier (optional BT in BG-31 PRODUCT)
+ 	 * <p>
+	 * An identifier, assigned by the Seller, for the item.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-31.BT-155
+	 * <br>Rule ID: 	
+	 * <br>Order-X-No: 	45
+	 * 
+	 * @param Identifier
+	 */
+	public void setSellerAssignedID(String id);
+	public String getSellerAssignedID();
+
+	/**
+	 * Item Buyer's identifier (optional BT in BG-31 PRODUCT)
+ 	 * <p>
+	 * An identifier, assigned by the Buyer, for the item.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-31.BT-156
+	 * <br>Rule ID: 	
+	 * <br>Order-X-No: 	46
+	 * 
+	 * @param Identifier
+	 */
+	public void setBuyerAssignedID(String id);
+	public String getBuyerAssignedID();
+	
+	// 47  SCT_LINE	EXTENDED  Item (Trade Product) Industry Assigned ID
+//	Gerhard : Yes, in UBL they use a StandardItemID which in fact means the “basic” not alternative ID. 
+//	And not what I thought an Industry “Standard” ID, therefore we could consider it not to use
+//	public void setIndustryID(String id);
+//	public String getIndustryID();
+
+	// 48  SCT_LINE	EXTENDED  Item (Trade Product) Model Name ID
+//	public void setModelID(String id);
+//	public String getModelID();
+
+	/**
+	 * Item name (optional BT in BG-31 PRODUCT)
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-31.BT-153 
+	 * <br>Rule ID: 	BR-25
+	 * <br>Order-X-No: 	49
+	 * 
+	 * @param text Text
+	 */
+//	public void setItemName(String text); // use factory
+	public String getItemName();
+
+	/**
+	 * Item description (optional BT in BG-31 PRODUCT)
+ 	 * <p>
+	 * The Item description allows for describing the item and its features in more detail than the Item name.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-31.BT-154
+	 * <br>Rule ID: 	
+	 * <br>Order-X-No: 	50
+	 * 
+	 * @param Text
+	 */
+	public void setDescription(String text);
+	public String getDescription();
+
+	// TODO	51  SCT_LINE	COMFORT	  Item (Trade Product) Batch ID (lot ID)
+	public void setBatchID(String id);
+	public String getBatchID();
+
+	// TODO	52  SCT_LINE	COMFORT	  Item (Trade Product) Brand Name
+//	public void setBrandName(String name);
+//	public String getBrandName();
+
+	// TODO	53  SCT_LINE	EXTENDED  Item (Trade Product) Model Name
+//	public void setModelName(String name);
+//	public String getModelName();
+
+	// 54: BG-32 0..n ITEM ATTRIBUTES
+	
+	/**
+	 * Item classification identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
+ 	 * <p>
+	 * A code for classifying the item by its type or nature.
+	 * Classification codes are used to allow grouping of similar items for a various purposes 
+	 * e.g. public procurement (CPV), e-Commerce (UNSPSC) etc.
+	 * <p>
+	 * Cardinality: 	0..n (optional)
+	 * <br>EN16931-ID: 	BG-31.BT-158
+	 * <br>Rule ID: 	BR-64
+	 * <br>Order-X-No: 	60
+	 * 
+	 * @param classCode,     BT-158   1..1
+	 * @param listID,        BT-158-1 1..1 The identification scheme shall be chosen from the entries in UNTDID 7143
+	 * @param listVersionID, BT-158-2 0..1 Scheme version identifier - The version of the identification scheme.
+	 * @param idText         optional Product Classification Class Name 0..1
+	 */
+//	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText);
+//	public void addClassificationIdentifier(IdentifierExt id);
+//	default void addClassificationIdentifier(String code, String listID, String listVersionID, String name) {
+//		addClassificationIdentifier(createClassificationIdentifier(code, listID, listVersionID, name));
+//	}
+//	public List<IdentifierExt> getClassifications();
+
+	/**
+	 * add Item (Trade Product) Instance
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	65
+	 * 
+	 * @param batchId - The unique batch identifier for this trade product instance
+	 * @param serialId - The unique supplier assigned serial identifier for this trade product instance
+	 */
+//	66  SCT_LINE	COMFORT	  Item (Trade Product) Instances Batch ID
+//	67  SCT_LINE	COMFORT	  Item (Trade Product) Instances Supplier Serial ID
+	public void addTradeProductInstance(String batchId, String serialId);
+	
+	public List<TradeProductInstance> getTradeProductInstances();
+
+	// 78: BG31_ItemInformation#setCountryOfOrigin
+//	public void setCountryOfOrigin(String code);
+//	public String getCountryOfOrigin();
+
+
+//	--------------------------------
+	/**
 	 * line object identifier
 	 * <p>
 	 * An identifier for an object on which the line is based, given by the Seller.
@@ -91,20 +315,19 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * for example in the case of large attachments and/or when sensitive information, 
 	 * e.g. person-related services, has to be separated from the order itself.
 	 * <p>
-	 * A Line MUST NOT HAVE more than 1 Object Identifier BT-128 ==> Cardinality 0..1
-	 * <p>
 	 * A Object Identifier (BT-128) MUST have an ID/IssuerAssignedID
 	 * <p>
 	 * Cardinality:     0..1 (optional)
 	 * <br>EN16931-ID: 	BG.25.BT-128, BT-128-0, BT-128-1
 	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R33
+	 * <br>Order-X-No: 	154
 	 * 
 	 * @param Identifier
 	 * @param typeCode for an Object Identifier MUST be present and equal to 130 (UNTDID 1001 : InvoicingDataSheet)
 	 * @param schemeCode (optional) if it may be not clear for the receiver what scheme is used for the identifier, 
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
 	 */
+//	 * A Line MUST NOT HAVE more than 1 Object Identifier BT-128 ==> Cardinality 0..1
 	public void setLineObjectID(String id, String typeCode, String schemeCode);
 	default void setLineObjectID(String id) {
 		setLineObjectID(id, DocumentNameCode.InvoicingDataSheet.getValueAsString(), null);
@@ -118,16 +341,17 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	public Identifier getLineObjectIdentifier(); // Identifier.Content == id , .SchemeIdentifier == schemeCode
 
 	/**
-	 * LINE TRADE DELIVERY Quantity
+	 * LINE TRADE DELIVERY Requested Quantity
 	 * 
-	 * Quantity and UoM of items (goods or services) to be charged in the Order line.
+	 * The quantity, at line level, requested for this trade delivery.
+	 * Unit of measure Code for Requested quantity.
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-129 (decimal quantity) + BT-130 (unitCode) 
 	 * <br>Rule ID: 	BR-22
-	 * <br>Request ID: 	R14, R39, R56
+	 * <br>Order-X-No: 	207
 	 * 
-	 * @param Quantity
+	 * @retu Quantity
 	 */
 //	public void setQuantity(Quantity quantity); // use factory
 	public IQuantity getQuantity();
@@ -269,10 +493,6 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * @see #getQuantity
 	 */
 	public IQuantity getUnitPriceQuantity();
-//	@Deprecated   // TODO remove in 3.X
-//	default Quantity getBaseQuantity() {
-//		return getUnitPriceQuantity();
-//	}
 	public void setUnitPriceQuantity(IQuantity quantity);
 	
 	// BG-30 ++ 1..1 LINE VAT INFORMATION
@@ -295,138 +515,6 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 //	public BigDecimal getTaxRate(); 
 
 	// BG-31 PRODUCT 0..1 : A group of business terms providing information about the goods and services ordered.
-
-	/**
-	 * Item name (optional BT in BG-31 PRODUCT)
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BG-31.BT-153 
-	 * <br>Rule ID: 	BR-25
-	 * <br>Request ID: 	R20, R56
-	 * 
-	 * @param text Text
-	 */
-//	public void setItemName(String text); // use factory
-	public String getItemName();
-
-	/**
-	 * Item description (optional BT in BG-31 PRODUCT)
- 	 * <p>
-	 * The Item description allows for describing the item and its features in more detail than the Item name.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BG-31.BT-154
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R20, R56
-	 * 
-	 * @param Text
-	 */
-	public void setDescription(String text);
-	public String getDescription();
-
-	/**
-	 * Item Seller's identifier (optional BT in BG-31 PRODUCT)
- 	 * <p>
-	 * An identifier, assigned by the Seller, for the item.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BG-31.BT-155
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R21, R56
-	 * 
-	 * @param Identifier
-	 */
-	public void setSellerAssignedID(String id);
-	public String getSellerAssignedID();
-
-	/**
-	 * Item Buyer's identifier (optional BT in BG-31 PRODUCT)
- 	 * <p>
-	 * An identifier, assigned by the Buyer, for the item.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BG-31.BT-156
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R21, R56, R22
-	 * 
-	 * @param Identifier
-	 */
-	public void setBuyerAssignedID(String id);
-	public String getBuyerAssignedID();
-	
-	/*
-	 * GlobalID Kennung eines Artikels nach registriertem Schema
-	 * CII:
-	 * BG-31    1 .. 1   SpecifiedTradeProduct
-	 * BT-157   0 .. 1   GlobalID
-	 * BT-157-1          required schemeID
-	 * Codeliste: ISO 6523 :
-	 * 0021 : SWIFT 
-	 * 0088 : EAN 
-	 * 0060 : DUNS
-	 * 0160 : GTIN , Global Trade Item Number https://www.gs1.org/standards/gs1-application-standard-usage-isoiec-6523-international-code-designator-icd-0209/current-standard#2-Purpose+2-1-Principles
-	 * 0177 : ODETTE automotive industry
-	 */
-	/**
-	 * Item standard (aka global) identifier (optional BT in BG-31 PRODUCT)
- 	 * <p>
-	 * An item identifier based on a registered scheme.
-	 * <p>
-	 * Cardinality: 	0..n (optional)
-	 * <br>EN16931-ID: 	BG-31.BT-157 BG-31.BT-157-1
-	 * <br>Rule ID: 	CSCMUS GS1 : an Order must contain a GlobalID for the Product on line level
-	 * <br>Request ID: 	R23, R56
-	 * 
-	 * @param globalID
-	 * @param schemeID, The identification scheme shall be identified from the entries of the list published by the ISO/IEC 6523 maintenance agency.
-	 */
-	public Identifier createStandardIdentifier(String globalID, String schemeID);
-	public void addStandardIdentifier(Identifier id);
-	default void addStandardIdentifier(String globalID, String schemeID) {
-		addStandardIdentifier(createStandardIdentifier(globalID, schemeID));
-	}
-	public List<Identifier> getStandardIdentifier();
-
-	/**
-	 * Item classification identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
- 	 * <p>
-	 * A code for classifying the item by its type or nature.
-	 * Classification codes are used to allow grouping of similar items for a various purposes 
-	 * e.g. public procurement (CPV), e-Commerce (UNSPSC) etc.
-	 * <p>
-	 * Cardinality: 	0..n (optional)
-	 * <br>EN16931-ID: 	BG-31.BT-158
-	 * <br>Rule ID: 	BR-64
-	 * <br>Request ID: 	R24
-	 * 
-	 * @param classCode,     BT-158   1..1
-	 * @param listID,        BT-158-1 1..1 The identification scheme shall be chosen from the entries in UNTDID 7143
-	 * @param listVersionID, BT-158-2 0..1 Scheme version identifier - The version of the identification scheme.
-	 * @param idText         optional Product Classification Class Name 0..1
-	 */
-	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText);
-	public void addClassificationIdentifier(IdentifierExt id);
-	default void addClassificationIdentifier(String code, String listID, String listVersionID, String name) {
-		addClassificationIdentifier(createClassificationIdentifier(code, listID, listVersionID, name));
-	}
-	public List<IdentifierExt> getClassifications();
-
-	/**
-	 * Item country of origin (optional part in 1..1 BG-31 ITEM INFORMATION)
- 	 * <p>
-	 * The code identifying the country from which the item originates.
-	 * The lists of valid countries are registered with the EN ISO 3166-1 Maintenance agency, 
-	 * “Codes for the representation of names of countries and their subdivisions”.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BG-31.BT-159
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R29 
-	 * 
-	 * @param code
-	 */
-	public void setCountryOfOrigin(String code);
-	public String getCountryOfOrigin();
 
 	public static final boolean NO = false;
 	public static final boolean YES = true;
