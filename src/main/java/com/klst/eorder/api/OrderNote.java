@@ -1,12 +1,15 @@
 package com.klst.eorder.api;
 
 /**
- * BG-1 ORDER NOTE
+ * ORDER NOTE
  * <p>
- * A group of business terms providing textual notes that are relevant for the order, 
+ * A group of business terms providing textual notes that are relevant for the order
+ * or order line, 
  * together with an indication of the note subject.
  * <p>
- * Similar to EN16931 business group BG-2
+ * Similar to EN16931 business group BG-1
+ * 
+ * @see OrderNoteFactory
  */
 public interface OrderNote extends OrderNoteFactory {
 	
@@ -14,10 +17,25 @@ public interface OrderNote extends OrderNoteFactory {
 //	void setCode(String code); // not public ==> use factory
 //	void setNote(String content); // not public ==> use factory
 	
-// getter in BG1_OrderNote
+// getter in BG1_OrderNote, OrderLine
 	
 	/**
-	 * returns optional Invoice note subject code
+	 * returns note
+	 * <p>
+	 * A textual note that gives unstructured information that is relevant to the document as a whole.
+	 * Such as the reason for any correction or assignment note in case the invoice has been factored
+	 * <p>
+	 * Cardinality: 	1..1
+	 * <br>EN16931-ID: 	BT-22, BT-127
+	 * <br>Rule ID: 	
+	 * <br>Order-X-No: 	23, 39
+	 * 
+	 * @return Text
+	 */
+	public String getNote();
+
+	/**
+	 * returns optional note subject code
 	 * <p>
 	 * To be chosen from the entries in UNTDID 4451
 	 * @see <a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred4451.htm">UNTDID 4451</a>
@@ -25,25 +43,10 @@ public interface OrderNote extends OrderNoteFactory {
 	 * Cardinality: 	0..1
 	 * <br>EN16931-ID: 	BT-21
 	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R56
+	 * <br>Order-X-No: 	24, 40
 	 * 
-	 * @return Text or null
+	 * @return subject code or null
 	 */
 	public String getCode();
-	
-	/**
-	 * returns Invoice note
-	 * <p>
-	 * A textual note that gives unstructured information that is relevant to the Invoice as a whole.
-	 * Such as the reason for any correction or assignment note in case the invoice has been factored
-	 * <p>
-	 * Cardinality: 	1..1
-	 * <br>EN16931-ID: 	BT-22
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R56
-	 * 
-	 * @return Text
-	 */
-	public String getNote();
 	
 }
