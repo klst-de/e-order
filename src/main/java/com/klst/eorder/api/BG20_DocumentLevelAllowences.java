@@ -6,20 +6,21 @@ import java.util.List;
 import com.klst.edoc.api.IAmount;
 
 /**
- * BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+ * 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
  * <br>
- * BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+ * 903: BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
  * <br>
- * BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
+ * 318: BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
  * <br>
- * BG-28 0..n LINE CHARGES / ZUSCHLÄGE
+ * 326: BG-28 0..n LINE CHARGES / ZUSCHLÄGE
  * <p>
  * Cardinality: 	0..n
  * <br>EN16931-ID: 	BG-20 / BG-21 / BG-27 / BG-28
  * <br>Rule ID: 	
- * <br>Request ID: 	R15, R18
+ * <br>Order-X-No: 	888, 903, 318, 326
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
+ *
  */
 public interface BG20_DocumentLevelAllowences extends AllowancesOrChargesFactory {
 

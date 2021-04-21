@@ -1,5 +1,6 @@
 package com.klst.readme;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -13,14 +14,15 @@ import java.net.URL;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.BusinessPartyAddress;
-import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.ContactInfo;
+import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
@@ -29,12 +31,13 @@ import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
-import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.ContactInfoExt;
+import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.impl.Amount;               // impl.jar
 import com.klst.eorder.impl.CrossIndustryOrder;   // impl.jar
 import com.klst.eorder.impl.ID;                   // ...
+import com.klst.eorder.impl.Measure;
 import com.klst.eorder.impl.Quantity;
 import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.TradeContact;
@@ -67,6 +70,7 @@ public class OrderTest {
 
 	static final String EUR = "EUR";
 	static final String C62 = "C62";
+	static final String MTR = "MTR";
 	static final String GTIN = "0160"; // Global Trade Item Number (GTIN)
 
 	static private AbstactTransformer cioTransformer;
@@ -207,12 +211,31 @@ public class OrderTest {
 		line.addClassificationIdentifier("4047247110051", "EN", null, null); // BG-31.BT-158
 		line.setCountryOfOrigin("FR"); // BG-31.BT-159
 		
+		// OrderLineID nicht mit ID verwechseln! 
+		// OrderLineID: der Verweis auf die ursprüngliche ID ist in CIO überflüssig, in CIOR/CIOC sinnvoll
 		line.setOrderLineID("id-1"); // warning expected
 		
-		// BG-27 0..n LINE ALLOWANCES:
+		// Order-X-No: 	68, Verpackung, ? für die 6 Zeitschriften
+		String woodenCase = "7B"; // UNTDID 7065 Package type description code verweist auf UN/ECE Recommendation 21, Annex V
+		line.setPackaging(woodenCase                      // 69: type of packaging
+				                                          // 70: Dimension:
+				, new Measure(MTR, new BigDecimal(0.30))  // 72+71: width/Breite 
+				, new Measure(null, new BigDecimal(0.50)) // 73:length ohne 74:Einheit sollte nicht möglich sein
+				, null);                                  // 76+75: height 
+		assertEquals(woodenCase, line.getPackagingCode());
+		assertEquals(MTR, line.getPackagingWidth().getUnitCode());
+		LOG.info("Packaging Width:"+line.getPackagingWidth()
+			+ " Length:"+line.getPackagingLength()
+			+ " Height:"+line.getPackagingHeight()
+				);
+		assertThat(new BigDecimal(0.30),  Matchers.closeTo(line.getPackagingWidth().getValue(RoundingMode.HALF_UP), new BigDecimal(0.0001)));
+		assertNull(line.getPackagingLength().getUnitCode());
+		assertNull(line.getPackagingHeight());
+		
+		// 318: BG-27 0..n LINE ALLOWANCES:
 		//BigDecimal tenPerCent = new BigDecimal(10);
 		line.addAllowance(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
-		// BG-28 0..n LINE CHARGES:
+		// 326: BG-28 0..n LINE CHARGES:
 		AllowancesAndCharges charge = line.createCharge(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
 		charge.setReasoncode("64");
 		charge.setReasonText("Special agreement");

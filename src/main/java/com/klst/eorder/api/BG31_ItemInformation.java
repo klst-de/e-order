@@ -143,6 +143,7 @@ public interface BG31_ItemInformation {
 	 * <p>
 	 * Cardinality: 	0..n (optional)
 	 * <br>EN16931-ID: 	BG-31.BT-158, BT-158-1, BT-158-2
+	 * <br>Order-X-No: 	60
 	 * 
 	 * @param classCode     BT-158   1..1
 	 * @param listID        BT-158-1 1..1 The identification scheme shall be chosen from the entries in UNTDID 7143
@@ -172,6 +173,7 @@ public interface BG31_ItemInformation {
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BG-31.BT-159
+	 * <br>Order-X-No: 	78
 	 * 
 	 * @param code
 	 */

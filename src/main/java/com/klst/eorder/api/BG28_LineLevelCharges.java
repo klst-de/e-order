@@ -1,7 +1,7 @@
 package com.klst.eorder.api;
 
 /**
- * BG-28 0..n LINE CHARGES / ZUSCHLÄGE
+ * 326: BG-28 0..n LINE CHARGES / ZUSCHLÄGE
  * 
  * @see BG20_DocumentLevelAllowences
  */

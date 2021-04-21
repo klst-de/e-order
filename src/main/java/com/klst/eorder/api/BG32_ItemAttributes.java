@@ -10,7 +10,7 @@ import java.util.Properties;
  * Cardinality: 	0..n
  * <br>EN16931-ID: 	BG-32
  * <br>Rule ID:     BR-54 	
- * <br>Request ID: 	R28
+ * <br>Order-X-No: 	55+59 Characteristics Code + Value as Text
  * <p>
  * BT-160 and BT-161
  * Cardinality: 	1..1
