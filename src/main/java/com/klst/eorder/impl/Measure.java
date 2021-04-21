@@ -13,7 +13,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._128.MeasureType;
  * Measure contains unit of measure and quantity for spatial dimensions.
  * <p>
  * This is a "decimal" type with 2 digits maximum after the decimal point, without a thousand separator, and with the ". " as a decimal separator. 
- * Example 1.50 "MTR"
+ * Example 1.50MTR
  * 
  * <br>The unit of measure that applies to the packaging dimension, f.i.width, length and height.
  * <br>A "decimal" type with 2 digits maximum after the decimal point, without a thousand separator, and with the "." as a decimal separator. 
@@ -40,6 +40,7 @@ public class Measure extends MeasureType implements IQuantity, IMeasureFactory {
 	}
 	// copy factory
 	static Measure create(MeasureType object) {
+		if(object==null) return null;
 		if(object instanceof MeasureType && object.getClass()!=MeasureType.class) {
 			// object is instance of a subclass of MeasureType, but not MeasureType itself
 			return (Measure)object;
@@ -64,12 +65,13 @@ public class Measure extends MeasureType implements IQuantity, IMeasureFactory {
 
 	@Override
 	public BigDecimal getValue(RoundingMode roundingMode) {
-		return getValue().setScale(SCALE, roundingMode);
+		return getValue()==null ? null : getValue().setScale(SCALE, roundingMode);
 	}
 	
 	@Override
 	public String toString() {
-		return getValue(RoundingMode.HALF_UP) + (getUnitCode()==null ? "" : getUnitCode());
+		return getValue()==null ? "" : getValue(RoundingMode.HALF_UP) 
+				+ (getUnitCode()==null ? "" : getUnitCode());
 	}
 
 }

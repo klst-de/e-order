@@ -121,6 +121,7 @@ BG-32 +++ 0..n ITEM ATTRIBUTES
 74  SCT_LINE	COMFORT	  Packaging Dimension Length UnitCode
 75  SCT_LINE	COMFORT	  Packaging Dimension Height
 76  SCT_LINE	COMFORT	  Packaging Dimension Height UnitCode
+
 77  SCT_LINE	COMFORT	  Item (Trade Product) Origin Country
 78  SCT_LINE	COMFORT	  Item (Trade Product) Origin Country ID
 
@@ -132,6 +133,7 @@ BG-32 +++ 0..n ITEM ATTRIBUTES
 84  SCT_LINE	COMFORT	  Additional Referenced Product Document - Attached document
 85  SCT_LINE	COMFORT	  Additional Referenced Product Document - Attached document Mime code
 86  SCT_LINE	COMFORT	  Additional Referenced Product Document- Attached document Filename
+
 87  SCT_LINE	EXTENDED  REFERENCED PRODUCT
 88  SCT_LINE	EXTENDED  Referenced Product ID
 89  SCT_LINE	EXTENDED  Referenced Product Global ID
@@ -869,12 +871,7 @@ realistisches Beispiel:
 	}
 	@Override
 	public IQuantity getPackagingWidth() {
-		if(super.getSpecifiedTradeProduct()==null) return null;
-		SpatialDimensionType sd = 
-		getSpecifiedTradeProduct().getApplicableSupplyChainPackaging()==null
-		? null
-		: getSpecifiedTradeProduct().getApplicableSupplyChainPackaging().getLinearSpatialDimension();
-				
+		SpatialDimensionType sd = getPackagingSpatialDimension();
 		return sd==null ? null : Measure.create(sd.getWidthMeasure());
 	}
 	@Override
@@ -885,6 +882,7 @@ realistisches Beispiel:
 	@Override
 	public IQuantity getPackagingHeight() {
 		SpatialDimensionType sd = getPackagingSpatialDimension();
+//		LOG.info("sd.getHeightMeasure():"+sd.getHeightMeasure());
 		return sd==null ? null : Measure.create(sd.getHeightMeasure());
 	}
 
