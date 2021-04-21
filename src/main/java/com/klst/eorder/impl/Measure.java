@@ -9,14 +9,24 @@ import com.klst.eorder.api.IMeasureFactory;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.MeasureType;
 
-/**
- * Measure contains unit of measure and quantity for spatial dimensions.
+/* Measure : „Core Data Types“ aus "ISO 15000-5" aka ebXML
+ * <br>
+ * A numeric value determined by measuring an object. 
+ * Measures are specified with a unit of measure. 
  * <p>
- * This is a "decimal" type with 2 digits maximum after the decimal point, without a thousand separator, and with the ". " as a decimal separator. 
+ * The applicable unit of measure is taken from UN/ECE Rec. 20. 
+ * <p>
+ * [Note: This Representation Term shall also be used 
+ * for measured coefficients (e.g. m/s).]
+ */
+/**
+ * Measure that applies to the packaging dimension, f.i. width, length and height.
  * Example 1.50MTR
+ * <p>
+ * A "decimal" type with 2 digits maximum after the decimal point, 
+ * without a thousand separator, and with the "." as a decimal separator. 
+ * <br>The unit of measure that applies to the packaging dimension, f.i. "MTR"
  * 
- * <br>The unit of measure that applies to the packaging dimension, f.i.width, length and height.
- * <br>A "decimal" type with 2 digits maximum after the decimal point, without a thousand separator, and with the "." as a decimal separator. 
  */
 public class Measure extends MeasureType implements IQuantity, IMeasureFactory {
 
@@ -60,9 +70,14 @@ public class Measure extends MeasureType implements IQuantity, IMeasureFactory {
 	public Measure(String unitCode, BigDecimal value) {
 		super();
 		super.setUnitCode(unitCode);
-		super.setValue(value.setScale(SCALE, RoundingMode.HALF_UP));
+		setvalue(value); // nicht super.setValue!
 	}
 
+	private void setvalue(BigDecimal value) {
+		if(value==null) return;
+		super.setValue(value.setScale(SCALE, RoundingMode.HALF_UP));
+	}
+	
 	@Override
 	public BigDecimal getValue(RoundingMode roundingMode) {
 		return getValue()==null ? null : getValue().setScale(SCALE, roundingMode);
