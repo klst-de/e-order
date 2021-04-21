@@ -363,6 +363,7 @@ BG-32 +++ 0..n ITEM ATTRIBUTES
 315 SCT_LINE_TS COMFORT	  Tax Type (category) Code
 316 SCT_LINE_TS EXTENDED  VAT Exemption Reason Code
 317 SCT_LINE_TS COMFORT	  Tax Type (category) rate
+
 318 SCT_LINE_TS COMFORT	  LINE ALLOWANCES
 319 SCT_LINE_TS COMFORT	  Charges and Allowances line Indicator
 320 SCT_LINE_TS COMFORT	  Line Allowances indicator value
@@ -379,6 +380,7 @@ BG-32 +++ 0..n ITEM ATTRIBUTES
 331 SCT_LINE_TS COMFORT	  line charge amount
 332 SCT_LINE_TS COMFORT	  line charge reason code
 333 SCT_LINE_TS COMFORT	  line charge reason
+
 334 SCT_LINE_TS BASIC	  LINE TOTAL AMOUNTS
 335 SCT_LINE_TS BASIC	  Line Total Amount (without VAT)
 336 SCT_LINE_TS EXTENDED  Line Total Charges (without VAT)
@@ -1222,7 +1224,25 @@ realistisches Beispiel:
 		return Period.create(start, end);
 	}
 
-/*
+	/*
+	 * 318: BG-27 0..n LINE ALLOWANCES
+	319 SCT_LINE_TS COMFORT	  Charges and Allowances line Indicator
+	320 SCT_LINE_TS COMFORT	  Line Allowances indicator value
+	321 SCT_LINE_TS COMFORT	  line allowance percentage
+	322 SCT_LINE_TS COMFORT	  line allowance base amount
+	323 SCT_LINE_TS COMFORT	  line allowance amount
+	324 SCT_LINE_TS COMFORT	  line allowance reason code
+	325 SCT_LINE_TS COMFORT	  line allowance reason
+	
+	 * 326: BG-28 0..n LINE CHARGES
+	327 SCT_LINE_TS COMFORT	  Charges and Allowances line Indicator
+	328 SCT_LINE_TS COMFORT	  Line Charges indicator value
+	329 SCT_LINE_TS COMFORT	  line charge percentage
+	330 SCT_LINE_TS COMFORT	  line charge base amount
+	331 SCT_LINE_TS COMFORT	  line charge amount
+	332 SCT_LINE_TS COMFORT	  line charge reason code
+	333 SCT_LINE_TS COMFORT	  line charge reason
+
                     <ram:SpecifiedTradeAllowanceCharge>
                          <ram:ChargeIndicator>
                               <udt:Indicator>false</udt:Indicator>
@@ -1244,10 +1264,6 @@ realistisches Beispiel:
                          <ram:Reason>FREIGHT SERVICES</ram:Reason>
                     </ram:SpecifiedTradeAllowanceCharge>
 
- */
-	/*
-	 * BG-27 0..n LINE ALLOWANCES
-	 * BG-28 0..n LINE CHARGES
 	 */
 	@Override
 	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {

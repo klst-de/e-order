@@ -443,11 +443,15 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	//       BT-135 +++ 0..1 Invoice line period end date
 	
 	/**
+	 * 318: BG-27 0..n LINE ALLOWANCES
+	 * <p>
 	 * {@inheritDoc}
 	 */
 	@Override
 	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage);	
 	/**
+	 * 326: BG-28 0..n LINE CHARGES
+	 * <p>
 	 * {@inheritDoc}
 	 */
 	@Override
