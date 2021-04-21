@@ -7,13 +7,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
@@ -45,12 +38,10 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradePriceType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeProductInstanceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeSettlementLineMonetarySummationType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.IndicatorType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._128.MeasureType;
 import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
 
 /*
@@ -809,9 +800,57 @@ realistisches Beispiel:
 		return TradeProductInstance.getTradeProductInstances(getSpecifiedTradeProduct().getIndividualTradeProductInstance());
 	}
 
-//	TODO: SupplyChainPackagingType
-//	68  SCT_LINE	COMFORT	  Packaging
-//	69  SCT_LINE	COMFORT	  Packaging TypeCode
+	// 68: SCT_LINE	COMFORT	  Packaging
+/* Exmpl
+        <ram:ApplicableSupplyChainPackaging>
+             <ram:TypeCode>7B</ram:TypeCode> <!-- 7B ==	wooden case 
+             <ram:LinearSpatialDimension>
+                  <ram:WidthMeasure unitCode="MTR">5</ram:WidthMeasure>
+                  <ram:LengthMeasure unitCode="MTR">3</ram:LengthMeasure>
+                  <ram:HeightMeasure unitCode="MTR">1</ram:HeightMeasure>
+             </ram:LinearSpatialDimension>
+        </ram:ApplicableSupplyChainPackaging>
+ */
+	@Override
+	public void setPackaging(String code, IQuantity width, IQuantity length, IQuantity height) {
+		SpatialDimensionType sd = null;
+		if(width==null && length==null && height==null) {
+			//
+		} else {
+			sd = new SpatialDimensionType();
+			if(width instanceof Measure) {
+				sd.setWidthMeasure((Measure)width);
+			}
+			if(length instanceof Measure) {
+				sd.setLengthMeasure((Measure)length);
+			}
+			if(height instanceof Measure) {
+				sd.setHeightMeasure((Measure)height);
+			}
+		}
+		if(sd==null && code==null) return;
+		
+		SupplyChainPackagingType scp = new SupplyChainPackagingType();
+		scp.setLinearSpatialDimension(sd);
+		if(code!=null) {
+			PackageTypeCodeType ptc = new PackageTypeCodeType();
+			ptc.setValue(code);
+			scp.setTypeCode(ptc);
+		}
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, scp);
+		super.getSpecifiedTradeProduct().setApplicableSupplyChainPackaging(scp);		
+	}
+	// 69: SCT_LINE	COMFORT	  Packaging TypeCode
+	@Override
+	public String getPackagingCode() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		PackageTypeCodeType ptc = 
+		getSpecifiedTradeProduct().getApplicableSupplyChainPackaging()==null
+		? null
+		: getSpecifiedTradeProduct().getApplicableSupplyChainPackaging().getTypeCode();
+				
+		return ptc==null ? null : ptc.getValue();
+	}
 //	70  SCT_LINE	COMFORT	  Packaging Dimension
 //	71  SCT_LINE	COMFORT	  Packaging Dimension Width
 //	72  SCT_LINE	COMFORT	  Packaging Dimension Width UnitCode
@@ -819,31 +858,35 @@ realistisches Beispiel:
 //	74  SCT_LINE	COMFORT	  Packaging Dimension Length UnitCode
 //	75  SCT_LINE	COMFORT	  Packaging Dimension Height
 //	76  SCT_LINE	COMFORT	  Packaging Dimension Height UnitCode
-/*
-    protected SupplyChainPackagingType applicableSupplyChainPackaging;
-public class SupplyChainPackagingType {
+	private SpatialDimensionType getPackagingSpatialDimension() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		return 
+		getSpecifiedTradeProduct().getApplicableSupplyChainPackaging()==null
+		? null
+		: getSpecifiedTradeProduct().getApplicableSupplyChainPackaging().getLinearSpatialDimension();
+	}
+	@Override
+	public IQuantity getPackagingWidth() {
+		if(super.getSpecifiedTradeProduct()==null) return null;
+		SpatialDimensionType sd = 
+		getSpecifiedTradeProduct().getApplicableSupplyChainPackaging()==null
+		? null
+		: getSpecifiedTradeProduct().getApplicableSupplyChainPackaging().getLinearSpatialDimension();
+				
+		return sd==null ? null : Measure.create(sd.getWidthMeasure());
+	}
+	@Override
+	public IQuantity getPackagingLength() {
+		SpatialDimensionType sd = getPackagingSpatialDimension();
+		return sd==null ? null : Measure.create(sd.getLengthMeasure());
+	}
+	@Override
+	public IQuantity getPackagingHeight() {
+		SpatialDimensionType sd = getPackagingSpatialDimension();
+		return sd==null ? null : Measure.create(sd.getHeightMeasure());
+	}
 
-    protected PackageTypeCodeType typeCode;
-    The code specifying the type of supply chain packaging.	
-    To be chosen from the entries in UNTDID 7065
-
-    protected SpatialDimensionType linearSpatialDimension;
-public class SpatialDimensionType {
-
-    protected MeasureType widthMeasure;   
-    The measure of the width component of this spatial dimension.
-	Unit Code of the measure of the width component of this spatial dimension.
-
-    protected MeasureType lengthMeasure;
-    protected MeasureType heightMeasure;
-
-public class MeasureType {
-
-    protected BigDecimal value;
-    protected String unitCode;
-
- */
-	// 78: BG-31.BT-159 0..1 Item country of origin
+	// 77,78: BG-31.BT-159 0..1 Item country of origin
 /*
                     <ram:OriginTradeCountry>
                          <ram:ID>FR</ram:ID>

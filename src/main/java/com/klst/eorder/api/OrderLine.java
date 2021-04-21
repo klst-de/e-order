@@ -3,11 +3,9 @@ package com.klst.eorder.api;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
-import com.klst.edoc.api.IdentifierExt;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.impl.TradeProductInstance;
 
@@ -289,11 +287,48 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 */
 //	66  SCT_LINE	COMFORT	  Item (Trade Product) Instances Batch ID
 //	67  SCT_LINE	COMFORT	  Item (Trade Product) Instances Supplier Serial ID
-	public void addTradeProductInstance(String batchId, String serialId);
-	
+	public void addTradeProductInstance(String batchId, String serialId);	
 	public List<TradeProductInstance> getTradeProductInstances();
 
-	// 78: BG31_ItemInformation#setCountryOfOrigin
+	/**
+	 * set Supply Chain Packaging
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	68
+	 * 
+	 * @param code - The code specifying the type of packaging.
+	 *               To be chosen from the entries in UNTDID 7065 Package type description code
+	 * @param width - Measure
+	 * @param length - Measure
+	 * @param height - Measure
+	 */
+	public void setPackaging(String code, IQuantity width, IQuantity length, IQuantity height);
+	/**
+	 * get Supply Chain Packaging Code
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	69
+	 * 
+	 * @return The code specifying the type of packaging.
+	 */
+	public String getPackagingCode();
+	/**
+	 * get Supply Chain Packaging Dimension Width
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	70: Packaging Dimension, 71: Width, 72: Width UnitCode
+	 * 
+	 * @return Measure aka IQuantity
+	 */
+	public IQuantity getPackagingWidth();
+//	73  SCT_LINE	COMFORT	  Packaging Dimension Length
+//	74  SCT_LINE	COMFORT	  Packaging Dimension Length UnitCode
+//	75  SCT_LINE	COMFORT	  Packaging Dimension Height
+//	76  SCT_LINE	COMFORT	  Packaging Dimension Height UnitCode
+	public IQuantity getPackagingLength();
+	public IQuantity getPackagingHeight();
+	
+	// 77,78: BG31_ItemInformation#setCountryOfOrigin
 //	public void setCountryOfOrigin(String code);
 //	public String getCountryOfOrigin();
 
@@ -351,7 +386,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * <br>Rule ID: 	BR-22
 	 * <br>Order-X-No: 	207
 	 * 
-	 * @retu Quantity
+	 * @return Quantity
 	 */
 //	public void setQuantity(Quantity quantity); // use factory
 	public IQuantity getQuantity();
@@ -377,12 +412,12 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BT-132
-	 * <br>Rule ID: 	 
-	 * <br>Request ID: 	R6
+	 * <br>Rule ID: 	
+	 * <br>Order-X-No: 	127 
 	 * 
 	 * @param reference id
 	 */
-	// nicht in CIO, nur in CIOR/CIOC
+	// der Verweis auf die ursprüngliche ID ist in CIO überflüssig, nur in CIOR/CIOC
 	public void setOrderLineID(String id);
 	public String getOrderLineID();
 	

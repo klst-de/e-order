@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IQuantity;
+import com.klst.eorder.api.IMeasureFactory;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.MeasureType;
 
@@ -15,12 +16,16 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._128.MeasureType;
  * Example 1.50 "MTR"
  * 
  * <br>The unit of measure that applies to the packaging dimension, f.i.width, length and height.
- * 
+ * <br>A "decimal" type with 2 digits maximum after the decimal point, without a thousand separator, and with the "." as a decimal separator. 
  */
-public class Measure extends MeasureType implements IQuantity {
+public class Measure extends MeasureType implements IQuantity, IMeasureFactory {
 
 	@Override
 	public IQuantity createQuantity(String unitCode, BigDecimal value) {
+		return createMeasure(unitCode, value);
+	}
+	@Override
+	public IQuantity createMeasure(String unitCode, BigDecimal value) {
 		return create(unitCode, value);
 	}
 

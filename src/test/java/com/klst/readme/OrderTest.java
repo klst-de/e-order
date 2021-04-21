@@ -35,6 +35,7 @@ import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.impl.Amount;               // impl.jar
 import com.klst.eorder.impl.CrossIndustryOrder;   // impl.jar
 import com.klst.eorder.impl.ID;                   // ...
+import com.klst.eorder.impl.Measure;
 import com.klst.eorder.impl.Quantity;
 import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.TradeContact;
@@ -67,6 +68,7 @@ public class OrderTest {
 
 	static final String EUR = "EUR";
 	static final String C62 = "C62";
+	static final String MTR = "MTR";
 	static final String GTIN = "0160"; // Global Trade Item Number (GTIN)
 
 	static private AbstactTransformer cioTransformer;
@@ -207,7 +209,16 @@ public class OrderTest {
 		line.addClassificationIdentifier("4047247110051", "EN", null, null); // BG-31.BT-158
 		line.setCountryOfOrigin("FR"); // BG-31.BT-159
 		
+		// OrderLineID nicht mit ID verwechseln! 
+		// OrderLineID: der Verweis auf die ursprüngliche ID ist in CIO überflüssig, in CIOR/CIOC sinnvoll
 		line.setOrderLineID("id-1"); // warning expected
+		
+		// Order-X-No: 	68, Verpackung, ? für die 6 Zeitschriften
+		line.setPackaging("7B"                           // 69: 7B == wooden case
+				// 70: Dimension
+				, new Measure(MTR, new BigDecimal(0.30))  // 72+71: width/Breite 
+				, new Measure(null, new BigDecimal(0.50)) // 73:length ohne 74:Einheit sollte nicht möglich sein
+				, null);                                  // 76+75: height 
 		
 		// BG-27 0..n LINE ALLOWANCES:
 		//BigDecimal tenPerCent = new BigDecimal(10);
