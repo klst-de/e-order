@@ -232,6 +232,14 @@ public class OrderTest {
 		assertNull(line.getPackagingLength().getUnitCode());
 		assertNull(line.getPackagingHeight());
 		
+		// 162: TODO ? createAllowance auch als createDiscount:
+//		line.createDiscount(new Amount(new BigDecimal(6.00)), reasonCode, reason);
+		AllowancesAndCharges discount = line.createAllowance(new Amount(new BigDecimal(1.00)), null, null);
+		discount.setReasoncode("95");
+		discount.setReasonText("DISCOUNT");
+//		line.setPriceDiscount(line.createAllowance(new Amount(new BigDecimal(1.00)), null, null));
+		line.setPriceDiscount(discount);
+		
 		// 318: BG-27 0..n LINE ALLOWANCES:
 		//BigDecimal tenPerCent = new BigDecimal(10);
 		line.addAllowance(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);

@@ -575,8 +575,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		return super.getSpecifiedTradeProduct().getID().getValue();
 	}
 
-	// 43: BG-31.BT-157 0..n SpecifiedTradeProduct.GlobalID
-	// 44:
+	// 43: BG-31.BT-157 0..n Item (Trade Product) Global ID
+	// 44:                   Item (Trade Product) Global ID Scheme ID
 	@Override
 	public Identifier createStandardIdentifier(String globalID, String schemeID) {
 		return new ID(globalID, schemeID);
@@ -633,7 +633,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 //		return super.getSpecifiedTradeProduct().getIndustryAssignedID().getValue();
 //	}
 	
-//	// 48: 0..1 SpecifiedTradeProduct.modelID
+	// 48: 0..1 SpecifiedTradeProduct.modelID
 //	@Override
 //	public void setModelID(String id) {
 //		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
@@ -668,7 +668,6 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		return Text.create(super.getSpecifiedTradeProduct().getDescription()).getValue();
 	}
 
-// TODO	51  SCT_LINE	COMFORT	  Item (Trade Product) Batch ID (lot ID)
 	// 51: 0..1 SpecifiedTradeProduct.batchID
 	@Override
 	public void setBatchID(String id) {
@@ -938,71 +937,6 @@ realistisches Beispiel:
 //	105 SCT_LINE	BASIC	  Substituted Product Name
 //	106 SCT_LINE	COMFORT	  Substituted Product Description
 	
-	/* ------------------------------------------------------------------------------
-	 * 107: BG-29 1..1 PRICE DETAILS
-	 * 
-	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
-	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
-	 */
-	// BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
-	@Override
-	public IAmount getUnitPriceAmount() {
-		TradePriceType tradePrice = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
-		return tradePrice==null ? null : Amount.create(tradePrice.getChargeAmount());
-	}
-
-	// BT-146 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional
-//	@Override
-//	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
-//		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
-//		if(quantity!=null) {
-//			QuantityType qt = new QuantityType();
-//			quantity.copyTo(qt);
-//			tradePrice.setBasisQuantity(qt); 
-//		}
-//		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
-//	}	
-	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
-		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
-	}
-
-	// BG-29.BT-150 + BG-29.BT-149 0..1
-	@Override
-	public IQuantity getUnitPriceQuantity() {
-		TradePriceType tradePrice = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
-		return tradePrice==null ? null : Quantity.create(tradePrice.getBasisQuantity());
-	}
-	@Override
-	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", basisQuantity);
-		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", basisQuantity);
-	}
-
-	// BG-29.BT-147 0..1 Item price discount
-	@Override
-	public IAmount getPriceDiscount() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void setPriceDiscount(IAmount grossPrice) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	// BG-29.BT-147 0..1 Item gross price
-	@Override
-	public IAmount getGrossPrice() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void setGrossPrice(IAmount grossPrice) {
-		// TODO Auto-generated method stub
-		
-	}
-
 //	107 SCT_LINE_TA BASIC	  LINE TRADE AGREEMENT
 //	108 SCT_LINE_TA EXTENDED  Minimum Orderable Quantity
 //	109 SCT_LINE_TA EXTENDED  Unit of Measure of Minimum Orderable Quantity
@@ -1109,7 +1043,20 @@ realistisches Beispiel:
 //	159 SCT_LINE_TA COMFORT	  Gross Price
 //	160 SCT_LINE_TA COMFORT	  Gross Price Base quantity
 //	161 SCT_LINE_TA COMFORT	  Gross Price Unit Code for base quantity
-//	162 SCT_LINE_TA COMFORT	  (((Item price discount)))
+	// 158: BG-29.BT-148 0..1 Item gross price
+	@Override
+	public IAmount getGrossPrice() {
+		TradePriceType grossPrice = super.getSpecifiedLineTradeAgreement()==null ? null 
+				: getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice();
+		return grossPrice==null ? null : Amount.create(grossPrice.getChargeAmount());
+	}
+	@Override
+	public void setGrossPrice(IAmount grossPrice) {
+		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "grossPriceProductTradePrice", grossPrice);
+		Mapper.set(getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice(), "chargeAmount", grossPrice);
+	}
+
+	// 162: BG-29.BT-147 0..1 Item price discount
 //	163 SCT_LINE_TA COMFORT	  ((Item price discount))
 //	164 SCT_LINE_TA COMFORT	  (Item price discount)
 //	165 SCT_LINE_TA EXTENDED  Item price discount CalculationPercent
@@ -1117,6 +1064,22 @@ realistisches Beispiel:
 //	167 SCT_LINE_TA COMFORT	  Item price discount
 //	168 SCT_LINE_TA COMFORT	  Item price discount Reason Code
 //	169 SCT_LINE_TA COMFORT	  Item price discount Reason
+	@Override
+	public AllowancesAndCharges getPriceDiscount() {
+		TradePriceType grossPrice = super.getSpecifiedLineTradeAgreement()==null ? null 
+				: getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice();
+		if(grossPrice==null) return null;
+		return grossPrice.getAppliedTradeAllowanceCharge().isEmpty() ? null
+				: TradeAllowanceCharge.create(grossPrice.getAppliedTradeAllowanceCharge().get(0));
+	}
+	@Override
+	public void setPriceDiscount(AllowancesAndCharges discount) {
+		// discount is ALLOWANCE!
+		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "grossPriceProductTradePrice", discount);
+		getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice()
+			.getAppliedTradeAllowanceCharge().add((TradeAllowanceCharge)discount);
+	}
+
 //	170 SCT_LINE_TA COMFORT	  (((Item price charge)))
 //	171 SCT_LINE_TA COMFORT	  ((Item price charge))
 //	172 SCT_LINE_TA COMFORT	  (Item price charge)
@@ -1125,6 +1088,48 @@ realistisches Beispiel:
 //	175 SCT_LINE_TA COMFORT	  Item price charge amount
 //	176 SCT_LINE_TA COMFORT	  Item price charge Reason Code
 //	177 SCT_LINE_TA COMFORT	  Item price charge Reason
+	
+	/* ------------------------------------------------------------------------------
+	 * BG-29 1..1 PRICE DETAILS
+	 * 
+	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
+	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
+	 */
+	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
+	@Override
+	public IAmount getUnitPriceAmount() {
+		TradePriceType tradePrice = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
+		return tradePrice==null ? null : Amount.create(tradePrice.getChargeAmount());
+	}
+
+	// BT-146 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional
+//	@Override
+//	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
+//		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
+//		if(quantity!=null) {
+//			QuantityType qt = new QuantityType();
+//			quantity.copyTo(qt);
+//			tradePrice.setBasisQuantity(qt); 
+//		}
+//		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
+//	}	
+	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
+		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
+		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
+	}
+
+	// 180+181: BG-29.BT-150 + BG-29.BT-149 0..1
+	@Override
+	public IQuantity getUnitPriceQuantity() {
+		TradePriceType tradePrice = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
+		return tradePrice==null ? null : Quantity.create(tradePrice.getBasisQuantity());
+	}
+	@Override
+	public void setUnitPriceQuantity(IQuantity basisQuantity) {
+		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", basisQuantity);
+		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", basisQuantity);
+	}
+
 
 	// ------------------------------------------
 

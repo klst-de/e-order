@@ -8,18 +8,20 @@ import com.klst.edoc.api.IAmount;
  * Common Interface for ALLOWANCES and CHARGES
  *
  * <p>
- * BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+ * 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
  * <br>
- * BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+ * 903: BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
  * <br>
- * BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
+ * 318: BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
  * <br>
- * BG-28 0..n LINE CHARGES / ZUSCHLÄGE
+ * 326: BG-28 0..n LINE CHARGES / ZUSCHLÄGE
+ * <br>
+ * 162: BG-29.BT-147 0..1 Item price discount aka ALLOWANCE
  * <p>
  * Cardinality: 	0..n
- * <br>EN16931-ID: 	BG-20 / BG-21 / BG-27 / BG-28
- * <br>Rule ID: 	
- * <br>Request ID: 	R15, R18
+ * <br>EN16931-ID: 	BG-20 / BG-21 / BG-27 / BG-28 / BG-29.BT-147
+ * <br>Rule ID: 	BR-31, BR-36
+ * <br>Order-X-No: 	888, 903, 318, 326, 162
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
@@ -28,19 +30,42 @@ public interface AllowancesAndCharges extends AllowancesOrChargesFactory, ITaxCa
 	public static final boolean ALLOWANCE = false;
 	public static final boolean CHARGE = true;
 
-	// BG-20-00, BG-21-00
+	/**
+	 * binary indicator for ALLOWANCES resp. CHARGES
+	 * <p>
+	 * EN16931-ID: BG-20-00, BG-21-00, BG-27-00, BG-28-00, BG-29.BT-147
+	 * <p>
+	 * Order-X-No: 890, 905, 320, 328, 164
+	 * 
+	 * @param indicator - use {@link #ALLOWANCE} resp. {@link #CHARGE}
+	 */
 	public void setChargeIndicator(boolean indicator);
+	
+	/**
+	 * check for ALLOWANCES
+	 * 
+	 * @return true for Order-X-No 890, 320, 164
+	 * <br> otherwise false (905, 328 or indicator is not set)
+	 */
 	public boolean isAllowance();
+	/**
+	 * check for CHARGES
+	 * 
+	 * @return true for Order-X-No 905, 328
+	 * <br> otherwise false (890, 320, 164 or indicator is not set)
+	 */
 	public boolean isCharge();
 	
 	/**
-	 * BT-92, BT-99 (mandatory) Document level allowance/charge amount
+	 * The amount of an allowance or charge, without VAT.
 	 * <p>
-	 * The amount of an allowance, without VAT.
+	 * Cardinality: 	1..1 (mandatory)
+	 * <p>
+	 * EN16931-ID: BG-20.BT-92, BG-21.BT-99, BG-27.BT-136, BG-28.BT-141
+	 * <br>
+	 * Order-X-No: 896, 911, 323, 331, 167
 	 * 
-	 * <br>Request ID: 	R15/16, R19
-	 * 
-	 * @param Amount amount
+	 * @param amount
 	 */
 	/*
 	 * Geschäftsregel: BR-31 Abschläge auf Dokumentenebene
@@ -54,26 +79,35 @@ public interface AllowancesAndCharges extends AllowancesOrChargesFactory, ITaxCa
 	public IAmount getAmountWithoutTax(); 
 
 	/**
-	 * BT-93, BT-100 (optional) Document level allowance/charge base amount
+	 * (optional) allowance or charge base amount
 	 * <p>
-	 * The base amount that may be used, in conjunction with the document level allowance/charge percentage, 
+	 * The base amount that may be used, in conjunction with the allowance/charge percentage, 
 	 * to calculate the document level allowance/charge amount.
+	 * <p>
+	 * (for 166): The monetary value that is the basis on which this trade price discount 
+	 * is calculated.
+
+	 * <p>
+	 * EN16931-ID: BG-20.BT-93, BG-21.BT-100, BG-27.BT-137, BG-28.BT-142
+	 * <br>
+	 * Order-X-No: 893, 908, 322, 330, 166
 	 * 
-	 * <br>Request ID: 	R15, R42 / R15, R16, R19
-	 * 
-	 * @param Amount amount
+	 * @param amount
 	 */
-	// BaseAmount umbenennen wg. Namenskollision in UBL // in AssessmentBase
 	public void setAssessmentBase(IAmount amount);
 	public IAmount getAssessmentBase(); 
 
 	/**
-	 * BT-94, BT-101 (optional) Document level allowance/charge percentage
+	 * (optional) allowance or charge percentage
 	 * <p>
-	 * The percentage that may be used, in conjunction with the document level allowance/charge base amount, 
-	 * to calculate the document level allowance/charge amount.
-	 * 
-	 * <br>Request ID: 	R15, R42 / R15, R16, R19
+	 * The percentage that may be used, in conjunction with the allowance/charge base amount, 
+	 * to calculate the allowance/charge amount.
+	 * <p>
+	 * (for 166): The percentage applied to calculate this trade price discount.
+	 * <p>
+	 * EN16931-ID: BG-20.BT-94, BG-21.BT-101, BG-27.BT-138, BG-28.BT-143
+	 * <br>
+	 * Order-X-No: 892, 907, 321, 329, 165
 	 * 
 	 * @param percentage
 	 */
@@ -142,11 +176,13 @@ public interface AllowancesAndCharges extends AllowancesOrChargesFactory, ITaxCa
 //	public BigDecimal getTaxPercentage();
 
 	/**
-	 * BT-97, BT-104 0..1 Document level allowance/charge reason
+	 * (optional) allowance or charge reason
 	 * <p>
-	 * The reason for the document level allowance/charge, expressed as text.
-	 * 
-	 * <br>Request ID: 	R15
+	 * The reason for the allowance/charge, expressed as text.
+	 * <p>
+	 * EN16931-ID: BG-20.BT-97, BG-21.BT-104, BG-27.BT-139, BG-28.BT-144
+	 * <br>
+	 * Order-X-No: 898, 913, 325, 333, 169
 	 * 
 	 * @param text
 	 */
@@ -177,16 +213,18 @@ oder einen Code des Grundes für den Zuschlag auf Dokumentenebene (BT-105) haben
 	public String getReasonText();
 	
 	/**
-	 * BT-98, BT-103 0..1 Document level allowance/charge reason code
+	 * (optional) allowance or charge reason code
 	 * <p>
-	 * The reason for the document level allowance/charge, expressed as a code.
-	 * <br>Use entries of the UNTDID 5189 code list[6]. 
-	 * The Document level allowance/charge reason code and the Document level allowance/charge reason 
+	 * The reason for the allowance/charge, expressed as a code.
+	 * <br>Use entries of the UNTDID 5189 code list. 
+	 * The allowance/charge reason code and the allowance/charge reason 
 	 * shall indicate the same allowance/charge reason.
+	 * <p>
+	 * EN16931-ID: BG-20.BT-98, BG-21.BT-103, BG-27.BT-140, BG-28.BT-144
+	 * <br>
+	 * Order-X-No: 897, 912, 324, 332, 168
 	 * 
-	 * <br>Request ID: 	R15
-	 * 
-	 * @param text
+	 * @param code as String
 	 */
 	/*
 
