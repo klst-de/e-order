@@ -1,34 +1,42 @@
 package com.klst.eorder.api;
 
+import java.sql.Timestamp;
+
 import com.klst.edoc.api.Reference;
 
+/*
+ * used in
+ * - at document level 
+ *          BT-17      TENDER OR LOT REFERENCE
+ * - 549ff: BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
+ * - at document line level:
+ * -  79ff: 0..n ADDITIONAL REFERENCED PRODUCT DOCUMENT in SpecifiedTradeProduct
+ * - 141ff: 0..n ADDITIONAL REFERENCED DOCUMENT in SpecifiedLineTradeAgreement
+ * - 154: BG.25.BT-128 0..1 line object identifier
+ */
 public interface SupportingDocument extends SupportingDocumentFactory {
 
+	// 552, 82, 145
+	public void setDocumentCode(String code);
+	public String getDocumentCode();
+	
+	// 151
+	public void setDate(Timestamp ts);
+	public Timestamp getDateAsTimestamp();
+
 	/**
-	 * set business term BG-24.BT-122 (mandatory): Supporting document reference
+	 * Additional supporting document reference
 	 * <p>
-	 * Business rule BR-52: Each Additional supporting document (BG-24) shall contain a 
-	 *                      Supporting document reference (BT-122).
+	 * Cardinality:     1..1 (mandatory)
+	 * <br>EN16931-ID: 	BG-24.BT-122
+	 * <br>Rule ID: 	BR-52: Each Additional supporting document (BG-24) shall contain a document reference (BT-122).
+	 * <br>Order-X-No: 	550, 80, 142
+	 * 
 	 * @param documentReference, an identifier of the supporting document.
 	 */
 	public void setDocumentReference(Reference documentReference);
 	public Reference getDocumentReference();
 	
-	/**
-	 * Supporting document description
-	 * <p>
-	 * A description of the supporting document. Such as: timesheet, usage report etc.
-	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID: 		BG-24.BT-123
-	 * <br>Rule ID: 	 
-	 * <br>Req.ID: 	R36
-	 * 
-	 * @param text
-	 */
-	public void setSupportingDocumentDescription(String text);
-	public String getSupportingDocumentDescription();
-
 	/**
 	 * External document location
 	 * <p>
@@ -38,15 +46,45 @@ public interface SupportingDocument extends SupportingDocumentFactory {
 	 * External document location shall be used if the Buyer requires additional information to support the Invoice.
 	 * External documents do not form part of the invoice. Risks can be involved when accessing external documents.
 	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID: 		BG-24.BT-124
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-24.BT-124
 	 * <br>Rule ID: 	 
-	 * <br>Req.ID: 	R36
+	 * <br>Order-X-No: 	551, 81, 143
 	 * 
 	 * @param url
 	 */
 	public void setExternalDocumentLocation(String location);
 	public String getExternalDocumentLocation();
+
+	/**
+	 * Additional supporting document line reference
+	 * <p>
+	 * Used in ADDITIONAL REFERENCED DOCUMENT (SpecifiedLineTradeAgreement)
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	
+	 * <br>Rule ID: 	 
+	 * <br>Order-X-No: 	144
+	 * 
+	 * @param lineReference
+	 */
+	public void setLineReference(Reference lineReference);
+	public Reference getLineReference();
+
+	/**
+	 * Supporting document description
+	 * <p>
+	 * A description of the supporting document. Such as: timesheet, usage report etc.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-24.BT-123
+	 * <br>Rule ID: 	 
+	 * <br>Order-X-No: 	553, 83, 146
+	 * 
+	 * @param text
+	 */
+	public void setSupportingDocumentDescription(String text);
+	public String getSupportingDocumentDescription();
 
 	/**
 	 * Attached document
@@ -55,14 +93,14 @@ public interface SupportingDocument extends SupportingDocumentFactory {
 	 * Attached document is used when documentation shall be stored with the Invoice 
 	 * for future reference or audit purposes.
 	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID: 		BG-24.BT-125
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-24.BT-125
 	 * <br>Rule ID: 	 
-	 * <br>Req.ID:  R35
+	 * <br>Order-X-No: 	554, 84, 147
 	 * 
-	 * @param binary content BT-125
-	 * @param mimeCode BT-125-1 The mime code of the attached document
-	 * @param filename BT-125-2 The file name of the attached document
+	 * @param doc binary content
+	 * @param mimeCode - The mime code of the attached document
+	 * @param filename - The file name of the attached document
 	 */
 	public void setAttachedDocument(byte[] doc, String mimeCode, String filename);
 	public byte[] getAttachedDocument();
