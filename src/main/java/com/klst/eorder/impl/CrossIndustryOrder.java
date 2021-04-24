@@ -12,6 +12,7 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DocumentNameCode;
@@ -292,7 +293,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getPurchaseOrderReference();	
 	}
 
-	// BT-17 + 0..1 Tender or lot reference
+	// 561: BT-17 0..1 Tender or lot reference
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
 		applicableHeaderTradeAgreement.setTenderOrLotReference(docRefId);	
@@ -302,6 +303,20 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getTenderOrLotReference();	
 	}
 
+	// 564: BT-18 0..1 (OBJECT IDENTIFIER FOR INVOICE)
+	@Override
+	public void setInvoicedObject(String name, String schemeID) {
+		applicableHeaderTradeAgreement.setInvoicedObject(name, schemeID);	
+	}
+	@Override
+	public String getInvoicedObject() {
+		return applicableHeaderTradeAgreement.getInvoicedObject();	
+	}
+	@Override
+	public Identifier getInvoicedObjectIdentifier() {
+		return applicableHeaderTradeAgreement.getInvoicedObjectIdentifier();	
+	}
+	
 	// BT-19 + 0..1 Buyer accounting reference
 	@Override
 	public void setBuyerAccountingReference(Reference textReference) {

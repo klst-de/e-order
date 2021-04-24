@@ -189,20 +189,24 @@ public class OrderTest {
 		allowance.setTaxPercentage(new BigDecimal(20));
 		order.addAllowanceCharge(allowance);
 		
-		// BG-24 ADDITIONAL SUPPORTING DOCUMENTS
-		// <ram:TypeCode>916</ram:TypeCode>
+		// 549: BG-24 ADDITIONAL SUPPORTING DOCUMENTS ==> <ram:TypeCode>916</ram:TypeCode>
 //		Use for "ADDITIONAL SUPPORTING DOCUMENTS" with TypeCode Value = 916, 
 //		or for "OBJECT IDENTIFIER with Type Code Value = 130, "
 //		or for "TENDER OR LOT REFERENCE" with Type Code Value = 50
 		order.addSupportigDocument("ADD_REF_DOC_ID", "ADD_REF_DOC_Desc", "ADD_REF_DOC_URIID");
+		// 561: BT-17 0..1 Tender or lot reference
 		String TENDER_ID = "TENDER_ID";
 		order.setTenderOrLotReference(TENDER_ID);
+		// 564: BT-18 0..1 (OBJECT IDENTIFIER FOR INVOICE)
+		String OBJECT_ID = "OBJECT_ID";
+		order.setInvoicedObject(OBJECT_ID, "AWV"); // AWV == Phone number
 
 		List<SupportingDocument> supportingDocs = order.getAdditionalSupportingDocuments();
 		assertEquals(TENDER_ID, order.getTenderOrLotReference());
 		assertEquals(1, supportingDocs.size());
 		SupportingDocument supportingDoc = supportingDocs.get(0);
 		assertEquals(DocumentNameCode.RelatedDocument.getValueAsString(), supportingDoc.getDocumentCode());
+		assertEquals(OBJECT_ID, order.getInvoicedObject());
 		
 		OrderLine line = order.createOrderLine("1"    // order line number
 				  , new Quantity("C62", new BigDecimal(6))              // one unit/C62

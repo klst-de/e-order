@@ -7,8 +7,10 @@ import com.klst.edoc.api.Reference;
 /*
  * used in
  * - at document level 
- *          BT-17      TENDER OR LOT REFERENCE
+ * - 561  : BT-17 0..1 TENDER OR LOT REFERENCE
+ * - 564  : BT-18 0..1 (OBJECT IDENTIFIER FOR INVOICE)
  * - 549ff: BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
+ * 
  * - at document line level:
  * -  79ff: 0..n ADDITIONAL REFERENCED PRODUCT DOCUMENT in SpecifiedTradeProduct
  * - 141ff: 0..n ADDITIONAL REFERENCED DOCUMENT in SpecifiedLineTradeAgreement
@@ -43,7 +45,7 @@ public interface SupportingDocument extends SupportingDocumentFactory {
 	 * The URL (Uniform Resource Locator) that identifies where the external document is located.
 	 * A means of locating the resource including its primary access mechanism, e.g. http:// or ftp://.
 	 * 
-	 * External document location shall be used if the Buyer requires additional information to support the Invoice.
+	 * External document location shall be used if the Buyer requires additional information to support the document.
 	 * External documents do not form part of the invoice. Risks can be involved when accessing external documents.
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
@@ -96,11 +98,11 @@ public interface SupportingDocument extends SupportingDocumentFactory {
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BG-24.BT-125
 	 * <br>Rule ID: 	 
-	 * <br>Order-X-No: 	554, 84, 147
+	 * <br>Order-X-No: 	554,555,556, 84, 147
 	 * 
-	 * @param doc binary content
-	 * @param mimeCode - The mime code of the attached document
-	 * @param filename - The file name of the attached document
+	 * @param doc      - 554 binary content
+	 * @param mimeCode - 555 The mime code of the attached document
+	 * @param filename - 556 The file name of the attached document
 	 */
 	public void setAttachedDocument(byte[] doc, String mimeCode, String filename);
 	public byte[] getAttachedDocument();

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.ContactInfoFactory;
 import com.klst.edoc.api.IPeriodFactory;
+import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddressFactory;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
@@ -205,7 +206,39 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public void setTenderOrLotReference(String docRefId);
 	public String getTenderOrLotReference();
 	
-	// TODO 564: BT-18 (OBJECT IDENTIFIER FOR INVOICE)
+	/**
+	 * BT-18 (OBJECT IDENTIFIER FOR INVOICE)
+	 * <p>
+	 * A group of business terms providing information about additional 
+	 * supporting documents substantiating the claims made in the order.
+	 * The additional supporting documents can be used for both 
+	 * referencing a document number which is expected to be known by the receiver, 
+	 * an external document (referenced by a URL) 
+	 * or as an embedded document (such as a time report in pdf). 
+	 * The option to link to an external document will be needed, 
+	 * for example in the case of large attachments and/or when sensitive information, 
+	 * e.g. person-related services, has to be separated from the order itself.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-18
+	 * <br>Rule ID: 	 
+	 * <br>Order-X-No: 	564
+	 * 
+	 * @param name   - 565 the identifier name BT-18
+	 * @param scheme - 567 identifier BT-18-1
+	 * The identification scheme identifier of the Invoiced object identifier.
+	 * If it may be not clear for the receiver what scheme is used for the identifier, 
+	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
+	 */
+	public void setInvoicedObject(String name, String schemeID);
+	default void setInvoicedObject(String name) {
+		setInvoicedObject(name, null);
+	}
+	default void setInvoicedObjectIdentifier(Identifier id) {
+		if(id!=null) setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
+	}
+	public String getInvoicedObject();
+	public Identifier getInvoicedObjectIdentifier();
 
 	/**
 	 * Buyer accounting reference

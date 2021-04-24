@@ -7,6 +7,7 @@ import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
+import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DocumentNameCode;
@@ -94,7 +95,7 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	}
 	
 	
-	// BT-17 0..1 Tender or lot reference
+	// 561: BT-17 0..1 Tender or lot reference
 /* Beispiel:
                <ram:AdditionalReferencedDocument>
                     <ram:IssuerAssignedID>TENDER_ID</ram:IssuerAssignedID>
@@ -121,6 +122,31 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 			if(referencedDocument.isValidatedPricedTender()) res.add(referencedDocument);
 		});
 		return res.isEmpty() ? null : res.get(0).getDocumentReference().getName();
+	}
+
+	// 564: BT-18 0..1 (OBJECT IDENTIFIER FOR INVOICE)
+	void setInvoicedObject(String name, String schemeID) {
+		ReferencedDocument rd = ReferencedDocument.create(name, DocumentNameCode.InvoicingDataSheet.getValueAsString()
+				, schemeID);
+		super.getAdditionalReferencedDocument().add(rd);
+	}
+	public String getInvoicedObject() {
+		List<ReferencedDocumentType> list = super.getAdditionalReferencedDocument();
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isInvoicingDataSheet()) res.add(referencedDocument);
+		});
+		return res.isEmpty() ? null : res.get(0).getDocumentReference().getName();
+	}
+	public Identifier getInvoicedObjectIdentifier() {
+		List<ReferencedDocumentType> list = super.getAdditionalReferencedDocument();
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isInvoicingDataSheet()) res.add(referencedDocument);
+		});
+		return res.isEmpty() ? null : res.get(0).getDocumentReference();
 	}
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller

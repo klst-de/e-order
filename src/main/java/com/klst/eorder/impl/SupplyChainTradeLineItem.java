@@ -939,12 +939,6 @@ realistisches Beispiel:
 		List<ReferencedDocumentType> list = getSpecifiedTradeProduct().getAdditionalReferenceReferencedDocument();
 		list.forEach(rd -> {
 			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
-//			LOG.info("rd:"+referencedDocument);
-//			if(referencedDocument.isRelatedDocument()) {
-//				// das sind die ReferencedDocuments
-//			} else {
-//				res.add(referencedDocument);
-//			}
 			res.add(referencedDocument);
 		});
 		return res;
