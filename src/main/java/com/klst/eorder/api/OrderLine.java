@@ -21,7 +21,9 @@ import com.klst.eorder.impl.TradeProductInstance;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
-public interface OrderLine extends OrderLineFactory, OrderNoteFactory, 
+public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
+	_79_AdditionalReferencedProductDocs, // 79 : ADDITIONAL REFERENCED PRODUCT DOCUMENT
+	_141_AdditionalReferencedDocs,       //	141: ADDITIONAL REFERENCED DOCUMENT
 	BG26_LineDeliveryPeriod, 
 	BG27_LineLevelAllowences, 
 	BG28_LineLevelCharges,
@@ -332,6 +334,8 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 //	public void setCountryOfOrigin(String code);
 //	public String getCountryOfOrigin();
 
+	// 79ff : ADDITIONAL REFERENCED PRODUCT DOCUMENT
+
 
 //	--------------------------------
 	/**
@@ -420,6 +424,38 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	// der Verweis auf die ursprüngliche ID ist in CIO überflüssig, nur in CIOR/CIOC
 	public void setOrderLineID(String id);
 	public String getOrderLineID();
+	
+	/**
+	 * The unique identifier of a line in this Quotation (???) referenced document.
+	 * 
+	 * The quotation document referenced in this line trade agreement	
+	 * In case an Order refers to different quotation
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	131
+	 * 
+	 * @param reference id
+	 */
+	public void setQuotationLineID(String id);
+	/**
+	 * The unique identifier of a line in this Quotation referenced document.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	131
+	 * 
+	 * @return reference id
+	 */
+	public String getQuotationLineID();
+	/**
+	 * The quotation document referenced in this line trade agreement.	
+	 * In case an Order refers to different quotation.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	130
+	 * 
+	 * @return reference id
+	 */
+	public String getQuotationID();
 	
 	/**
 	 * line Buyer accounting reference

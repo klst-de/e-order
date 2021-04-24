@@ -50,10 +50,10 @@ public interface BG29_PriceDetails {
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BG-29.BT-148
+	 * <br>Order-X-No: 	159
 	 * 
 	 * @return UnitPriceAmount
 	 */
-// ram:SpecifiedLineTradeAgreement/ram:GrossPriceProductTradePrice/ram:ChargeAmount existiert nicht nicht in BASIC
 	public IAmount getGrossPrice();
 	public void setGrossPrice(IAmount grossPrice);
 

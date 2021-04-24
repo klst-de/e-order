@@ -198,12 +198,14 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * <br>EN16931-ID: 	BT-17
 	 * <br>Rule ID: 	ON profiles BASIC OR COMFORT, 
 	 *                  the Order MUST NOT HAVE more than 1 Tender or Lot Reference on Header Level
-	 * <br>Request ID: 	R7, R4
+	 * <br>Order-X-No: 	561
 	 * 
-	 * @param Document reference
+	 * @param docRefId Document reference (Order-X-No: 562)
 	 */
 	public void setTenderOrLotReference(String docRefId);
 	public String getTenderOrLotReference();
+	
+	// TODO 564: BT-18 (OBJECT IDENTIFIER FOR INVOICE)
 
 	/**
 	 * Buyer accounting reference

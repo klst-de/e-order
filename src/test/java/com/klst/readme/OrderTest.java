@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -24,6 +25,7 @@ import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
@@ -34,6 +36,7 @@ import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.ContactInfoExt;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.Amount;               // impl.jar
 import com.klst.eorder.impl.CrossIndustryOrder;   // impl.jar
 import com.klst.eorder.impl.ID;                   // ...
@@ -192,6 +195,14 @@ public class OrderTest {
 //		or for "OBJECT IDENTIFIER with Type Code Value = 130, "
 //		or for "TENDER OR LOT REFERENCE" with Type Code Value = 50
 		order.addSupportigDocument("ADD_REF_DOC_ID", "ADD_REF_DOC_Desc", "ADD_REF_DOC_URIID");
+		String TENDER_ID = "TENDER_ID";
+		order.setTenderOrLotReference(TENDER_ID);
+
+		List<SupportingDocument> supportingDocs = order.getAdditionalSupportingDocuments();
+		assertEquals(TENDER_ID, order.getTenderOrLotReference());
+		assertEquals(1, supportingDocs.size());
+		SupportingDocument supportingDoc = supportingDocs.get(0);
+		assertEquals(DocumentNameCode.RelatedDocument.getValueAsString(), supportingDoc.getDocumentCode());
 		
 		OrderLine line = order.createOrderLine("1"    // order line number
 				  , new Quantity("C62", new BigDecimal(6))              // one unit/C62
@@ -231,6 +242,38 @@ public class OrderTest {
 		assertThat(new BigDecimal(0.30),  Matchers.closeTo(line.getPackagingWidth().getValue(RoundingMode.HALF_UP), new BigDecimal(0.0001)));
 		assertNull(line.getPackagingLength().getUnitCode());
 		assertNull(line.getPackagingHeight());
+
+		/* Test Order-X-No: 79 + 141
+                    <ram:AdditionalReferenceReferencedDocument>
+                         <ram:IssuerAssignedID>ADD_REF_PROD_ID</ram:IssuerAssignedID>
+                         <ram:URIID>ADD_REF_PROD_URIID</ram:URIID>
+                         <ram:TypeCode>6</ram:TypeCode>       TODO DocumentNameCode.ProductSpecification report
+                         <ram:Name>ADD_REF_PROD_Desc</ram:Name>
+                    </ram:AdditionalReferenceReferencedDocument>
+               </ram:SpecifiedTradeProduct>
+                    <ram:AdditionalReferencedDocument>
+                         <ram:IssuerAssignedID>ADD_REF_DOC_ID</ram:IssuerAssignedID>
+                         <ram:URIID>ADD_REF_DOC_URIID</ram:URIID>
+                         <ram:LineID>5</ram:LineID>
+                         <ram:TypeCode>916</ram:TypeCode>
+                         <ram:Name>ADD_REF_DOC_Desc</ram:Name>
+                    </ram:AdditionalReferencedDocument>
+		 */
+		// 79:
+		line.addReferencedProductDocument("ADD_REF_PROD_ID", "6", "ADD_REF_PROD_Desc", "ADD_REF_PROD_URIID");
+		// 141:
+		Reference lineID_5 = new ID("5");
+		line.addReferencedDocument("ADD_REF_DOC_ID", lineID_5, "ADD_REF_DOC_Desc", null, "ADD_REF_DOC_URIID");
+		
+		List<SupportingDocument> refProdDocs = line.getReferencedProductDocuments();
+		assertEquals(1, refProdDocs.size());
+		SupportingDocument refProdDoc = refProdDocs.get(0);
+		assertEquals("6", refProdDoc.getDocumentCode());
+		List<SupportingDocument> refDocs = line.getReferencedDocuments();
+		assertEquals(1, refDocs.size());
+		SupportingDocument refDoc = refDocs.get(0);
+		assertEquals(DocumentNameCode.RelatedDocument.getValueAsString(), refDoc.getDocumentCode());
+		assertEquals("5", refDoc.getLineReference().getName());
 		
 		// 162: TODO ? createAllowance auch als createDiscount:
 //		line.createDiscount(new Amount(new BigDecimal(6.00)), reasonCode, reason);

@@ -545,15 +545,16 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 	}
 
 	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
-	public SupportingDocument createSupportigDocument(String docRefId, String description, String uri) {
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
 		// delegieren
-		ReferencedDocument rd = ReferencedDocument.create(docRefId, description);
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, lineId, description);
 		rd.setExternalDocumentLocation(uri);
 		return rd;
 	}
-	public SupportingDocument createSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts
+			, byte[] content, String mimeCode, String filename) {
 		// delegieren
-		ReferencedDocument rd = ReferencedDocument.create(docRefId, description);
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, lineId, description);
 		rd.setAttachedDocument(content, mimeCode, filename);
 		return rd;
 	}

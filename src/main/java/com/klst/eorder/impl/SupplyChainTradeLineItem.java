@@ -14,6 +14,7 @@ import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
+import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
@@ -21,6 +22,7 @@ import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
+import com.klst.eorder.api.SupportingDocument;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._128.PackageTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.DocumentLineDocumentType;
@@ -881,7 +883,6 @@ realistisches Beispiel:
 	@Override
 	public IQuantity getPackagingHeight() {
 		SpatialDimensionType sd = getPackagingSpatialDimension();
-//		LOG.info("sd.getHeightMeasure():"+sd.getHeightMeasure());
 		return sd==null ? null : Measure.create(sd.getHeightMeasure());
 	}
 
@@ -903,8 +904,7 @@ realistisches Beispiel:
 		return getSpecifiedTradeProduct().getOriginTradeCountry()==null ? null : getSpecifiedTradeProduct().getOriginTradeCountry().getID().getValue().value();
 	}
 
-	// TODO
-//	79  SCT_LINE	COMFORT	  ADDITIONAL REFERENCED PRODUCT DOCUMENT
+	// 79: 0..n ADDITIONAL REFERENCED PRODUCT DOCUMENT
 //	80  SCT_LINE	COMFORT	  Additional Referenced Product Document - ID
 //	81  SCT_LINE	COMFORT	  Additional Referenced Product Document - External document location
 //	82  SCT_LINE	COMFORT	  Additional Referenced Product Document - Type Code
@@ -912,6 +912,43 @@ realistisches Beispiel:
 //	84  SCT_LINE	COMFORT	  Additional Referenced Product Document - Attached document
 //	85  SCT_LINE	COMFORT	  Additional Referenced Product Document - Attached document Mime code
 //	86  SCT_LINE	COMFORT	  Additional Referenced Product Document- Attached document Filename
+	// Name in BG-24 anders: ADDITIONAL SUPPORTING DOCUMENTS
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
+		// delegieren
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, lineId, description);
+		rd.setExternalDocumentLocation(uri);
+		return rd;
+	}
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts,
+			byte[] content, String mimeCode, String filename) {
+		// delegieren
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, lineId, description);
+		rd.setAttachedDocument(content, mimeCode, filename);
+		return rd;
+	}
+	public void addReferencedProductDocument(String code, SupportingDocument supportigDocument) {
+		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, supportigDocument);
+		supportigDocument.setDocumentCode(code);
+		super.getSpecifiedTradeProduct().getAdditionalReferenceReferencedDocument().add((ReferencedDocument)supportigDocument);		
+	}
+	public List<SupportingDocument> getReferencedProductDocuments() {
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
+		if(super.getSpecifiedTradeProduct()==null) return res;
+		List<ReferencedDocumentType> list = getSpecifiedTradeProduct().getAdditionalReferenceReferencedDocument();
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+//			LOG.info("rd:"+referencedDocument);
+//			if(referencedDocument.isRelatedDocument()) {
+//				// das sind die ReferencedDocuments
+//			} else {
+//				res.add(referencedDocument);
+//			}
+			res.add(referencedDocument);
+		});
+		return res;
+	}
 
 	// TODO
 //	87  SCT_LINE	EXTENDED  REFERENCED PRODUCT
@@ -962,6 +999,7 @@ realistisches Beispiel:
 //	128 SCT_LINE_TA BASIC	  Referenced Buyer Order line reference
 	private static final String WARN_ORDERLINEID = "An Order (Document Type Code BT-3 = 220) MUST NOT contain this business term: ";
 	// 127: BT-132 0..1 Referenced purchase order line reference
+	@Override
 	public void setOrderLineID(String id) {
 		if(id==null) return;
 		if(this.order.getDocumentCode()==DocumentNameCode.Order) {
@@ -971,18 +1009,39 @@ realistisches Beispiel:
 		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "buyerOrderReferencedDocument", id);
 		Mapper.set(getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument(), "lineID", id);
 	}
+	@Override
 	public String getOrderLineID() {
-		ReferencedDocumentType referencedDocument = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument();
+		ReferencedDocumentType referencedDocument = super.getSpecifiedLineTradeAgreement()==null ? null 
+				: getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument();
 		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
 	}
 
-	// TODO
-//	129 SCT_LINE_TA COMFORT	  QUOTATION REFERENCE
+	// 129: 0..1 QUOTATION REFERENCE
 //	130 SCT_LINE_TA COMFORT	  Quotation Reference ID
 //	131 SCT_LINE_TA COMFORT	  Quotation Reference LineID
-//	132 SCT_LINE_TA EXTENDED  (Quotation Reference Date)
+//	132 SCT_LINE_TA EXTENDED  (Quotation Reference Date)             TODO
 //	133 SCT_LINE_TA EXTENDED  Quotation Reference Date
 //	134 SCT_LINE_TA EXTENDED  Date format
+	@Override
+	public void setQuotationLineID(String id) {
+		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "quotationReferencedDocument", id);
+		Mapper.set(getSpecifiedLineTradeAgreement().getQuotationReferencedDocument(), "lineID", id);
+	}
+	// 130: 0..1 Quotation Reference ID
+	@Override
+	public String getQuotationID() {
+		ReferencedDocumentType referencedDocument = super.getSpecifiedLineTradeAgreement()==null ? null 
+				: getSpecifiedLineTradeAgreement().getQuotationReferencedDocument();
+		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
+	}
+	// 131: 0..1 Quotation Reference LineID
+	@Override
+	public String getQuotationLineID() {
+		ReferencedDocumentType referencedDocument = super.getSpecifiedLineTradeAgreement()==null ? null 
+				: getSpecifiedLineTradeAgreement().getQuotationReferencedDocument();
+		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
+	}
+
 	
 //	135 SCT_LINE_TA EXTENDED  CONTRACT REFERENCE
 //	136 SCT_LINE_TA EXTENDED  Contract Reference ID
@@ -991,17 +1050,40 @@ realistisches Beispiel:
 //	139 SCT_LINE_TA EXTENDED  Contract Reference Date
 //	140 SCT_LINE_TA EXTENDED  Date format
 	
-//	141 SCT_LINE_TA COMFORT	  ADDITIONAL REFERENCED DOCUMENT
+	
+	// ??? TODO Unterschied zu 79: 0..n ADDITIONAL REFERENCED PRODUCT DOCUMENT (ist in SpecifiedTradeProduct)
+//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedTradeProduct/ram:AdditionalReferenceReferencedDocument
+//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedLineTradeAgreement/ram:AdditionalReferencedDocument
+//	141 SCT_LINE_TA COMFORT	  ADDITIONAL REFERENCED DOCUMENT (in SpecifiedLineTradeAgreement) 
+	// und mit Line ID, dh ===> SupportingDocument erweitern
+	
+	
+	// An additional document referenced in this line trade agreement.
+	public void addReferencedDocument(SupportingDocument supportigDocument) {
+		super.getSpecifiedLineTradeAgreement().getAdditionalReferencedDocument().add((ReferencedDocument)supportigDocument);
+//		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, supportigDocument);
+//		super.getSpecifiedTradeProduct().getAdditionalReferenceReferencedDocument().add((ReferencedDocument)supportigDocument);		
+	}
+	public List<SupportingDocument> getReferencedDocuments() {
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
+		if(super.getSpecifiedLineTradeAgreement()==null) return res;
+		List<ReferencedDocumentType> list = getSpecifiedLineTradeAgreement().getAdditionalReferencedDocument();
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isRelatedDocument()) res.add(referencedDocument);
+		});
+		return res;
+	}
 //	142 SCT_LINE_TA COMFORT	  Additional Referenced Document - ID
 //	143 SCT_LINE_TA COMFORT	  Additional Referenced Document - External document location
-//	144 SCT_LINE_TA COMFORT	  Additional Referenced Document - Line ID
+//	144 SCT_LINE_TA COMFORT	  Additional Referenced Document + Line ID
 //	145 SCT_LINE_TA COMFORT	  Additional Referenced Document - Type Code
 //	146 SCT_LINE_TA COMFORT	  Additional Referenced Document - Description
 //	147 SCT_LINE_TA COMFORT	  Additional Referenced Document - Attached document
 //	148 SCT_LINE_TA COMFORT	  Additional Referenced Document - Attached document Mime code
 //	149 SCT_LINE_TA COMFORT	  Additional Referenced Document- Attached document Filename
 //	150 SCT_LINE_TA COMFORT	  Additional Referenced Document - Reference Type Code
-//	151 SCT_LINE_TA EXTENDED  (Additional Referenced Document -  Date)
+//	151 SCT_LINE_TA EXTENDED  (Additional Referenced Document +  Date)
 //	152 SCT_LINE_TA EXTENDED  Additional Referenced Document -  Date
 //	153 SCT_LINE_TA EXTENDED  Date format
 	
@@ -1043,7 +1125,7 @@ realistisches Beispiel:
 //	159 SCT_LINE_TA COMFORT	  Gross Price
 //	160 SCT_LINE_TA COMFORT	  Gross Price Base quantity
 //	161 SCT_LINE_TA COMFORT	  Gross Price Unit Code for base quantity
-	// 158: BG-29.BT-148 0..1 Item gross price
+	// 159: BG-29.BT-148 0..1 Item gross price
 	@Override
 	public IAmount getGrossPrice() {
 		TradePriceType grossPrice = super.getSpecifiedLineTradeAgreement()==null ? null 
@@ -1095,6 +1177,7 @@ realistisches Beispiel:
 	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
 	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
 	 */
+	// 179: price after subracting === korrekt
 	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
 	@Override
 	public IAmount getUnitPriceAmount() {
