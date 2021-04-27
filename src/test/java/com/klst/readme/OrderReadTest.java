@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -29,6 +31,7 @@ import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.api.SupportingDocument;
 import com.klst.marshaller.CioTransformer;
 
 public class OrderReadTest {
@@ -200,6 +203,26 @@ public class OrderReadTest {
 		assertEquals(BG2_ProcessControl.PROFILE_COMFORT, cio.getProfile());
 		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());	
 		assertEquals("202003311232", DateTimeFormats.tsToCCYYMMDDHHMM(cio.getIssueDateAsTimestamp()));
+		
+		List<SupportingDocument> docList = cio.getAdditionalSupportingDocuments();
+		LOG.info(">>>>>>>>>>> docList.size()="+docList.size());
+		SupportingDocument doc = docList.get(0);
+		LOG.info("AttachedDocumentFilename="+doc.getAttachedDocumentFilename());
+		LOG.info("AttachedDocumentMimeCode="+doc.getAttachedDocumentMimeCode());
+		if("application/pdf".equals(doc.getAttachedDocumentMimeCode())) {
+			LOG.info("TODO"); // TODO:
+//			try (FileOutputStream fos = new FileOutputStream(doc.getAttachedDocumentFilename())) {
+//				 fos.write(doc.getAttachedDocument());
+//				   //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
+//			} catch (FileNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+		}
+		
 
 		List<OrderLine> lines = cio.getLines();
 		assertEquals(3, lines.size());

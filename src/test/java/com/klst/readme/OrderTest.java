@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -75,6 +78,10 @@ public class OrderTest {
 	static final String C62 = "C62";
 	static final String MTR = "MTR";
 	static final String GTIN = "0160"; // Global Trade Item Number (GTIN)
+	static final String TESTDIR = "src/test/resources/";
+	// file content: "Das könnte eine Anlage sein."
+	static final String PDF = "01_15_Anhang_01.pdf";
+	static final String MIME = "application/pdf";
 
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
@@ -91,6 +98,29 @@ public class OrderTest {
 	   	object = null;
     }
 
+	// https://stackoverflow.com/questions/4350084/byte-to-file-in-java
+	private byte[] getBytesFromTestFile(String fileName) {
+		Path path = Paths.get(TESTDIR+fileName);
+		byte[] data = null;
+		try {
+			data = Files.readAllBytes(path);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
+	}
+	private void writeBytesToFile(byte[] bytes, String fileName) {
+		File file = new File(fileName);
+		Path path = Paths.get(file.getAbsolutePath());
+		try {
+			Files.write(path, bytes);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
 	@Test
 	public void cioTest() {
 		CoreOrder order;
@@ -267,7 +297,12 @@ public class OrderTest {
 		line.addReferencedProductDocument("ADD_REF_PROD_ID", "6", "ADD_REF_PROD_Desc", "ADD_REF_PROD_URIID");
 		// 141:
 		Reference lineID_5 = new ID("5");
-		line.addReferencedDocument("ADD_REF_DOC_ID", lineID_5, "ADD_REF_DOC_Desc", null, "ADD_REF_DOC_URIID");
+		byte[] content = getBytesFromTestFile(PDF);
+		LOG.info("content.length:"+content.length); // das result xml ist zu gross für's Loggen
+		line.addReferencedDocument("ADD_REF_DOC_ID", lineID_5, "ADD_REF_DOC_Desc"
+				, null // no date for the issuance
+//				, content, MIME, PDF);
+				, "ADD_REF_DOC_URIID");
 		
 		List<SupportingDocument> refProdDocs = line.getReferencedProductDocuments();
 		assertEquals(1, refProdDocs.size());
@@ -320,6 +355,7 @@ public class OrderTest {
 		
 		byte[] xml = transformer.marshal(object);
 		LOG.info(new String(xml));
+//		writeBytesToFile(xml, "orderTestResult.xml");
 	}
 
 }

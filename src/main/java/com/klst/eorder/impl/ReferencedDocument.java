@@ -241,10 +241,11 @@ Beispiel:
 	// code == 130 : isInvoicingDataSheet()    ==> BT-18
 	@Override
 	public void setDocumentCode(String code) {
-		if(code==null) return;
-		DocumentCodeType documentCode = new DocumentCodeType();
-		documentCode.setValue(code);
-		super.setTypeCode(documentCode);
+		Mapper.set(this, "typeCode", code);
+//		if(code==null) return;
+//		DocumentCodeType documentCode = new DocumentCodeType();
+//		documentCode.setValue(code);
+//		super.setTypeCode(documentCode);
 	}
 	boolean isRelatedDocument() {
 		String typeCode = getDocumentCode();
