@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
@@ -519,8 +518,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		return super.getAssociatedDocumentLineDocument().getLineID().getValue();
 	}
 	void setId(String id) {
-		Mapper.newFieldInstance(this, AssociatedDocumentLineDocument, id);
-		Mapper.set(getAssociatedDocumentLineDocument(), "lineID", id);
+		SCopyCtor.getInstance().newFieldInstance(this, AssociatedDocumentLineDocument, id);
+		SCopyCtor.getInstance().set(getAssociatedDocumentLineDocument(), "lineID", id);
 	}
 
 	// 36: 0..1
@@ -537,8 +536,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 			LOG.warning(WARN_ORDERLINEID + "ignore status:'"+status+"'.");
 			return;
 		}
-		Mapper.newFieldInstance(this, AssociatedDocumentLineDocument, status);
-		Mapper.set(getAssociatedDocumentLineDocument(), "lineStatusCode", status);
+		SCopyCtor.getInstance().newFieldInstance(this, AssociatedDocumentLineDocument, status);
+		SCopyCtor.getInstance().set(getAssociatedDocumentLineDocument(), "lineStatusCode", status);
 	}
 
 	// 37: BT-127 0..1/n Freitext zur Rechnungsposition : ram:IncludedNote
@@ -568,8 +567,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	// 42: 0..1 SpecifiedTradeProduct.ID
 	@Override
 	public void setProductID(String id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		Mapper.set(getSpecifiedTradeProduct(), "id", id);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "id", id);
 	}
 	@Override
 	public String getProductID() {
@@ -585,7 +584,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	}
 	@Override
 	public void addStandardIdentifier(Identifier id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
 		super.getSpecifiedTradeProduct().getGlobalID().add((ID)id);
 	}
 	@Override
@@ -602,8 +601,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	// 45: BG-31.BT-155 0..1 SpecifiedTradeProduct.sellerAssignedID
 	@Override
 	public void setSellerAssignedID(String id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		Mapper.set(getSpecifiedTradeProduct(), "sellerAssignedID", id);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "sellerAssignedID", id);
 	}
 	@Override
 	public String getSellerAssignedID() {
@@ -614,8 +613,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	// 46: BG-31.BT-156 0..1 SpecifiedTradeProduct.buyerAssignedID
 	@Override
 	public void setBuyerAssignedID(String id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		Mapper.set(getSpecifiedTradeProduct(), "buyerAssignedID", id);		
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "buyerAssignedID", id);		
 	}
 	@Override
 	public String getBuyerAssignedID() {
@@ -649,8 +648,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	
 	// 49: BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) { // not public, user factory
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, text);
-		Mapper.set(getSpecifiedTradeProduct(), "name", text);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, text);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "name", text);
 	}
 	@Override
 	public String getItemName() {
@@ -661,8 +660,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	// 50: BG-31.BT-154 0..1 Item description
 	@Override
 	public void setDescription(String text) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, text);
-		Mapper.set(getSpecifiedTradeProduct(), "description", text);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, text);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "description", text);
 	}
 	@Override
 	public String getDescription() {
@@ -673,8 +672,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	// 51: 0..1 SpecifiedTradeProduct.batchID
 	@Override
 	public void setBatchID(String id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		Mapper.set(getSpecifiedTradeProduct(), "batchID", id);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "batchID", id);
 	}
 	@Override
 	public String getBatchID() {
@@ -770,7 +769,7 @@ realistisches Beispiel:
 	}
 	@Override
 	public void addClassificationIdentifier(IdentifierExt id) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
 		ProductClassificationType productClassificationType = new ProductClassificationType();
 		productClassificationType.setClassCode((Code)id);
 		super.getSpecifiedTradeProduct().getDesignatedProductClassification().add(productClassificationType);		
@@ -795,7 +794,7 @@ realistisches Beispiel:
 	public void addTradeProductInstance(String batchId, String serialId) {
 		TradeProductInstance tpi = TradeProductInstance.create(batchId, serialId);
 		if(tpi!=null) {
-			Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, tpi);
+			SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, tpi);
 			super.getSpecifiedTradeProduct().getIndividualTradeProductInstance().add(tpi);		
 		}
 	}
@@ -842,7 +841,7 @@ realistisches Beispiel:
 			ptc.setValue(code);
 			scp.setTypeCode(ptc);
 		}
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, scp);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, scp);
 		super.getSpecifiedTradeProduct().setApplicableSupplyChainPackaging(scp);		
 	}
 	// 69: SCT_LINE	COMFORT	  Packaging TypeCode
@@ -894,9 +893,9 @@ realistisches Beispiel:
  */
 	@Override
 	public void setCountryOfOrigin(String code) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, code);
-		Mapper.newFieldInstance(getSpecifiedTradeProduct(), "originTradeCountry", code);		
-		Mapper.set(getSpecifiedTradeProduct().getOriginTradeCountry(), "id", ISOTwoletterCountryCodeContentType.fromValue(code));
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, code);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedTradeProduct(), "originTradeCountry", code);		
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct().getOriginTradeCountry(), "id", ISOTwoletterCountryCodeContentType.fromValue(code));
 	}
 	@Override
 	public String getCountryOfOrigin() {
@@ -929,7 +928,7 @@ realistisches Beispiel:
 		return rd;
 	}
 	public void addReferencedProductDocument(String code, SupportingDocument supportigDocument) {
-		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, supportigDocument);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, supportigDocument);
 		supportigDocument.setDocumentCode(code);
 		super.getSpecifiedTradeProduct().getAdditionalReferenceReferencedDocument().add((ReferencedDocument)supportigDocument);		
 	}
@@ -1000,8 +999,8 @@ realistisches Beispiel:
 			LOG.warning(WARN_ORDERLINEID + "ignore purchase order line reference:'"+id+"'.");
 			return;
 		}
-		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "buyerOrderReferencedDocument", id);
-		Mapper.set(getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument(), "lineID", id);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "buyerOrderReferencedDocument", id);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument(), "lineID", id);
 	}
 	@Override
 	public String getOrderLineID() {
@@ -1018,8 +1017,8 @@ realistisches Beispiel:
 //	134 SCT_LINE_TA EXTENDED  Date format
 	@Override
 	public void setQuotationLineID(String id) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "quotationReferencedDocument", id);
-		Mapper.set(getSpecifiedLineTradeAgreement().getQuotationReferencedDocument(), "lineID", id);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "quotationReferencedDocument", id);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getQuotationReferencedDocument(), "lineID", id);
 	}
 	// 130: 0..1 Quotation Reference ID
 	@Override
@@ -1128,8 +1127,8 @@ realistisches Beispiel:
 	}
 	@Override
 	public void setGrossPrice(IAmount grossPrice) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "grossPriceProductTradePrice", grossPrice);
-		Mapper.set(getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice(), "chargeAmount", grossPrice);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "grossPriceProductTradePrice", grossPrice);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice(), "chargeAmount", grossPrice);
 	}
 
 	// 162: BG-29.BT-147 0..1 Item price discount
@@ -1151,7 +1150,7 @@ realistisches Beispiel:
 	@Override
 	public void setPriceDiscount(AllowancesAndCharges discount) {
 		// discount is ALLOWANCE!
-		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "grossPriceProductTradePrice", discount);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "grossPriceProductTradePrice", discount);
 		getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice()
 			.getAppliedTradeAllowanceCharge().add((TradeAllowanceCharge)discount);
 	}
@@ -1191,8 +1190,9 @@ realistisches Beispiel:
 //		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
 //	}	
 	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
-		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
+		LOG.info(">>>>>>>>unitPriceAmount:"+unitPriceAmount);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
 	}
 
 	// 180+181: BG-29.BT-150 + BG-29.BT-149 0..1
@@ -1203,8 +1203,8 @@ realistisches Beispiel:
 	}
 	@Override
 	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", basisQuantity);
-		Mapper.set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", basisQuantity);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", basisQuantity);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", basisQuantity);
 	}
 
 
@@ -1213,7 +1213,7 @@ realistisches Beispiel:
 	// BT-129 ++ 1..1 bestellte Menge
 	// BT-129+BT-130
 	void setQuantity(Quantity quantity) { 
-		Mapper.set(getSpecifiedLineTradeDelivery(), "requestedQuantity", quantity);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "requestedQuantity", quantity);
 	}
 	@Override
 	public IQuantity getQuantity() {
@@ -1223,8 +1223,8 @@ realistisches Beispiel:
 
 	// BT-131 ++ 1..1 Nettobetrag der Rechnungsposition
 	void setLineTotalAmount(Amount amount) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", amount);
-		Mapper.set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", amount);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
 	}
 
 	@Override
@@ -1235,8 +1235,8 @@ realistisches Beispiel:
 
 	// BT-133 0..1 line Buyer accounting reference : ram:ReceivableSpecifiedTradeAccountingAccount
 	public void setBuyerAccountingReference(String text) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeSettlement(), "receivableSpecifiedTradeAccountingAccount", text);
-		Mapper.set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), "id", text);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "receivableSpecifiedTradeAccountingAccount", text);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), "id", text);
 	}
 	public String getBuyerAccountingReference() {
 		TradeAccountingAccountType taa = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount();
@@ -1265,7 +1265,7 @@ realistisches Beispiel:
  */
 	public void setLineDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		Mapper.newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", ts);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", ts);
 		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
@@ -1280,7 +1280,7 @@ realistisches Beispiel:
 
 	// BG-26 0..1 Period on which Delivery is requested
 	public void setLineDeliveryPeriod(IPeriod period) {
-		Mapper.newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", period);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", period);
 		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
@@ -1399,7 +1399,7 @@ realistisches Beispiel:
 	// --------------------------- CIO only:
 	@Override
 	public void setPartialDeliveryIndicator(boolean indicator) {
-		Mapper.set(getSpecifiedLineTradeDelivery(), "partialDeliveryAllowedIndicator", indicator);		
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "partialDeliveryAllowedIndicator", indicator);		
 	}
 	@Override
 	public boolean isPartialDeliveryAllowed() {

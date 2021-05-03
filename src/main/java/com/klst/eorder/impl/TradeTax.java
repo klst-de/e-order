@@ -3,7 +3,6 @@ package com.klst.eorder.impl;
 import java.math.BigDecimal;
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.TaxCategoryCode;
@@ -131,7 +130,7 @@ keine Beispiele für Tests!
 //	0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit   BT-8
 	public void setTaxPointDateCode(String code) {
 		if(code==null) return;		
-		Mapper.set(this, "dueDateTypeCode", code);
+		SCopyCtor.getInstance().set(this, "dueDateTypeCode", code);
 	}
 	public String getTaxPointDateCode() {
 		return super.getDueDateTypeCode()==null ? null : getDueDateTypeCode().getValue();		
@@ -163,7 +162,7 @@ keine Beispiele für Tests!
 	@Override
 	public void setTaxType(String code) {
 		if(code==null) return;		
-		Mapper.set(this, "typeCode", code);
+		SCopyCtor.getInstance().set(this, "typeCode", code);
 	}
 
 	@Override
@@ -176,7 +175,7 @@ keine Beispiele für Tests!
 	@Override
 	public void setTaxCategoryCode(String code) {
 		if(code==null) return;		
-		Mapper.set(this, "categoryCode", code);
+		SCopyCtor.getInstance().set(this, "categoryCode", code);
 	}
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
@@ -227,7 +226,7 @@ keine Beispiele für Tests!
 			super.setExemptionReason(Text.create(text));
 		}
 		if(code!=null) {
-			Mapper.set(this, "exemptionReasonCode", code);
+			SCopyCtor.getInstance().set(this, "exemptionReasonCode", code);
 		}
 	}
 

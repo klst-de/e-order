@@ -375,6 +375,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 		setLineObjectID(id, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeCode);
 	}
 	default void setLineObjectIdentifier(Identifier id) {
+		if(id==null) return;
 		setLineObjectID(id.getContent(), DocumentNameCode.InvoicingDataSheet.getValueAsString(), id.getSchemeIdentifier());
 	}
 	public Identifier getLineObjectIdentifier(); // Identifier.Content == id , .SchemeIdentifier == schemeCode

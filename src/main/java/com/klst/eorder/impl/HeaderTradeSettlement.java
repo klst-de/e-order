@@ -1,6 +1,5 @@
 package com.klst.eorder.impl;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
 
@@ -40,7 +39,7 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 //				setOrderCurrencyCode(new CurrencyCodeType());
 //			}
 //			getOrderCurrencyCode().setValue(ISO3AlphaCurrencyCodeContentType.fromValue(isoCurrencyCode));
-			Mapper.set(this, "orderCurrencyCode", ISO3AlphaCurrencyCodeContentType.fromValue(isoCurrencyCode));
+			SCopyCtor.getInstance().set(this, "orderCurrencyCode", ISO3AlphaCurrencyCodeContentType.fromValue(isoCurrencyCode));
 		} catch (IllegalArgumentException e) {
 //			LOG.warning("Invalid currencyCode "+isoCurrencyCode);
 			throw new IllegalArgumentException("Invalid currencyCode "+isoCurrencyCode);
@@ -53,7 +52,7 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 
 	// BT-19 + 0..1 Buyer accounting reference
 	public void setBuyerAccountingReference(Reference textReference) {
-		Mapper.set(this, "receivableSpecifiedTradeAccountingAccount", textReference);
+		SCopyCtor.getInstance().set(this, "receivableSpecifiedTradeAccountingAccount", textReference);
 	}
 	public Reference getBuyerAccountingReference() {
 		return getReceivableSpecifiedTradeAccountingAccount()==null ? null : new ID(getReceivableSpecifiedTradeAccountingAccount().getID());

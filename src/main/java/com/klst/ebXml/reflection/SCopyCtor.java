@@ -23,7 +23,7 @@ import javax.inject.Singleton;
  * @see https://github.com/javax-inject/javax-inject
  */
 @Singleton
-// TODO rename, der Name ist historisch bedingt, neu: Macro , Util , ...
+// TODO rename, der Name ist historisch bedingt, neu: Mapper, Macro , Util , ...
 public class SCopyCtor {
 
 	private static final Logger LOG = Logger.getLogger(SCopyCtor.class.getName());
@@ -229,16 +229,6 @@ public class SCopyCtor {
 
 		if(type.isInstance(object)) {
 			return invokeGetXX(METHOD_GETVALUE, type, object);
-//			try {
-//				Method getValue = type.getDeclaredMethod(METHOD_GETVALUE);
-//				return getValue.invoke(object);
-//			} catch (NoSuchMethodException e) {
-//				LOG.severe(METHOD_GETVALUE + "() not defined for " + codeType.getClass().getSimpleName());
-//				e.printStackTrace(); // darf nicht passieren
-//			} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
-//				LOG.severe(e.getMessage());
-//				e.printStackTrace(); // darf nicht passieren
-//			}					
 		} else {
 			LOG.info("Object "+codeType + " isInstance of "+codeType.getClass().getName() + " NOT "+clazz);
 		}
@@ -299,15 +289,17 @@ public class SCopyCtor {
     private static final String METHOD_SETVALUE = "setValue"; // setValue(String value)
     private static final String METHOD_SETID = "setID"; // setID(IDType id)
     private static final String METHOD_SETINDICATOR = "setIndicator";
+    private static final String METHOD_SETCURRENCY = "setCurrencyID"; // wg. Amount
+    private static final String METHOD_GETCURRENCY = "getCurrencyID"; // wg. Amount
     private static final String METHOD_SETUNITCODE = "setUnitCode"; // wg. Quantity
     private static final String METHOD_GETUNITCODE = "getUnitCode"; // wg. Quantity
-    
-	private static final String UDT="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128";
+
     private Class<?> typeUDT_ID = un.unece.uncefact.data.standard.unqualifieddatatype._128.IDType.class;
-//    private Class<?> CLASS_QuantityType = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType.class;
-    private Class<?> CLASS_QuantityType = un.unece.uncefact.data.standard.unqualifieddatatype._128.QuantityType.class;
+    private Package packageUDT = typeUDT_ID.getPackage();
     private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._128.QuantityType.class;
-//    private Class<?> CLASS_AmountType = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType.class;
+    private Class<?> type_Quantity = typeUDT_Quantity;
+    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._128.AmountType.class;
+    private Class<?> type_Amount = typeUDT_Amount;
     
 	private void set(Field field, Object obj, String fieldName, Object value) {
 		if(value==null) return;
@@ -360,122 +352,74 @@ public class SCopyCtor {
 			}
 		}
 		
-		// fehlt: billedQuantity
-		if(CLASS_QuantityType.isInstance(value) && value.getClass()!=CLASS_QuantityType) {
+		if(type_Amount.isInstance(value) && value.getClass()!=type_Amount) {
+			// value is instance of a subclass of type_Amount, but not type_Amount itself
+			// mögliche Methoden: setLineTotalAmount / setChargeAmount
+			if (set(obj, field, value)) return;
+		}
+		
+		if(type_Quantity.isInstance(value) && value.getClass()!=type_Quantity) {
 			// value is instance of a subclass of QuantityType, but not QuantityType itself
 			// mögliche Methoden: setRequestedQuantity / setAgreedQuantity / setBasisQuantity
-			if (set("setBilledQuantity", obj, field, value, typeUDT_Quantity)) return;
-			if (set("setBasisQuantity", obj, field, value, typeUDT_Quantity)) return;
-//			methodName = "setRequestedQuantity"; 
-//			try {
-//				Method setter = obj.getClass().getDeclaredMethod(methodName, CLASS_QuantityType);
-//				setter.invoke(obj, CLASS_QuantityType.cast(value));
-//				return;
-//			} catch (NoSuchMethodException e) {
-//				LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-////				e.printStackTrace();
-//			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-//				e.printStackTrace();
-//				return;
-//			}
-//			methodName = "setBasisQuantity"; 
-//			try {
-//				Method setter = obj.getClass().getDeclaredMethod(methodName, CLASS_QuantityType);
-//				setter.invoke(obj, CLASS_QuantityType.cast(value));
-//				return;
-//			} catch (NoSuchMethodException e) {
-//				LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-////				e.printStackTrace();
-//			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-//				e.printStackTrace();
-//				return;
-//			}
+			if (set(obj, field, value)) return;
 		}
 		LOG.warning("NO METHOD found for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 
-//		if(CLASS_AmountType.isInstance(value) && value.getClass()!=CLASS_AmountType) {
-//			// value is instance of a subclass of AmountType, but not AmountType itself
-//			// mögliche Methoden: setLineTotalAmount / setChargeAmount
-//			methodName = "setLineTotalAmount"; 
-//			try {
-//				Method setter = obj.getClass().getDeclaredMethod(methodName, CLASS_AmountType);
-//				setter.invoke(obj, CLASS_AmountType.cast(value));
-//				return;
-//			} catch (NoSuchMethodException e) {
-//				LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-////				e.printStackTrace();
-//			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-//				e.printStackTrace();
-//				return;
-//			}
-//			methodName = "setChargeAmount"; 
-//			try {
-//				Method setter = obj.getClass().getDeclaredMethod(methodName, CLASS_AmountType);
-//				setter.invoke(obj, CLASS_AmountType.cast(value));
-//				return;
-//			} catch (NoSuchMethodException e) {
-//				LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-////				e.printStackTrace();
-//			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-//				e.printStackTrace();
-//				return;
-//			}
-//		}
-
 	}
 
-	private boolean set(String methodName, Object obj, Field field, Object value, Class<?> valueType) {
-		// TODO methodName selber rausfinden, dann para methodName raus
-		// para valueType wird nicht genutzt
+	private boolean set(Object obj, Field field, Object value) {
 		Class<?> valueSuperType = value.getClass().getSuperclass();
+		while(valueSuperType.getPackage()!=packageUDT) {
+			LOG.info("seach for package of "+valueSuperType.getCanonicalName());
+			valueSuperType = valueSuperType.getSuperclass();
+		}
 		String fieldName = field.getName();
+		String methodName = set + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
+
 		try {
 			Object fo = field.get(obj);
-			// exception, wenn es methodName nicht gibt
+			// exception, wenn es set methodName nicht gibt
 			Method setter = obj.getClass().getDeclaredMethod(methodName, fo.getClass());
 			
-			/* methodName mit passender Signatur existiert:
-
+			/* setter methodName mit passender Signatur existiert:
+Amount:
 Quantity: UBL nutzt die Klasse von CII:
 
 un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType mit
-    protected BigDecimal value;
-    protected String unitCode;
-    protected String unitCodeListID;
-    protected String unitCodeListAgencyID;
-    protected String unitCodeListAgencyName;
-
                                     ^
                                     |extends
                                     |
 com.klst.einvoice.unece.uncefact.Quantity  --- impl --> IQuantity
 
 in LineTradeDeliveryType, ... ist aber 
-un.unece.uncefact.data.standard.unqualifieddatatype._100 mit
+un.unece.uncefact.data.standard.unqualifieddatatype._100 mit gleichen membern:
     protected BigDecimal value;
     protected String unitCode;
     protected String unitCodeListID;
     protected String unitCodeListAgencyID;
     protected String unitCodeListAgencyName;
 
-ich kopiere also um:
+ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 
 			 */
+
 			LOG.info("value:"+value 
+					+ "\n\t   Package:"+ valueSuperType.getPackage().getName()
 					+ "\n\t     Class:"+ value.getClass().getCanonicalName()
 					+ "\n\tSuperClass:"+ value.getClass().getSuperclass().getCanonicalName()
-//					+ "\n\texp.SClass:"+ CLASS_QuantityType.getCanonicalName());
 				);
-			if(CLASS_QuantityType==value.getClass().getSuperclass()) {
+			if(type_Amount==valueSuperType) {
+				Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
+				Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
+				setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
+				setUnitCode.invoke(fo, invokeGetXX(METHOD_GETCURRENCY, valueSuperType, value));
+			}
+			if(type_Quantity==valueSuperType) {
 				Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
 				Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETUNITCODE, String.class);
 				setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
 				setUnitCode.invoke(fo, invokeGetXX(METHOD_GETUNITCODE, valueSuperType, value));
 			}
-//			Method setValue = fo.getClass().getDeclaredMethod("setValue", BigDecimal.class);
-//			Method setUnitCode = fo.getClass().getDeclaredMethod("setUnitCode", String.class);
-//			setValue.invoke(fo, invokeGetXX("getValue", CLASS_QuantityType, value));
-//			setUnitCode.invoke(fo, invokeGetXX("getUnitCode", CLASS_QuantityType, value));
 			
 			setter.invoke(obj, fo);
 			LOG.info("DONE "+methodName);

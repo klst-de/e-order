@@ -3,7 +3,6 @@ package com.klst.eorder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
@@ -63,9 +62,9 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
                </ram:SpecifiedProcuringProject>
  */
 	public void setProjectReference(String id, String name) {
-		Mapper.newFieldInstance(this, "specifiedProcuringProject", id);
-		Mapper.set(getSpecifiedProcuringProject(), "id", id);
-		Mapper.set(getSpecifiedProcuringProject(), "name", name);
+		SCopyCtor.getInstance().newFieldInstance(this, "specifiedProcuringProject", id);
+		SCopyCtor.getInstance().set(getSpecifiedProcuringProject(), "id", id);
+		SCopyCtor.getInstance().set(getSpecifiedProcuringProject(), "name", name);
 	}
 	public Reference getProjectReference() {
 		return getSpecifiedProcuringProject()==null ? null 
@@ -76,8 +75,8 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 
 	// BT-12 + 0..1 Contract reference
 	public void setContractReference(String id) {
-		Mapper.newFieldInstance(this, "contractReferencedDocument", id);
-		Mapper.set(getContractReferencedDocument(), FIELD_issuerAssignedID, id);
+		SCopyCtor.getInstance().newFieldInstance(this, "contractReferencedDocument", id);
+		SCopyCtor.getInstance().set(getContractReferencedDocument(), FIELD_issuerAssignedID, id);
 	}
 	public String getContractReference() {
 		if(getContractReferencedDocument()==null) return null;
@@ -86,8 +85,8 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	
 	// BT-13 + 0..1 Purchase order reference
 	public void setPurchaseOrderReference(String id) {
-		Mapper.newFieldInstance(this, "buyerOrderReferencedDocument", id);
-		Mapper.set(getBuyerOrderReferencedDocument(), FIELD_issuerAssignedID, id);
+		SCopyCtor.getInstance().newFieldInstance(this, "buyerOrderReferencedDocument", id);
+		SCopyCtor.getInstance().set(getBuyerOrderReferencedDocument(), FIELD_issuerAssignedID, id);
 	}
 	public String getPurchaseOrderReference() {
 		if(getBuyerOrderReferencedDocument()==null) return null;
@@ -182,12 +181,12 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	}
 
 	void setDeliveryType(String deliveryType) {
-		Mapper.newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, deliveryType);
-		Mapper.set(getApplicableTradeDeliveryTerms(), "deliveryTypeCode", deliveryType);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, deliveryType);
+		SCopyCtor.getInstance().set(getApplicableTradeDeliveryTerms(), "deliveryTypeCode", deliveryType);
 	}
 	void setDeliveryFunctionCode(String functionCode) {
-		Mapper.newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, functionCode);
-		Mapper.set(getApplicableTradeDeliveryTerms(), "functionCode", functionCode);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, functionCode);
+		SCopyCtor.getInstance().set(getApplicableTradeDeliveryTerms(), "functionCode", functionCode);
 	}
 
 	String getDeliveryType() {
@@ -200,8 +199,8 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	}
 
 	void setQuotationReference(String id) {
-		Mapper.newFieldInstance(this, "quotationReferencedDocument", id);
-		Mapper.set(getQuotationReferencedDocument(), FIELD_issuerAssignedID, id);
+		SCopyCtor.getInstance().newFieldInstance(this, "quotationReferencedDocument", id);
+		SCopyCtor.getInstance().set(getQuotationReferencedDocument(), FIELD_issuerAssignedID, id);
 	}
 	String getQuotationReference() {
 		if(getQuotationReferencedDocument()==null) return null;
@@ -209,8 +208,8 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	}
 
 	void setBlanketOrderReference(String id) {
-		Mapper.newFieldInstance(this, "blanketOrderReferencedDocument", id);
-		Mapper.set(getBlanketOrderReferencedDocument(), FIELD_issuerAssignedID, id);
+		SCopyCtor.getInstance().newFieldInstance(this, "blanketOrderReferencedDocument", id);
+		SCopyCtor.getInstance().set(getBlanketOrderReferencedDocument(), FIELD_issuerAssignedID, id);
 	}
 	String getBlanketOrderReference() {
 		if(getBlanketOrderReferencedDocument()==null) return null;
@@ -218,8 +217,8 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	}
 
 	void setPreviousOrderReference(String id) {
-		Mapper.newFieldInstance(this, "previousOrderReferencedDocument", id);
-		Mapper.set(getPreviousOrderReferencedDocument(), FIELD_issuerAssignedID, id);
+		SCopyCtor.getInstance().newFieldInstance(this, "previousOrderReferencedDocument", id);
+		SCopyCtor.getInstance().set(getPreviousOrderReferencedDocument(), FIELD_issuerAssignedID, id);
 	}
 	String getPreviousOrderReference() {
 		if(getPreviousOrderReferencedDocument()==null) return null;
@@ -228,8 +227,8 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 
 	// in Doc Zeile 571 : N (not in CIO/220)
 	void setPreviousOrderChangeReference(String id) {
-		Mapper.newFieldInstance(this, "previousOrderChangeReferencedDocument", id);
-		Mapper.set(getPreviousOrderChangeReferencedDocument(), FIELD_issuerAssignedID, id);
+		SCopyCtor.getInstance().newFieldInstance(this, "previousOrderChangeReferencedDocument", id);
+		SCopyCtor.getInstance().set(getPreviousOrderChangeReferencedDocument(), FIELD_issuerAssignedID, id);
 	}
 	String getPreviousOrderChangeReference() {
 		if(getPreviousOrderChangeReferencedDocument()==null) return null;
@@ -238,8 +237,8 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	
 	// in Doc Zeile 576 : N (not in CIO/220)
 	void setPreviousOrderResponseReference(String id) {
-		Mapper.newFieldInstance(this, "previousOrderResponseReferencedDocument", id);
-		Mapper.set(getPreviousOrderResponseReferencedDocument(), FIELD_issuerAssignedID, id);
+		SCopyCtor.getInstance().newFieldInstance(this, "previousOrderResponseReferencedDocument", id);
+		SCopyCtor.getInstance().set(getPreviousOrderResponseReferencedDocument(), FIELD_issuerAssignedID, id);
 	}
 	String getPreviousOrderResponseReference() {
 		if(getPreviousOrderResponseReferencedDocument()==null) return null;

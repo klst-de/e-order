@@ -2,7 +2,6 @@ package com.klst.eorder.impl;
 
 import java.sql.Timestamp;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
@@ -114,7 +113,12 @@ Beispiel:
 //	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 //		return create(docRefId, ts);
 //	}
-
+//	static ReferencedDocument create(String docRefId, Timestamp ts) {
+//		ReferencedDocument rd = new ReferencedDocument(docRefId, (String)null, (String)null);
+//		rd.setDate(ts);
+//		return rd;
+//	}
+	
 	// factory
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
@@ -132,12 +136,6 @@ Beispiel:
 
 	static ReferencedDocument create(String docRefId, Reference lineId, String description) {
 		ReferencedDocument rd = new ReferencedDocument(docRefId, lineId, description);
-		return rd;
-	}
-	
-	static ReferencedDocument create(String docRefId, Timestamp ts) {
-		ReferencedDocument rd = new ReferencedDocument(docRefId, (String)null, (String)null);
-		rd.setDate(ts);
 		return rd;
 	}
 	
@@ -241,7 +239,7 @@ Beispiel:
 	// code == 130 : isInvoicingDataSheet()    ==> BT-18
 	@Override
 	public void setDocumentCode(String code) {
-		Mapper.set(this, "typeCode", code);
+		SCopyCtor.getInstance().set(this, "typeCode", code);
 //		if(code==null) return;
 //		DocumentCodeType documentCode = new DocumentCodeType();
 //		documentCode.setValue(code);
@@ -266,7 +264,7 @@ Beispiel:
 	// 553: BG-24.BT-123 0..1 Supporting document description
 	@Override
 	public void setSupportingDocumentDescription(String text) {
-		Mapper.set(this, "name", text);
+		SCopyCtor.getInstance().set(this, "name", text);
 	}
 	@Override
 	public String getSupportingDocumentDescription() {
