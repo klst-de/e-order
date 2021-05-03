@@ -277,6 +277,7 @@ public class SCopyCtor {
 			if(field.get(obj)==null) {
 				fieldType = field.getType();
 				field.set(obj, fieldType.newInstance());
+				LOG.config(fieldName);
 			}
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | InstantiationException e) {
 			LOG.warning(obj.getClass().getSimpleName() +"."+fieldName + ": Exception:"+e);
@@ -309,6 +310,7 @@ public class SCopyCtor {
 		try { // "setValue" existiert ? ==> ausführen
 			Method setValue = fieldType.getDeclaredMethod(methodName, value.getClass());	
 			setValue.invoke(field.get(obj), value.getClass().cast(value));
+			LOG.config(methodName + " with "+value);
 			return;
 		} catch (NoSuchMethodException e) {
 			LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
@@ -324,6 +326,7 @@ public class SCopyCtor {
 			// mit IDType ist der Mapper an unqualifieddatatype._103 bzw CLASS_IDType gebunden
 			Method setID = fieldType.getDeclaredMethod(methodName, typeUDT_ID);	
 			setID.invoke(field.get(obj), typeUDT_ID.cast(value));
+			LOG.config(methodName + " with "+value);
 			return;
 		} catch (NoSuchMethodException e) {
 			LOG.config(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
@@ -403,11 +406,11 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 
 			 */
 
-			LOG.info("value:"+value 
-					+ "\n\t   Package:"+ valueSuperType.getPackage().getName()
-					+ "\n\t     Class:"+ value.getClass().getCanonicalName()
-					+ "\n\tSuperClass:"+ value.getClass().getSuperclass().getCanonicalName()
-				);
+//			LOG.info("value:"+value 
+//					+ "\n\t   Package:"+ valueSuperType.getPackage().getName()
+//					+ "\n\t     Class:"+ value.getClass().getCanonicalName()
+//					+ "\n\tSuperClass:"+ value.getClass().getSuperclass().getCanonicalName()
+//				);
 			if(type_Amount==valueSuperType) {
 				Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
 				Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
@@ -422,7 +425,7 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 			}
 			
 			setter.invoke(obj, fo);
-			LOG.info("DONE "+methodName);
+			LOG.config(methodName + " with "+value);
 			return true;
 		} catch (NoSuchMethodException e) {
 			LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);

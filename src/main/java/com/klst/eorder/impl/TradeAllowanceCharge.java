@@ -12,6 +12,7 @@ import com.klst.eorder.api.ITaxCategory;
 
 import un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d20a.DutyorTaxorFeeCategoryCodeContentType;
 import un.unece.uncefact.codelist.standard.unece.dutytaxfeetypecode.d20a.DutyTaxFeeTypeCodeContentType;
+import un.unece.uncefact.data.standard.qualifieddatatype._128.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.IndicatorType;
 
@@ -165,18 +166,14 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return tradeTax.getTaxType();
 	}
 
-	// BT-95, BT-102 1..1 (mandatory) Document level allowance/charge VAT category code
-//	@Override
-//	public void setTaxCategoryCode(TaxCategoryCode code) {
-//		setTaxCategoryCode(code.getValue());
-//	}
+	// 916 : BT-95.BT-102 1..1 (mandatory) Document level allowance/charge VAT category code
 	@Override
 	public void setTaxCategoryCode(String code) {
 		// the following throws IllegalArgumentException if tax code is invalid
 		DutyorTaxorFeeCategoryCodeContentType.fromValue(code);
-		
+
 		SCopyCtor.getInstance().newFieldInstance(this, "categoryTradeTax", code);
-		SCopyCtor.getInstance().set(getCategoryTradeTax(), "typeCode", DutyorTaxorFeeCategoryCodeContentType.fromValue(code));		
+		SCopyCtor.getInstance().set(getCategoryTradeTax(), "categoryCode", DutyorTaxorFeeCategoryCodeContentType.fromValue(code));		
 	}
 
 	@Override

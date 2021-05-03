@@ -35,11 +35,25 @@ public interface ITaxCategory extends ITaxCategoryFactory, ITaxType {
 	 * <br>EN16931-ID: 	BG-23.BT-118, also used in BG-20.BT-95 , BG-21.BT-102 and BG-30.BT-151
 	 * <br>Rule ID: 	BR-47
 	 * <br>Request ID: 	R38, R45, R49
+	 * <br>Order-X-No: 	884, 901, 
 	 * 
 	 * @param code typically S for StandardRate
 	 * 
+	 * @exception IllegalArgumentException if tax code is invalid
+	 * 
 	 * @see TaxCategoryCode defined in codelist UNTDID 5305
 	 */
+//	879 : BT-118-0 VAT type code
+//	884 : BT-118   VAT category code
+
+//	899 : BT-95-00 (VAT type code for document level allowances)
+//	900 : BT-95-0  VAT type code for document level allowances
+//	901 : BT-95    Document level allowance VAT category code
+
+//	914 : BT-102-00
+//	915 : BT-102-0
+//	916 : BT-102
+
 	// ALLOWANCES (BG-20) and CHARGES (BG-21) BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
 	// VAT BREAKDOWN BG-23.BT-118
 	public void setTaxCategoryCode(String code);

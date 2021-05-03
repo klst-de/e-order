@@ -1190,7 +1190,7 @@ realistisches Beispiel:
 //		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
 //	}	
 	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-		LOG.info(">>>>>>>>unitPriceAmount:"+unitPriceAmount);
+		LOG.fine("unitPriceAmount:"+unitPriceAmount);
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
 		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
 	}
