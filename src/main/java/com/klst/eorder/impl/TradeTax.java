@@ -9,6 +9,10 @@ import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.ITaxCategory;
 
+import un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d20a.DutyorTaxorFeeCategoryCodeContentType;
+import un.unece.uncefact.codelist.standard.unece.dutytaxfeetypecode.d20a.DutyTaxFeeTypeCodeContentType;
+import un.unece.uncefact.data.standard.qualifieddatatype._128.TaxCategoryCodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._128.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeTaxType;
 
 public class TradeTax extends TradeTaxType implements ITaxCategory {
@@ -162,7 +166,10 @@ keine Beispiele für Tests!
 	@Override
 	public void setTaxType(String code) {
 		if(code==null) return;		
-		SCopyCtor.getInstance().set(this, "typeCode", code);
+//		SCopyCtor.getInstance().set(this, "typeCode", code);
+		TaxTypeCodeType ttc = new TaxTypeCodeType();
+		ttc.setValue(DutyTaxFeeTypeCodeContentType.fromValue(code));
+		super.setTypeCode(ttc);
 	}
 
 	@Override
@@ -175,11 +182,14 @@ keine Beispiele für Tests!
 	@Override
 	public void setTaxCategoryCode(String code) {
 		if(code==null) return;		
-		SCopyCtor.getInstance().set(this, "categoryCode", code);
+//		SCopyCtor.getInstance().set(this, "categoryCode", code);
+		TaxCategoryCodeType tcc = new TaxCategoryCodeType();
+		tcc.setValue(DutyorTaxorFeeCategoryCodeContentType.fromValue(code));
+		super.setCategoryCode(tcc);
 	}
 	@Override
-	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(super.getCategoryCode().getValue().value());
+	public TaxCategoryCode getTaxCategoryCode() {	
+		return TaxCategoryCode.getEnum(super.getCategoryCode().getValue().value());
 	}
 
 	/* BT-118 1..1 CategoryCode

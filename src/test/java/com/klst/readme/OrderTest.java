@@ -243,6 +243,7 @@ public class OrderTest {
 				  , new Amount(EUR, new BigDecimal(60.00))				// line net amount
 				  , new UnitPriceAmount(EUR, new BigDecimal(10.00))	    // price
 				  , "Zeitschrift [...]"									// itemName
+				  , TaxCategoryCode.StandardRate, new BigDecimal(7)     // VAT category code, rate 7%
 				  );
 		line.addNote("AAI", "Content of Note");
 		line.setUnitPriceQuantity(new Quantity("C62", new BigDecimal(1))); // (optional) price base quantity
@@ -343,7 +344,9 @@ public class OrderTest {
 				, new Quantity("C62", new BigDecimal(10))
 				, new Amount(new BigDecimal(100.00))
 				, new UnitPriceAmount(new BigDecimal(10.00))
-				, "Product Name");
+				, "Product Name"
+				, TaxCategoryCode.StandardRate, new BigDecimal(16)
+				);
 
 		transformer = cioTransformer;
 		object = order;

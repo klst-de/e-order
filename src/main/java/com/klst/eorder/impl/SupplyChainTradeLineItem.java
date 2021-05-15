@@ -17,6 +17,7 @@ import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
@@ -407,13 +408,13 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount,
-			IAmount priceAmount, String itemName) {
-		return create(this.order, id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
+			IAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		return create(this.order, id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
 	}
 
-	static SupplyChainTradeLineItem create(CoreOrder order, String id, Quantity quantity, Amount lineTotalAmount, 
-			UnitPriceAmount priceAmount, String itemName) {
-		SupplyChainTradeLineItem orderLine =  new SupplyChainTradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName);
+	static SupplyChainTradeLineItem create(CoreOrder order, String id, IQuantity quantity, IAmount lineTotalAmount, 
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		SupplyChainTradeLineItem orderLine =  new SupplyChainTradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent);
 		orderLine.order = order;
 		return orderLine;
 	}
@@ -434,6 +435,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	private static final Logger LOG = Logger.getLogger(SupplyChainTradeLineItem.class.getName());
 	private static final String AssociatedDocumentLineDocument = "associatedDocumentLineDocument";
 	private CoreOrder order; // order this orderLine belongs to
+	private TradeTax tradeTax;
+
 	
 	// copy ctor
 	private SupplyChainTradeLineItem(SupplyChainTradeLineItemType line) {
@@ -443,9 +446,12 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 			LOG.fine("copy ctor:"+this);
 		}
 		this.order = null;
+		tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax()==null ? null 
+				: TradeTax.create(specifiedLineTradeSettlement.getApplicableTradeTax());
 	}
-
-	private SupplyChainTradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName) {
+	
+	private SupplyChainTradeLineItem(String id, IQuantity quantity, IAmount lineTotalAmount, 
+		UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
 		super.setAssociatedDocumentLineDocument(new DocumentLineDocumentType()); // mit id
 		super.setSpecifiedLineTradeAgreement(new LineTradeAgreementType()); // mit setUnitPriceAmount
 		super.setSpecifiedLineTradeDelivery(new LineTradeDeliveryType()); // mit quantity
@@ -456,6 +462,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		setLineTotalAmount(lineTotalAmount);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
+		setTaxCategoryAndRate(taxCat, percent);
 	}
 	
 	public String toString() {
@@ -1167,9 +1174,10 @@ realistisches Beispiel:
 	/* ------------------------------------------------------------------------------
 	 * BG-29 1..1 PRICE DETAILS
 	 * 
-	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
-	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
+	 * BT-146   1..1      Item net price   ==> NetPriceProductTradePrice
+	 * BT-149-0 BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
 	 */
+	private static final String FIELD_netPriceProductTradePrice = "netPriceProductTradePrice";
 	// 179: price after subracting === korrekt
 	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
 	@Override
@@ -1177,24 +1185,16 @@ realistisches Beispiel:
 		TradePriceType tradePrice = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
 		return tradePrice==null ? null : Amount.create(tradePrice.getChargeAmount());
 	}
-
-	// BT-146 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional
-//	@Override
-//	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
-//		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
-//		if(quantity!=null) {
-//			QuantityType qt = new QuantityType();
-//			quantity.copyTo(qt);
-//			tradePrice.setBasisQuantity(qt); 
-//		}
-//		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
-//	}	
+	// tradePrice wird im ctor initialisiert, in CII ist chargeAmount List, in CIO field
 	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
 		LOG.fine("unitPriceAmount:"+unitPriceAmount);
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
+//		Object tradePrice = 
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), FIELD_netPriceProductTradePrice, unitPriceAmount);
 		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
 	}
 
+	// in CII gibt es: setUnitPriceAmountAndQuantity
+	
 	// 180+181: BG-29.BT-150 + BG-29.BT-149 0..1
 	@Override
 	public IQuantity getUnitPriceQuantity() {
@@ -1203,17 +1203,94 @@ realistisches Beispiel:
 	}
 	@Override
 	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", basisQuantity);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), FIELD_netPriceProductTradePrice, basisQuantity);
 		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", basisQuantity);
 	}
 
+	// 182: Minimum Quantity for this Unit Price
+	// 183: UnitCode for  Minimum Quantity
+	// 184: Maximum Quantity for this Unit Price
+	// 185: UnitCode for  Maximum Quantity
+	
+	/* 186: INCLUDED TRADE TAX
+	// TODO INCLUDED TRADE TAX ist nicht BG-30
+// ram:SpecifiedLineTradeAgreement/ram:NetPriceProductTradePrice/ram:IncludedTradeTax
+	 A tax included in this trade price 
+	 (for instance in case of  other Tax, or B2C Order with VAT)
+*/
+	// 187: Included Tade Tax Calculated Amount
+	// 188: Included Tade Tax type code on line level
+	// 189: Included Tade Tax Exemption Reason
+	// 190: Included Tade Tax Type (category) Code
+	// 191: Included Tade Tax Exemption Reason Code
+	// 192: Included Tade Tax Type rate
 
-	// ------------------------------------------
+	// 311: BG-30 LINE VAT INFORMATION
+	// TODO 312: VAT Calculated Amount
+	// TODO 313: VAT type code on line level
+	// TODO 314: VAT Exemption Reason
 
-	// BT-129 ++ 1..1 bestellte Menge
-	// BT-129+BT-130
-	void setQuantity(Quantity quantity) { 
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "requestedQuantity", quantity);
+//	193 SCT_LINE_TA COMFORT	  (CATALOGUE REFERENCED DOC)
+//	194 SCT_LINE_TA COMFORT	  Catalogue Referenced Doc ID
+//	195 SCT_LINE_TA COMFORT	  Catalogue Referenced Doc LineID
+//	196 SCT_LINE_TA EXTENDED  (Catalog Reference Date)
+//	197 SCT_LINE_TA EXTENDED  Catalog Reference Date
+//	198 SCT_LINE_TA EXTENDED  Date format
+
+//	199 SCT_LINE_TA BASIC	  (BLANKET ORDER REFERENCED LINE ID)
+//	200 SCT_LINE_TA BASIC	  Blanket Order Referenced Line ID
+	public void setBlanketOrderReference(String id) {
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "blanketOrderReferencedDocument", id);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getBlanketOrderReferencedDocument(), "lineID", id);
+	}
+	public String getBlanketOrderReference() {
+		ReferencedDocumentType refDoc = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getBlanketOrderReferencedDocument();
+		return refDoc==null ? null : new ID(refDoc.getLineID()).getContent();
+	}
+
+//	201 SCT_LINE_TA EXTENDED  ULTIMATE CUSTOMER ORDER REFERENCED DOCUMENT
+//	202 SCT_LINE_TA EXTENDED  Ultimate Customer Order Referenced Doc ID
+//	203 SCT_LINE_TA EXTENDED  Ultimate Customer Order Referenced Doc LineID
+//	204 SCT_LINE_TA EXTENDED  (Ultimate Customer Order Date)
+//	205 SCT_LINE_TA EXTENDED  Ultimate Customer Order Date
+//	206 SCT_LINE_TA EXTENDED  Date format
+	
+/*	207 SCT_LINE_TD BASIC	  LINE TRADE DELIVERY
+    <ram:SpecifiedLineTradeDelivery>
+         <ram:PartialDeliveryAllowedIndicator>
+              <udt:Indicator>true</udt:Indicator>		<!-- 209: isPartialDeliveryAllowed
+         </ram:PartialDeliveryAllowedIndicator>
+         <ram:RequestedQuantity unitCode="C62">6</ram:RequestedQuantity> <!-- 210+211
+         <ram:PackageQuantity unitCode="C62">3</ram:PackageQuantity>     <!-- 214+215
+         <ram:PerPackageUnitQuantity unitCode="C62">2</ram:PerPackageUnitQuantity> <!-- 216+217
+         <ram:RequestedDeliverySupplyChainEvent>		<!-- 297: BG-26 0..1
+              <ram:OccurrenceSpecifiedPeriod>			<!-- 303:
+                   <ram:StartDateTime>            		<!-- 304: BG-26.BT-134
+                        <udt:DateTimeString format="102">20200415</udt:DateTimeString>
+                   </ram:StartDateTime>
+                   <ram:EndDateTime>              		<!-- 307: BG-26.BT-135
+                        <udt:DateTimeString format="102">20200430</udt:DateTimeString>
+                   </ram:EndDateTime>
+              </ram:OccurrenceSpecifiedPeriod>
+         </ram:RequestedDeliverySupplyChainEvent>
+    </ram:SpecifiedLineTradeDelivery>
+*/
+	// 208: SCT_LINE_TD BASIC	  Partial Delivery Allowed Indicator
+	// 209: SCT_LINE_TD BASIC	  Partial Delivery Allowed Indicator Value
+	@Override
+	public void setPartialDeliveryIndicator(boolean indicator) {
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "partialDeliveryAllowedIndicator", indicator);		
+	}
+	@Override
+	public boolean isPartialDeliveryAllowed() {
+		IndicatorType indicator = super.getSpecifiedLineTradeDelivery().getPartialDeliveryAllowedIndicator();
+		return indicator!=null && indicator.isIndicator().equals(YES);
+	}
+	
+	// 210: BT-129 1..1 bestellte Menge / The quantity, at line level, requested for this trade delivery.
+	// 211: Unit of measure Code for Requested quantity BT-129+BT-130
+	void setQuantity(IQuantity quantity) { 
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "requestedQuantity", (Quantity)quantity);
 	}
 	@Override
 	public IQuantity getQuantity() {
@@ -1221,87 +1298,206 @@ realistisches Beispiel:
 		return ltd.getRequestedQuantity()==null ?  null : Quantity.create(ltd.getRequestedQuantity());
 	}
 
-	// BT-131 ++ 1..1 Nettobetrag der Rechnungsposition
-	void setLineTotalAmount(Amount amount) {
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", amount);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
-	}
-
+	// 212: SCT_LINE_TD BASIC	  Agreed Quantity
+	// 213: SCT_LINE_TD BASIC	  Unit of measure Code for Agreed quantity
 	@Override
-	public IAmount getLineTotalAmount() {
-		TradeSettlementLineMonetarySummationType tsms = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation();
-		return tsms==null ? null : Amount.create(tsms.getLineTotalAmount());
+	public void setAgreedQuantity(IQuantity quantity) { 
+		if(quantity==null) return;
+		if(this.order.getDocumentCode()!=DocumentNameCode.OrderResponse) {
+			LOG.warning(WARN_ORDERLINEID + "ignore Agreed Quantity:'"+quantity+"'.");
+			return;
+		}
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "agreedQuantity", (Quantity)quantity);
+	}
+	@Override
+	public IQuantity getAgreedQuantity() {
+		LineTradeDeliveryType ltd = super.getSpecifiedLineTradeDelivery();
+		return ltd.getAgreedQuantity()==null ?  null : Quantity.create(ltd.getAgreedQuantity());
 	}
 
-	// BT-133 0..1 line Buyer accounting reference : ram:ReceivableSpecifiedTradeAccountingAccount
-	public void setBuyerAccountingReference(String text) {
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "receivableSpecifiedTradeAccountingAccount", text);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), "id", text);
+	// 214: SCT_LINE_TD COMFORT	  Package Quantity
+	// 215: SCT_LINE_TD COMFORT	  Unit of measure Code for Package quantity
+	@Override
+	public void setPackageQuantity(IQuantity quantity) { 
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "packageQuantity", (Quantity)quantity);
 	}
-	public String getBuyerAccountingReference() {
-		TradeAccountingAccountType taa = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount();
-		return taa==null ? null : new ID(taa.getID()).getName();		
+	@Override
+	public IQuantity getPackageQuantity() {
+		LineTradeDeliveryType ltd = super.getSpecifiedLineTradeDelivery();
+		return ltd.getPackageQuantity()==null ?  null : Quantity.create(ltd.getPackageQuantity());
+	}
+	
+	// 216: SCT_LINE_TD COMFORT	  Per Package Quantity
+	// 217: SCT_LINE_TD COMFORT	  Unit of measure Code for Per Package quantity
+	@Override
+	public void setPerPackageQuantity(IQuantity quantity) { 
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "perPackageUnitQuantity", (Quantity)quantity);
+	}
+	@Override
+	public IQuantity getPerPackageQuantity() {
+		LineTradeDeliveryType ltd = super.getSpecifiedLineTradeDelivery();
+		return ltd.getPerPackageUnitQuantity()==null ?  null : Quantity.create(ltd.getPerPackageUnitQuantity());
 	}
 
-/*
-               <ram:SpecifiedLineTradeDelivery>
-                    <ram:PartialDeliveryAllowedIndicator>
-                         <udt:Indicator>true</udt:Indicator>
-                    </ram:PartialDeliveryAllowedIndicator>
-                    <ram:RequestedQuantity unitCode="C62">6</ram:RequestedQuantity>
-                    <ram:PackageQuantity unitCode="C62">3</ram:PackageQuantity>
-                    <ram:PerPackageUnitQuantity unitCode="C62">2</ram:PerPackageUnitQuantity>
-                    <ram:RequestedDeliverySupplyChainEvent>  <!-- BG-26 0..1
-                         <ram:OccurrenceSpecifiedPeriod>
-                              <ram:StartDateTime>            <!-- BG-26.BT-134
-                                   <udt:DateTimeString format="102">20200415</udt:DateTimeString>
-                              </ram:StartDateTime>
-                              <ram:EndDateTime>              <!-- BG-26.BT-135
-                                   <udt:DateTimeString format="102">20200430</udt:DateTimeString>
-                              </ram:EndDateTime>
-                         </ram:OccurrenceSpecifiedPeriod>
-                    </ram:RequestedDeliverySupplyChainEvent>
-               </ram:SpecifiedLineTradeDelivery>
- */
+	/* ram:SpecifiedLineTradeDelivery/ram:ShipToTradeParty : ltd.getShipToTradeParty()
+
+A group of business terms providing information about where and when the goods and services ordered are delivered.
+
+	 */
+//	218 SCT_LINE_TD EXTENDED  SHIP TO PARTY
+//	219 SCT_LINE_TD EXTENDED  Ship To ID
+//	220 SCT_LINE_TD EXTENDED  Ship To Global ID
+//	221 SCT_LINE_TD EXTENDED  SchemeID
+//	222 SCT_LINE_TD EXTENDED  Ship To Name
+//	223 SCT_LINE_TD EXTENDED  (Ship to Legal ID)
+//	224 SCT_LINE_TD EXTENDED  Ship to Legal ID
+//	225 SCT_LINE_TD EXTENDED  Ship to Legal ID scheme ID
+//	226 SCT_LINE_TD EXTENDED  Ship to Trading Name
+//	227 SCT_LINE_TD EXTENDED  SHIP TO CONTACT
+//	228 SCT_LINE_TD EXTENDED  SHIP TO Contact - Person Name
+//	229 SCT_LINE_TD EXTENDED  SHIP TO Contact - Department Name
+//	230 SCT_LINE_TD EXTENDED  SHIP TO Contact - Type
+//	231 SCT_LINE_TD EXTENDED  (SHIP TO Contact - telephone number)
+//	232 SCT_LINE_TD EXTENDED  SHIP TO Contact - telephone number
+//	233 SCT_LINE_TD EXTENDED  (SHIP TO Contact -Fax number)
+//	234 SCT_LINE_TD EXTENDED  SHIP TO Contact -Fax number
+//	235 SCT_LINE_TD EXTENDED  (SHIP TO Contact - email address)
+//	236 SCT_LINE_TD EXTENDED  SHIP TO Contact - email address
+//	237 SCT_LINE_TD EXTENDED  SHIP TO POSTAL ADDRESS
+//	238 SCT_LINE_TD EXTENDED  Ship To Address / Postal Code
+//	239 SCT_LINE_TD EXTENDED  Ship To Address / Line One
+//	240 SCT_LINE_TD EXTENDED  Ship To Address / Line Two
+//	241 SCT_LINE_TD EXTENDED  Ship To Address / Line Three
+//	242 SCT_LINE_TD EXTENDED  Ship To Address / City Name
+//	243 SCT_LINE_TD EXTENDED  Ship To Country Code
+//	244 SCT_LINE_TD EXTENDED  Ship To Country Subdivision
+//	245 SCT_LINE_TD EXTENDED  SHIP TO ELECTRONIC ADDRESS
+//	246 SCT_LINE_TD EXTENDED  SHIP TO Electronic Address ID
+//	247 SCT_LINE_TD EXTENDED  SHIP TO Electronic Address Scheme ID
+//	248 SCT_LINE_TD EXTENDED  SHIP TO TAX REGISTRATION
+//	249 SCT_LINE_TD EXTENDED  SHIP TO VAT Identifier
+//	250 SCT_LINE_TD EXTENDED
+	/*
+A group of business terms providing information about where and when the goods and services ordered are delivered.
+	 */
+//	251 SCT_LINE_TD EXTENDED  ULTIMATE SHIP TO PARTY
+//	252 SCT_LINE_TD EXTENDED  Ultimate Ship To ID
+//	253 SCT_LINE_TD EXTENDED  Ultimate Ship To Global ID
+//	254 SCT_LINE_TD EXTENDED  SchemeID
+//	255 SCT_LINE_TD EXTENDED  Ultimate Ship To Name
+//	256 SCT_LINE_TD EXTENDED  (ULTIMATE SHIP TO LEGAL)
+//	257 SCT_LINE_TD EXTENDED  Ultimate Ship to Legal ID
+//	258 SCT_LINE_TD EXTENDED  Ultimate Ship to Legal ID scheme ID
+//	259 SCT_LINE_TD EXTENDED  Ultimate Ship to Trading Name
+//	260 SCT_LINE_TD EXTENDED  ULTIMATE SHIP TO CONTACT
+//	261 SCT_LINE_TD EXTENDED  Ultimate Ship TO Contact - Person Name
+//	262 SCT_LINE_TD EXTENDED  Ultimate Ship TO Contact - Department Name
+//	263 SCT_LINE_TD EXTENDED  Ultimate Ship TO Contact - Type
+//	264 SCT_LINE_TD EXTENDED  (Ultimate Ship TO Contact - telephone number)
+//	265 SCT_LINE_TD EXTENDED  Ultimate Ship TO Contact - telephone number
+//	266 SCT_LINE_TD EXTENDED  (Ultimate Ship TO Contact -Fax number)
+//	267 SCT_LINE_TD EXTENDED  Ultimate Ship TO Contact -Fax number
+//	268 SCT_LINE_TD EXTENDED  (Ultimate Ship TO Contact - email address)
+//	269 SCT_LINE_TD EXTENDED  Ultimate Ship TO Contact - email address
+//	270 SCT_LINE_TD EXTENDED  ULTIMATE SHIP TO POSTAL ADDRESS
+//	271 SCT_LINE_TD EXTENDED  Ultimate Ship To Address / Postal Code
+//	272 SCT_LINE_TD EXTENDED  Ultimate Ship To Address / Line One
+//	273 SCT_LINE_TD EXTENDED  Ultimate Ship To Address / Line Two
+//	274 SCT_LINE_TD EXTENDED  Ultimate Ship To Address / Line Three
+//	275 SCT_LINE_TD EXTENDED  Ultimate Ship To Address / City Name
+//	276 SCT_LINE_TD EXTENDED  Ultimate Ship To Country Code
+//	277 SCT_LINE_TD EXTENDED  Ultimate Ship To Country Subdivision
+//	278 SCT_LINE_TD EXTENDED  ULTIMATE SHIP TO ELECTRONIC ADDRESS
+//	279 SCT_LINE_TD EXTENDED  Ultimate Ship TO Electronic Address Scheme ID
+//	280 SCT_LINE_TD EXTENDED  Ultimate Ship TO Electronic Address Scheme ID
+//	281 SCT_LINE_TD EXTENDED  ULTIMATE SHIP TO TAX REGISTRATION
+//	282 SCT_LINE_TD EXTENDED  Ultimate Ship TO VAT Identifier
+//	283 SCT_LINE_TD EXTENDED
+	
+	// 284: SCT_LINE_TD COMFORT	  LINE REQUESTED PICK UP DATE - PERIOD
+	//ram:SpecifiedLineTradeDelivery/ram:RequestedDespatchSupplyChainEvent
+	//ram:SpecifiedLineTradeDelivery/ram:RequestedDespatchSupplyChainEvent/ram:OccurrenceDateTime 285
+// TODO ich sehe keinen Unterschiedd zwischen 284ff bzw. 297ff - dem Namen nach ist es 297ff
+	// 297: SCT_LINE_TD COMFORT	  LINE REQUESTED DELIVERY DATE - PERIOD
+	//ram:SpecifiedLineTradeDelivery/ram:RequestedDeliverySupplyChainEvent
+	//ram:SpecifiedLineTradeDelivery/ram:RequestedDeliverySupplyChainEvent/ram:OccurrenceDateTime 298
+	// --------------------------
+	// 298: BG-26 0..1 Date on which Delivery is requested
 	public void setLineDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", ts);
-		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
+		if (getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
+
 	public Timestamp getLineDeliveryDateAsTimestamp() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
-		if(list.isEmpty()) return null;
-		DateTimeType dateTime = list.get(0).getOccurrenceDateTime(); 
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+		if (list.isEmpty()) return null;
+		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
+		return dateTime == null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 
-	// BG-26 0..1 Period on which Delivery is requested
+	// 304..306 + 305..307
+	@Override
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return Period.create(start, end);
+	}
+
+	// 303: BG-26 0..1 Period on which Delivery is requested
 	public void setLineDeliveryPeriod(IPeriod period) {
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", period);
 		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
-//		Mapper.set(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent(), "occurrenceSpecifiedPeriod", period);
-//		// TODO 
-//		List<SupplyChainEventType> list =
-//			super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
-//		list.get(0).setOccurrenceSpecifiedPeriod((Period)period);
 	}
+
 	@Override
 	public IPeriod getLineDeliveryPeriod() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
-		if(list.isEmpty()) return null;
+		if (list.isEmpty()) return null;
 		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();
-		return period==null ? null : Period.create(period); 
+		return period == null ? null : Period.create(period);
 	}
 	
+//	310 SCT_LINE_TS BASIC	  LINE TRADE SETTLEMENT
+//	311 SCT_LINE_TS COMFORT	  LINE VAT
+//	312 SCT_LINE_TS EXTENDED  VAT Calculated Amount
+//	313 SCT_LINE_TS COMFORT	  VAT type code on line level
+//	314 SCT_LINE_TS EXTENDED  VAT Exemption Reason
+//	315 SCT_LINE_TS COMFORT	  Tax Type (category) Code
+//	316 SCT_LINE_TS EXTENDED  VAT Exemption Reason Code
+//	317 SCT_LINE_TS COMFORT	  Tax Type (category) rate
+
+	// 315: BG-30.BT-151 1..1 item VAT category code
 	@Override
-	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-		return Period.create(start, end);
+	public void setTaxCategory(TaxCategoryCode code) {
+		if(tradeTax==null) {
+			tradeTax = TradeTax.create(TaxTypeCode.ValueAddedTax, code, null);
+			specifiedLineTradeSettlement.setApplicableTradeTax(tradeTax);
+		} else {
+			tradeTax.setTaxCategoryCode(code.getValue());
+			specifiedLineTradeSettlement.setApplicableTradeTax(tradeTax);
+		}
+	}
+	@Override
+	public TaxCategoryCode getTaxCategory() {
+		return tradeTax.getTaxCategoryCode();
+	}
+
+	// TODO 316: VAT Exemption Reason Code
+
+	// 317: BG-30.BT-152 0..1 item VAT rate
+	@Override
+	public void setTaxRate(BigDecimal percent) {
+		tradeTax.setTaxPercentage(percent);
+		specifiedLineTradeSettlement.setApplicableTradeTax(tradeTax);
+	}
+	@Override
+	public BigDecimal getTaxRate() {
+		return tradeTax.getTaxPercentage();
 	}
 
 	/*
@@ -1372,39 +1568,35 @@ realistisches Beispiel:
 		return res;
 	}
 
-	// BG-30 LINE VAT INFORMATION -------------------------------------------------------
-	// BG-30.BT-151 1..1 item VAT category code
-	@Override
-	public void setTaxCategory(TaxCategoryCode codeEnum) {
-		// TODO Auto-generated method stub		
+//	334 SCT_LINE_TS BASIC	  LINE TOTAL AMOUNTS
+//	335 SCT_LINE_TS BASIC	  Line Total Amount (without VAT)
+//	336 SCT_LINE_TS EXTENDED  Line Total Charges (without VAT)
+//	337 SCT_LINE_TS EXTENDED  Line Total Allowance Amount (without VAT)
+//	338 SCT_LINE_TS EXTENDED  Line Total Tax amount
+//	339 SCT_LINE_TS EXTENDED  Line Total Charges and Allowances Amount (without VAT)
+//	340 SCT_LINE_TS COMFORT	  (IORDER LINE BUYER ACCOUNTING REFERENCE)
+//	341 SCT_LINE_TS COMFORT	  Order line Buyer accounting reference
+//	342 SCT_LINE_TS EXTENDED  TypeCode
+
+	// 335: BT-131 1..1 Nettobetrag der Rechnungsposition
+	void setLineTotalAmount(IAmount amount) {
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", amount);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", (Amount)amount);
 	}
 	@Override
-	public TaxCategoryCode getTaxCategory() {
-		// TODO Auto-generated method stub
-		return null;
+	public IAmount getLineTotalAmount() {
+		TradeSettlementLineMonetarySummationType tsms = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation();
+		return tsms==null ? null : Amount.create(tsms.getLineTotalAmount());
 	}
 
-	// BG-30.BT-152 0..1 item VAT rate
-	@Override
-	public void setTaxRate(BigDecimal taxRate) {
-		// TODO Auto-generated method stub		
+	// 340: BT-133 0..1 line Buyer accounting reference : ram:ReceivableSpecifiedTradeAccountingAccount
+	public void setBuyerAccountingReference(String text) {
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "receivableSpecifiedTradeAccountingAccount", text);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), "id", text);
 	}
-	@Override
-	public BigDecimal getTaxRate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	// --------------------------- CIO only:
-	@Override
-	public void setPartialDeliveryIndicator(boolean indicator) {
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "partialDeliveryAllowedIndicator", indicator);		
-	}
-	@Override
-	public boolean isPartialDeliveryAllowed() {
-		IndicatorType indicator = super.getSpecifiedLineTradeDelivery().getPartialDeliveryAllowedIndicator();
-		return indicator!=null && indicator.isIndicator().equals(YES);
+	public String getBuyerAccountingReference() {
+		TradeAccountingAccountType taa = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount();
+		return taa==null ? null : new ID(taa.getID()).getName();		
 	}
 
 }

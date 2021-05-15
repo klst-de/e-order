@@ -16,6 +16,7 @@ import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG22_DocumentTotals;
 import com.klst.eorder.api.BG2_ProcessControl;
@@ -608,9 +609,9 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 	// BG-25 1..n ORDER LINE
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
-			IAmount priceAmount, String itemName) {
+			IAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
 		// delegieren:
-		return SupplyChainTradeLineItem.create(this, id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
+		return SupplyChainTradeLineItem.create(this, id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
 	}
 
 	@Override

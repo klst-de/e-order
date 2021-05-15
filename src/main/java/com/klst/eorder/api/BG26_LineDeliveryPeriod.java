@@ -9,12 +9,13 @@ import com.klst.edoc.untdid.DateTimeFormats;
 /**
  * BG-26 DELIVERY PERIOD with BT-134 line period start date and BT-135 line period end date
  * <p>
- * A group of business terms providing information about the delivery period relevant for the Order line.
+ * The Requested Date or Period on which Pick up is requested
+ * A group of business terms providing information about the delivery date or period relevant for the Order line.
  * <p>
  * Cardinality: 	0..1
  * <br>EN16931-ID: 	BG-26
  * <br>Rule ID: 	
- * <br>Request ID: 	R30
+ * <br>Order-X-No: 	284ff (Pick up) , 297ff (Delivery)
  * <p>
  * BT-134 and BT-135
  * Cardinality: 	0..1
