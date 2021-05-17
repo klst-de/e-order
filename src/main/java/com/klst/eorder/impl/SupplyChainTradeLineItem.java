@@ -1423,9 +1423,11 @@ A group of business terms providing information about where and when the goods a
 	//ram:SpecifiedLineTradeDelivery/ram:RequestedDeliverySupplyChainEvent/ram:OccurrenceDateTime 298
 	// --------------------------
 	// 298: BG-26 0..1 Date on which Delivery is requested
+	// wie HeaderTradeDelivery#setLineDeliveryDate
 	public void setLineDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", ts);
+		//SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", ts);
+		// newFieldInstance nicht notwendig, da .getRequestedDeliverySupplyChainEvent() dasselbe bewirkt:
 		if (getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
