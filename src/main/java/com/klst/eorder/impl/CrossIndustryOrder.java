@@ -16,6 +16,7 @@ import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG22_DocumentTotals;
@@ -139,7 +140,6 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return documentContextParameterType==null ? null : new ID(documentContextParameterType.getID()).getContent();
 	}
 
-//	----------------------------------
 /*
 	<rsm:ExchangedDocument>
 		<ram:ID>PO123456789</ram:ID>
@@ -159,18 +159,17 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		</ram:IncludedNote>
 	</rsm:ExchangedDocument>
  */
-	// Invoice number BT-1 Identifier (mandatory) - A unique identification of the Invoice.
+	// 9: Invoice number BT-1 Identifier (mandatory) - A unique identification of the Invoice.
 	@Override
 	public void setId(String id) {
 		super.getExchangedDocument().setID(new ID(id)); // No identification scheme is to be used.
 	}
-	
 	@Override
 	public String getId() {
 		return super.getExchangedDocument().getID().getValue();
 	}
 
-	/* Document issue date, BT-2  Date (mandatory) 
+	/* 14: Document issue date, BT-2  Date (mandatory) 
 	 * Das Datum, an dem der Beleg ausgestellt wurde.
 	 */
 	@Override
@@ -178,12 +177,91 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		super.getExchangedDocument().setIssueDateTime(dateTime);
 	}
-
 	@Override
 	public Timestamp getIssueDateAsTimestamp() {
 		return DateTimeFormatStrings.getDateAsTimestamp(super.getExchangedDocument().getIssueDateTime());
 	}
+	
+	// 789: BT-6 0..1 REQUESTED TAX CURRENCY IN INVOICE
+	@Override
+	public void setTaxCurrency(String isoCurrencyCode) {
+		applicableHeaderTradeSettlement.setTaxCurrency(isoCurrencyCode);
+	}
+	@Override
+	public String getTaxCurrency() {
+		return applicableHeaderTradeSettlement.getTaxCurrency();
+	}
 
+	// 790: BT-5 1..1 Invoice currency code
+	@Override
+	public void setDocumentCurrency(String isoCurrencyCode) {
+		applicableHeaderTradeSettlement.setDocumentCurrency(isoCurrencyCode);
+	}
+	@Override
+	public String getDocumentCurrency() {
+		return applicableHeaderTradeSettlement.getDocumentCurrency();
+	}
+
+	// 875:	BG-16.BT-81 0..1 Payment Means Code
+	public void setPaymentMeansEnum(PaymentMeansEnum code) {
+		applicableHeaderTradeSettlement.setPaymentMeansEnum(code);
+	}
+	public PaymentMeansEnum getPaymentMeansEnum() {
+		try {
+			return applicableHeaderTradeSettlement.getPaymentMeansEnum();
+		} catch (RuntimeException e) {
+			LOG.warning(e.getMessage());
+			return null;
+		}
+	}
+	
+	// 876:	BG-16.BT-82 0..1 Payment Means
+	public void setPaymentMeansText(String text) {
+		applicableHeaderTradeSettlement.setPaymentMeansText(text);
+	}
+	public String getPaymentMeansText() {
+		return applicableHeaderTradeSettlement.getPaymentMeansText();
+	}
+
+	// 886: BT-8 0..1 Value added tax point date code
+	@Override
+	public void setTaxPointDateCode(String code) {
+		applicableHeaderTradeSettlement.setTaxPointDateCode(code);
+	}
+	@Override
+	public String getTaxPointDateCode() {
+		return applicableHeaderTradeSettlement.getTaxPointDateCode();
+	}
+	
+	// 942: BT-19 0..1 Buyer accounting reference
+	@Override
+	public void setBuyerAccountingReference(Reference textReference) {
+		applicableHeaderTradeSettlement.setBuyerAccountingReference(textReference);
+	}
+	@Override
+	public Reference getBuyerAccountingReference() {
+		return applicableHeaderTradeSettlement.getBuyerAccountingReference();
+	}
+
+	// 925: BT-20 0..1 PAYMENT TERMS
+	//rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeSettlement/ram: SpecifiedTradePaymentTerms/ram:Description
+	@Override
+	public void addPaymentTerm(String description) {
+		applicableHeaderTradeSettlement.addPaymentTerm(description);
+	}
+	@Override
+	public void setPaymentTerms(List<String> paymentTerms) {
+		applicableHeaderTradeSettlement.setPaymentTerms(paymentTerms);
+	}
+	@Override
+	public List<String> getPaymentTerms() {
+		return applicableHeaderTradeSettlement.getPaymentTerms();
+	}
+
+	//------------------------------------
+
+
+	// 767: Requested Delivery Date
 	@Override
 	public void setDeliveryDate(Timestamp ts) {
 		applicableHeaderTradeDelivery.setDeliveryDate(ts);
@@ -193,6 +271,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeDelivery.getDeliveryDateAsTimestamp();
 	}
 
+	// 770: Requested Delivery Period
 	@Override
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
 		return Period.create(start, end);
@@ -242,19 +321,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return Note.getNotes(super.getExchangedDocument().getIncludedNote());
 	}	
 
-	// BT-5 + 1..1 Invoice currency code
-	@Override
-	public void setDocumentCurrency(String isoCurrencyCode) {
-		// delegieren:
-		applicableHeaderTradeSettlement.setDocumentCurrency(isoCurrencyCode);
-	}
-
-	@Override
-	public String getDocumentCurrency() {
-		return applicableHeaderTradeSettlement.getDocumentCurrency();
-	}
-
-	// BT-10
+	// 344: BT-10 0..1 Buyer reference
 	@Override
 	public void setBuyerReference(String reference) {
 		applicableHeaderTradeAgreement.setBT10_BuyerReference(reference);
@@ -264,7 +331,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getBuyerReferenceValue();
 	}
 	
-	// BT-11 0..1 procuring project
+	// 634: BT-11 0..1 procuring project
 	@Override
 	public void setProjectReference(String id, String name) {
 		applicableHeaderTradeAgreement.setProjectReference(id, name);
@@ -274,7 +341,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getProjectReference();
 	}
 	
-	// BT-12 0..1 Contract reference
+	// 539: BT-12 0..1 Contract reference
 	@Override
 	public void setContractReference(String id) {
 		applicableHeaderTradeAgreement.setContractReference(id);	
@@ -284,7 +351,19 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getContractReference();	
 	}
 
-	// BT-13 0..1 Purchase order reference
+	// TODO 524: BT-14 SALES ORDER REFERENCED DOCUMENT
+	//rsm:SupplyChainTradeTransaction/ram:ApplicableHeaderTradeAgreement/ram:SellerOrderReferencedDocument/ram:IssuerAssignedID
+	// 524: BT-14 0..1 SALES ORDER REFERENCED DOCUMENT
+	@Override
+	public void setOrderReference(String docRefId) {
+		applicableHeaderTradeAgreement.setOrderReference(docRefId);	
+	}
+	@Override
+	public String getOrderReference() {
+		return applicableHeaderTradeAgreement.getOrderReference();	
+	}
+	
+	// 529: BT-13 0..1 Purchase order reference
 	@Override
 	public void setPurchaseOrderReference(String id) {
 		applicableHeaderTradeAgreement.setPurchaseOrderReference(id);	
@@ -318,17 +397,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getInvoicedObjectIdentifier();	
 	}
 	
-	// BT-19 + 0..1 Buyer accounting reference
-	@Override
-	public void setBuyerAccountingReference(Reference textReference) {
-		applicableHeaderTradeSettlement.setBuyerAccountingReference(textReference);
-	}
-	@Override
-	public Reference getBuyerAccountingReference() {
-		return applicableHeaderTradeSettlement.getBuyerAccountingReference();
-	}
-
-	// BG-4 + 1..1 SELLER @see BG4_Seller
+	// 345: BG-4 1..1 SELLER @see BG4_Seller
 	@Override
 	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
 		BusinessParty party = createParty(name, address, contact);
@@ -345,7 +414,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getSeller();
 	}
 
-	// BG-7 + 1..1 BUYER @see BG7_Buyer
+	// 390: BG-7 1..1 BUYER @see BG7_Buyer
 	@Override
 	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
@@ -360,6 +429,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getBuyer();
 	}
 
+	// 643: ShipToParty @see ShipTo
 	@Override
 	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact);
@@ -374,6 +444,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeDelivery.getShipToParty();
 	}
 
+	// 725: ShipFromParty @see ShipFrom
 	@Override
 	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact);
@@ -402,6 +473,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getDeliveryFunctionCode();
 	}
 
+	// 534: 0..1 QUOTATION REFERENCE, not in CII
 	@Override
 	public void setQuotationReference(String id) {
 		applicableHeaderTradeAgreement.setQuotationReference(id);
@@ -411,6 +483,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getQuotationReference();
 	}
 
+	// 614: 0..1 BLANKET ORDER REFERENCE, not in CII
 	@Override
 	public void setBlanketOrderReference(String id) {
 		applicableHeaderTradeAgreement.setBlanketOrderReference(id);
@@ -420,6 +493,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getBlanketOrderReference();
 	}
 
+	// 619: 0..1 PREVIOUS ORDER REFERENCE, not in CII
 	@Override
 	public void setPreviousOrderReference(String id) {
 		applicableHeaderTradeAgreement.setPreviousOrderReference(id);
@@ -430,6 +504,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getPreviousOrderReference();
 	}
 
+	// 624: 0..1 PREVIOUS ORDER CHANGE REFERENCED DOCUMENT, not in CII
 	@Override
 	public void setPreviousOrderChangeReference(String id) {
 		if(getDocumentCode()==DocumentNameCode.Order) {
@@ -438,12 +513,12 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 			applicableHeaderTradeAgreement.setPreviousOrderChangeReference(id);
 		}
 	}
-
 	@Override
 	public String getPreviousOrderChangeReference() {
 		return applicableHeaderTradeAgreement.getPreviousOrderChangeReference();
 	}
 
+	// 629: 0..1 PREVIOUS ORDER RESPONSE REFERENCED DOCUMENT, not in CII
 	@Override
 	public void setPreviousOrderResponseReference(String id) {
 		if(getDocumentCode()==DocumentNameCode.Order) {
@@ -452,7 +527,6 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 			applicableHeaderTradeAgreement.setPreviousOrderResponseReference(id);
 		}
 	}
-
 	@Override
 	public String getPreviousOrderResponseReference() {
 		return applicableHeaderTradeAgreement.getPreviousOrderResponseReference();

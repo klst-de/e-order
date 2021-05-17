@@ -1,6 +1,7 @@
 package com.klst.eorder.api;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.ContactInfoFactory;
@@ -10,6 +11,7 @@ import com.klst.edoc.api.PostalAddressFactory;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
 	BG14_DeliveryPeriod, BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
@@ -29,7 +31,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * Cardinality: 1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-1
 	 * <br>Rule ID: 	BR-2
-	 * <br>Request ID: 	R56
+	 * <br>Order-X-No: 	9
 	 * 
 	 * @param id Identifier
 	 */
@@ -44,7 +46,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * Cardinality: 1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-2
 	 * <br>Rule ID: 	BR-3
-	 * <br>Request ID: 	R56
+	 * <br>Order-X-No: 	14
 	 * 
 	 * @param timestamp
 	 */
@@ -96,7 +98,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 *     875 (Partial construction invoice), 
 	 *     876 (Partial final construction invoice), 
 	 *     877 (Final construction invoice)
-	 * <br>Request ID: 	R44
+	 * <br>Order-X-No: 	11
 	 * 
 	 * @param code
 	 */
@@ -104,18 +106,15 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public DocumentNameCode getDocumentCode();
 
 	/**
-	 * Invoice currency code
+	 * ORDER CURRENCY
 	 * <p>
-	 * The currency in which all Invoice amounts are given, 
-	 * except for the Total VAT amount in accounting currency.
-	 * Only one currency shall be used in the Invoice, 
-	 * except for the Invoice total VAT amount in accounting currency (BT-111) 
-	 * in accordance with article 230 of Directive 2006/112/EC on VAT.
+	 * The currency in which all order amounts are given.
+	 * Only one currency shall be used in the order.
 	 * <p>
 	 * Cardinality: 1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-5
 	 * <br>Rule ID: 	BR-5
-	 * <br>Request ID: 	R54, R47
+	 * <br>Order-X-No: 	790
 	 * 
 	 * @param isoCode
 	 * <p>
@@ -124,25 +123,78 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public void setDocumentCurrency(String isoCurrencyCode);
 	public String getDocumentCurrency();
 	
-	// TODO BT-6 VAT accounting currency code
-	//      BT-7 BT-7-0
-	//      BT-8
-	//      BT-9
-	// BT-9 (Payment due date) & BT-20
+	/**
+	 * REQUESTED TAX CURRENCY IN INVOICE
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-6
+	 * <br>Rule ID:
+	 * <br>Order-X-No: 	789
+	 * 
+	 * @param isoCode
+	 * <p>
+	 * The lists of valid currencies are registered with the ISO 4217 Maintenance Agency “Codes for the representation of currencies and funds”.
+	 */
+	public void setTaxCurrency(String isoCurrencyCode);
+	public String getTaxCurrency();
+	
+	// BT-7 BT-7-0 : nicht in CIO
+
+	/**
+	 * Value added tax point date code
+	 * <p>
+	 * The code of the date when the VAT becomes accountable for the Seller and for the Buyer.
+	 * The code shall distinguish between the following entries of UNTDID 2005:
+	 * <br> - Invoice document issue date
+	 * <br> - Delivery date, actual
+	 * <br> - Paid to date
+	 * <p>
+	 * The Value added tax point date code is used if the Value added tax point date is not known when the invoice is issued. 
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-8
+	 * <br>Rule ID: 	BR-CO-3
+	 * <br>Order-X-No: 	886
+	 * 
+	 * @param code
+	 */
+	/* Folgende Codes aus der Codeliste UNTDID 2005 werden verwendet:
+	 *   3 (Invoice document issue date time)
+	 *  35 (Delivery date/time, actual)
+	 * 432 (Paid to date)
+	 * 
+	 * In Deutschland ist das Liefer- und Leistungsdatum maßgebend (BT-72)
+	 */
+	public void setTaxPointDateCode(String code);
+	public String getTaxPointDateCode();
+
+	// BT-9 (Payment due date) : nicht in CIO
 	
 	/**
+	 * Buyer reference - An identifier assigned by the Buyer used for internal routing purposes.
+	 * <p>
 	 * The identifier is defined by the Buyer (e.g. contact ID, department, office id, project code), 
 	 * but provided by the Seller in the order.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-10
+	 * <br>Rule ID: 	BR-DE-15
+	 * <br>Order-X-No: 	344
 	 * 
 	 * @param reference
 	 */
-	// BT-10
 	public void setBuyerReference(String reference);
 	public String getBuyerReferenceValue();
-	
-	// BT-11, (Projektname BT-11-0)
+
 	/**
 	 * The procuring project specified for this header trade agreement.
+	 * <p>
+	 * The identification of the project the order refers to
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-11, (Projektname BT-11-0)
+	 * <br>Rule ID: 	
+	 * <br>Order-X-No: 	634
 	 * 
 	 * @param id - Project reference
 	 * @param name - Project name
@@ -150,7 +202,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public void setProjectReference(String id, String name);
 //	public void setProjectReference(String id);
 	default void setProjectReference(Reference ref) {
-		setProjectReference(ref.getName(), ref.getID()); // TODO symetrisch zu e-invoice falschrum?
+		setProjectReference(ref.getName(), ref.getID()); // TODO in e-invoice andersrum?
 	}	
 	public Reference getProjectReference();
 
@@ -163,7 +215,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * Cardinality: 0..1 (optional)
 	 * <br>EN16931-ID: 	BT-12
 	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R7
+	 * <br>Order-X-No: 	539
 	 * 
 	 * @param Document reference
 	 */
@@ -179,7 +231,7 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * Cardinality: 0..1 (optional)
 	 * <br>EN16931-ID: 	BT-13
 	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R5, R56
+	 * <br>Order-X-No: 	529
 	 * 
 	 * @param Document reference
 	 */
@@ -187,6 +239,24 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public void setPurchaseOrderReference(String id);
 	public String getPurchaseOrderReference();
 
+	/**
+	 * Sales order reference
+	 * <p>
+	 * An identifier of a referenced sales order, issued by the Seller.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-14
+	 * <br>Rule ID: 	 
+	 * <br>Order-X-No: 	524
+	 * 
+	 * @param Document reference
+	 */
+	public void setOrderReference(String docRefId);
+	public String getOrderReference();
+
+	// BT-15 (Receiving advice / Receipt document reference) : nicht in CIO
+	// BT-16 (Despatch advice reference) : nicht in CIO
+	
 	/**
 	 * Tender or lot reference
 	 * <p>
@@ -248,20 +318,86 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * Cardinality: 0..1 (optional)
 	 * <br>EN16931-ID: 	BT-19
 	 * <br>Rule ID: 	 
-	 * <br>Request ID: 	R2, R4
+	 * <br>Order-X-No: 	942
 	 * 
 	 * @param textReference
 	 */
-	// BT-19 + 0..1 Buyer accounting reference
 	public void setBuyerAccountingReference(Reference textReference);
 	public Reference getBuyerAccountingReference();
 
-	// BG-4 + 1..1 SELLER @see BG4_Seller
-	// BG-7 + 1..1 BUYER @see BG7_Buyer
-	// ShipToParty @see ShipTo
-	// ShipFromParty @see ShipFrom
+	/**
+	 * PAYMENT TERMS
+	 * <p>
+	 * A textual description of the payment terms that apply to the amount due for payment 
+	 * (Including description of possible penalties).
+	 * This element may contain multiple lines and multiple terms.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-20
+	 * <br>Rule ID: 	 
+	 * <br>Order-X-No: 	925
+	 * 
+	 * @param description
+	 */
+	public void addPaymentTerm(String description);
+	public void setPaymentTerms(List<String> paymentTerms);
+	public List<String> getPaymentTerms();
 
-	// nicht in CII: 0..1 DELIVERY TERMS, Doku Zeile 505 : ram:ApplicableTradeDeliveryTerms
+	
+	// 345: BG-4 1..1 SELLER @see BG4_Seller
+	// 390: BG-7 1..1 BUYER @see BG7_Buyer
+	
+	// 435: HEADER BUYER REQUISITIONER (ORIGINATOR) TODO
+	// 476: PRODUCT END USER TODO
+	// 568: BUYER AGENT TODO
+
+	// 643: BG-13 0..1 ShipToParty @see ShipTo
+	// 684: ULTIMATE SHIP TO PARTY TODO
+	// 725: ShipFromParty @see ShipFrom
+	
+	/* 874: BG-16 PAYMENT MEANS - A group of business terms providing information about the payment.
+example:
+               <ram:SpecifiedTradeSettlementPaymentMeans>
+                    <ram:TypeCode>30</ram:TypeCode>
+                    <ram:Information>Credit Transfer</ram:Information>
+               </ram:SpecifiedTradeSettlementPaymentMeans>
+
+	 */
+	/**
+	 * Payment means type code
+	 * <p>
+	 * The means, expressed as code, for how a payment is expected to be or has been settled.
+	 * <p>
+	 * Entries from the UNTDID 4461 code list shall be used. Distinction should be made between SEPA and non-SEPA payments, 
+	 * and between credit payments, direct debits, card payments and other instruments.
+	 * <p>
+	 * Cardinality: 	1..1
+	 * <br>EN16931-ID: 	BT-81
+	 * <br>Rule ID: 	BR-49
+	 * <br>Order-X-No: 	875
+	 * 
+	 * @return Code
+	 */
+	public PaymentMeansEnum getPaymentMeansEnum();
+	public void setPaymentMeansEnum(PaymentMeansEnum code);
+	
+	/**
+	 * Payment means text
+	 * <p>
+	 * The means, expressed as text, for how a payment is expected to be or has been settled.
+	 * Such as cash, credit transfer, direct debit, credit card, etc.
+	 * <p>
+	 * Cardinality: 	0..1
+	 * <br>EN16931-ID: 	BT-82
+	 * <br>Rule ID: 	 
+	 * <br>Order-X-No: 	876
+	 * 
+	 * @return Text
+ 	 */
+	public String getPaymentMeansText();
+	public void setPaymentMeansText(String text);
+
+	// 517: 0..1 DELIVERY TERMS, nicht in CII : ram:ApplicableTradeDeliveryTerms
 	// Added in CIO
 /*
 Added in CIO
@@ -301,7 +437,7 @@ example:
 	public String getDeliveryType();
 	public String getDeliveryFunctionCode();
 
-	// nicht in CII: 0..1 QUOTATION REFERENCE, Doku Zeile 522 Angebot ref: ram:QuotationReferencedDocument
+	// 534: 0..1 QUOTATION REFERENCE, nicht in CII: Angebot ref: ram:QuotationReferencedDocument
 /*
 Quotation Reference ID
 An Identifier of a Quotation, issued by the Seller.
@@ -309,7 +445,7 @@ An Identifier of a Quotation, issued by the Seller.
 	public void setQuotationReference(String id);
 	public String getQuotationReference();
 
-	// nicht in CII: 0..1 BLANKET ORDER REFERENCE, Doku Zeile 561 Rahmenauftrag ref: ram:BlanketOrderReferencedDocument
+	// 614: 0..1 BLANKET ORDER REFERENCE, nicht in CII: Rahmenauftrag ref: ram:BlanketOrderReferencedDocument
 /*
 Blanket Order number ID
 The identification of a Blanket Order, issued by the Buyer or the Buyer Requisitioner.
@@ -317,7 +453,7 @@ The identification of a Blanket Order, issued by the Buyer or the Buyer Requisit
 	public void setBlanketOrderReference(String id);
 	public String getBlanketOrderReference();
 
-	// nicht in CII: 0..1 PREVIOUS ORDER REFERENCE, Doku Zeile 566 : ram:PreviousOrderReferencedDocument (ohne Beispiel)
+	// 619: 0..1 PREVIOUS ORDER REFERENCE, nicht in CII: ram:PreviousOrderReferencedDocument (ohne Beispiel)
 /*
 Previous Order Reference in case the Buyer decides to raise a new ORDER to replace a prvious one
 
@@ -329,7 +465,7 @@ it can refer to the previous one with this ID
 	public void setPreviousOrderReference(String id);
 	public String getPreviousOrderReference();
 
-	// nicht in CII: 0..1 PREVIOUS ORDER CHANGE REFERENCED DOCUMENT, Doku Zeile 571
+	// 624: 0..1 PREVIOUS ORDER CHANGE REFERENCED DOCUMENT, not in CII
 /*
 An Order (Document Type Code BT-3 = 220) MUST NOT contain a Previous Order Change Referenced Document
 
@@ -339,7 +475,7 @@ The identification of a the Previous Order Change Document, issued by the Buyer 
 	public void setPreviousOrderChangeReference(String id);
 	public String getPreviousOrderChangeReference();
 
-	// nicht in CII: 0..1 PREVIOUS ORDER RESPONSE REFERENCED DOCUMENT, Doku Zeile 576
+	// 629: 0..1 PREVIOUS ORDER RESPONSE REFERENCED DOCUMENT, not in CII
 /*
 An Order (Document Type Code BT-3 = 220) MUST NOT contain a Previous Order Response Referenced Document
 

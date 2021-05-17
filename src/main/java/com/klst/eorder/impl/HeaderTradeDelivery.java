@@ -38,6 +38,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		}
 	}
 
+	// 643: ShipToParty @see ShipTo
 	@Override
 	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);
@@ -53,6 +54,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		return super.getShipToTradeParty()==null ? null : TradeParty.create(super.getShipToTradeParty());
 	}
 
+	// 725: ShipFromParty @see ShipFrom
 	@Override
 	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);
@@ -69,9 +71,10 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 	}
 
 	// die nachfolgenden nicht public, methoden werden hierhin delegiert
+	// 767: Requested Delivery Date
+	// wie SupplyChainTradeLineItem#setLineDeliveryDate
 	void setDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		// nur ein (?) element:
 		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
@@ -83,6 +86,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 	
+	// 770: Requested Delivery Period
 	void setDeliveryPeriod(IPeriod period) {
 		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
