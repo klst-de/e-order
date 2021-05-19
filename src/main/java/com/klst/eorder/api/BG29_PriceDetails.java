@@ -44,6 +44,19 @@ public interface BG29_PriceDetails {
 	public void setPriceDiscount(AllowancesAndCharges allowance);
 
 	/**
+	 * Item price charge
+	 * <p>
+	 * Only applies if the charge is provided per unit and if it is not included in the Item gross price, for instance for WEEE tax.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	170
+	 * 
+	 * @return {@link AllowancesAndCharges}
+	 */
+	public AllowancesAndCharges getPriceCharge();
+	public void setPriceCharge(AllowancesAndCharges charge);
+	
+	/**
 	 * Item gross price
 	 * <p>
 	 * The unit price, exclusive of VAT, before subtracting Item price discount.

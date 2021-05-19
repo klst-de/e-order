@@ -433,7 +433,18 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	}
 
 	private static final Logger LOG = Logger.getLogger(SupplyChainTradeLineItem.class.getName());
-	private static final String AssociatedDocumentLineDocument = "associatedDocumentLineDocument";
+	private static final String FIELD_associatedDocumentLineDocument = "associatedDocumentLineDocument";
+	private static final String FIELD_specifiedTradeProduct = "specifiedTradeProduct";
+	private static final String FIELD_lineID = "lineID";
+	private static final String FIELD_id = "id";
+	private static final String FIELD_name = "name";
+	private static final String FIELD_description = "description";
+	private static final String FIELD_sellerAssignedID = "sellerAssignedID";
+	private static final String FIELD_buyerAssignedID = "buyerAssignedID";
+	private static final String FIELD_substitutedReferencedProduct = "substitutedReferencedProduct";
+	private static final String FIELD_grossPriceProductTradePrice = "grossPriceProductTradePrice";
+	private static final String FIELD_netPriceProductTradePrice = "netPriceProductTradePrice";
+	
 	private CoreOrder order; // order this orderLine belongs to
 	private TradeTax tradeTax;
 
@@ -525,8 +536,8 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		return super.getAssociatedDocumentLineDocument().getLineID().getValue();
 	}
 	void setId(String id) {
-		SCopyCtor.getInstance().newFieldInstance(this, AssociatedDocumentLineDocument, id);
-		SCopyCtor.getInstance().set(getAssociatedDocumentLineDocument(), "lineID", id);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_associatedDocumentLineDocument, id);
+		SCopyCtor.getInstance().set(getAssociatedDocumentLineDocument(), FIELD_lineID, id);
 	}
 
 	// 36: 0..1
@@ -543,7 +554,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 			LOG.warning(WARN_ORDERLINEID + "ignore status:'"+status+"'.");
 			return;
 		}
-		SCopyCtor.getInstance().newFieldInstance(this, AssociatedDocumentLineDocument, status);
+		SCopyCtor.getInstance().newFieldInstance(this, FIELD_associatedDocumentLineDocument, status);
 		SCopyCtor.getInstance().set(getAssociatedDocumentLineDocument(), "lineStatusCode", status);
 	}
 
@@ -569,13 +580,12 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	}
 	
 	// 41: BG-31 SpecifiedTradeProduct ----------------------------------------------
-	private static final String FIELD_specifiedTradeProduct = "specifiedTradeProduct";
 	
 	// 42: 0..1 SpecifiedTradeProduct.ID
 	@Override
 	public void setProductID(String id) {
 		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "id", id);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), FIELD_id, id);
 	}
 	@Override
 	public String getProductID() {
@@ -609,7 +619,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	@Override
 	public void setSellerAssignedID(String id) {
 		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "sellerAssignedID", id);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), FIELD_sellerAssignedID, id);
 	}
 	@Override
 	public String getSellerAssignedID() {
@@ -621,7 +631,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	@Override
 	public void setBuyerAssignedID(String id) {
 		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "buyerAssignedID", id);		
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), FIELD_buyerAssignedID, id);		
 	}
 	@Override
 	public String getBuyerAssignedID() {
@@ -656,7 +666,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	// 49: BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) { // not public, user factory
 		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, text);
-		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "name", text);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), FIELD_name, text);
 	}
 	@Override
 	public String getItemName() {
@@ -668,7 +678,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	@Override
 	public void setDescription(String text) {
 		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, text);
-		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), "description", text);
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct(), FIELD_description, text);
 	}
 	@Override
 	public String getDescription() {
@@ -902,7 +912,7 @@ realistisches Beispiel:
 	public void setCountryOfOrigin(String code) {
 		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, code);
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedTradeProduct(), "originTradeCountry", code);		
-		SCopyCtor.getInstance().set(getSpecifiedTradeProduct().getOriginTradeCountry(), "id", ISOTwoletterCountryCodeContentType.fromValue(code));
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct().getOriginTradeCountry(), this.FIELD_id, ISOTwoletterCountryCodeContentType.fromValue(code));
 	}
 	@Override
 	public String getCountryOfOrigin() {
@@ -919,6 +929,7 @@ realistisches Beispiel:
 //	85  SCT_LINE	COMFORT	  Additional Referenced Product Document - Attached document Mime code
 //	86  SCT_LINE	COMFORT	  Additional Referenced Product Document- Attached document Filename
 	// Name in BG-24 anders: ADDITIONAL SUPPORTING DOCUMENTS
+	// factory für _79_AdditionalReferencedProductDocs und _141_AdditionalReferencedDocs
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
 		// delegieren
@@ -934,11 +945,13 @@ realistisches Beispiel:
 		rd.setAttachedDocument(content, mimeCode, filename);
 		return rd;
 	}
+	@Override // implements interface _79_AdditionalReferencedProductDocs
 	public void addReferencedProductDocument(String code, SupportingDocument supportigDocument) {
 		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, supportigDocument);
 		supportigDocument.setDocumentCode(code);
 		super.getSpecifiedTradeProduct().getAdditionalReferenceReferencedDocument().add((ReferencedDocument)supportigDocument);		
 	}
+	@Override
 	public List<SupportingDocument> getReferencedProductDocuments() {
 		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
 		if(super.getSpecifiedTradeProduct()==null) return res;
@@ -950,7 +963,10 @@ realistisches Beispiel:
 		return res;
 	}
 
-	// TODO
+	// 87: TODO
+//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/
+	//ram:SpecifiedTradeProduct/ram:IncludedReferencedProduct
+
 //	87  SCT_LINE	EXTENDED  REFERENCED PRODUCT
 //	88  SCT_LINE	EXTENDED  Referenced Product ID
 //	89  SCT_LINE	EXTENDED  Referenced Product Global ID
@@ -963,16 +979,105 @@ realistisches Beispiel:
 //	96  SCT_LINE	EXTENDED  Referenced Product Unit Quantity
 //	97  SCT_LINE	EXTENDED  Referenced Product UnitCode for Unit Quantity
 
-	// TODO OOR only
-//	98  SCT_LINE	BASIC	  SUBSTITUTED PRODUCT 
+//	98  SCT_LINE	BASIC	  SUBSTITUTED PRODUCT / OOR only
+	private boolean isOOR(Object o) {
+		if(this.order.getDocumentCode()==DocumentNameCode.OrderResponse) return true;
+		if(o!=null) {
+			LOG.warning("Document Type is not OrderResponse, ignore Substituted Product:'"+o+"'.");
+		}
+		return false;
+	}
+
 //	99  SCT_LINE	EXTENDED  Substituted Product ID
+	@Override
+	public void setSubstitutedProductID(String id) {
+		if(isOOR(id)) {
+			SCopyCtor.getInstance().newFieldInstance(this, FIELD_substitutedReferencedProduct, id);
+			SCopyCtor.getInstance().set(getSubstitutedReferencedProduct(), FIELD_id, id);
+		}
+	}
+	@Override
+	public String getSubstitutedProductID() {
+		if(super.getSubstitutedReferencedProduct()==null) return null;
+		return getSubstitutedReferencedProduct().getID().getValue();
+	}
+	
 //	100 SCT_LINE	BASIC	  Substituted Product Global ID
 //	101 SCT_LINE	BASIC	  Substituted Product Global ID Scheme IDScheme
+	@Override
+	public void addSubstitutedIdentifier(Identifier id) {
+		if(isOOR(id)) {
+			SCopyCtor.getInstance().newFieldInstance(this, FIELD_substitutedReferencedProduct, id);
+			super.getSubstitutedReferencedProduct().getGlobalID().add((ID)id);
+		}
+	}
+	@Override
+	public List<Identifier> getSubstitutedIdentifier() {
+		if(super.getSubstitutedReferencedProduct()==null) return null;
+		List<IDType> list = getSubstitutedReferencedProduct().getGlobalID();
+		List<Identifier> result = new ArrayList<Identifier>(list.size());
+		list.forEach(id -> {
+			result.add(new ID(id));
+		});
+		return result;
+	}
+	
 //	102 SCT_LINE	BASIC	  Substituted Product Seller Assigned ID
+	@Override
+	public void setSubstitutedSellerAssignedID(String id) {
+		if(isOOR(id)) {
+			SCopyCtor.getInstance().newFieldInstance(this, FIELD_substitutedReferencedProduct, id);
+			SCopyCtor.getInstance().set(getSubstitutedReferencedProduct(), FIELD_sellerAssignedID, id);
+		}
+	}
+	@Override
+	public String getSubstitutedSellerAssignedID() {
+		if(super.getSubstitutedReferencedProduct()==null) return null;
+		return new ID(getSubstitutedReferencedProduct().getSellerAssignedID()).getContent();
+	}
+
 //	103 SCT_LINE	BASIC	  Substituted Product Buyer Assigned ID
+	@Override
+	public void setSubstitutedBuyerAssignedID(String id) {
+		if(isOOR(id)) {
+			SCopyCtor.getInstance().newFieldInstance(this, FIELD_substitutedReferencedProduct, id);
+			SCopyCtor.getInstance().set(getSubstitutedReferencedProduct(), FIELD_buyerAssignedID, id);
+		}
+	}
+	@Override
+	public String getSubstitutedBuyerAssignedID() {
+		if(super.getSubstitutedReferencedProduct()==null) return null;
+		return new ID(getSubstitutedReferencedProduct().getBuyerAssignedID()).getContent();
+	}
+	
 //	104 SCT_LINE	EXTENDED  Substituted Product Industry Assigned ID
+	
 //	105 SCT_LINE	BASIC	  Substituted Product Name
+	@Override
+	public void setSubstitutedProductName(String text) {
+		if(isOOR(text)) {
+			SCopyCtor.getInstance().newFieldInstance(this, FIELD_substitutedReferencedProduct, text);
+			SCopyCtor.getInstance().set(getSubstitutedReferencedProduct(), FIELD_name, text);
+		}
+	}
+	@Override
+	public String getSubstitutedProductName() {
+		if(super.getSubstitutedReferencedProduct()==null) return null;
+		return Text.create(super.getSubstitutedReferencedProduct().getName()).getValue();
+	}
 //	106 SCT_LINE	COMFORT	  Substituted Product Description
+	@Override
+	public void setSubstitutedProductDescription(String text) {
+		if(isOOR(text)) {
+			SCopyCtor.getInstance().newFieldInstance(this, FIELD_substitutedReferencedProduct, text);
+			SCopyCtor.getInstance().set(getSubstitutedReferencedProduct(), FIELD_description, text);
+		}
+	}
+	@Override
+	public String getSubstitutedProductDescription() {
+		if(super.getSubstitutedReferencedProduct()==null) return null;
+		return Text.create(super.getSubstitutedReferencedProduct().getDescription()).getValue();
+	}
 	
 //	107 SCT_LINE_TA BASIC	  LINE TRADE AGREEMENT
 //	108 SCT_LINE_TA EXTENDED  Minimum Orderable Quantity
@@ -1007,7 +1112,7 @@ realistisches Beispiel:
 			return;
 		}
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "buyerOrderReferencedDocument", id);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument(), "lineID", id);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getBuyerOrderReferencedDocument(), FIELD_lineID, id);
 	}
 	@Override
 	public String getOrderLineID() {
@@ -1017,22 +1122,23 @@ realistisches Beispiel:
 	}
 
 	// 129: 0..1 QUOTATION REFERENCE
-//	130 SCT_LINE_TA COMFORT	  Quotation Reference ID
-//	131 SCT_LINE_TA COMFORT	  Quotation Reference LineID
-//	132 SCT_LINE_TA EXTENDED  (Quotation Reference Date)             TODO
-//	133 SCT_LINE_TA EXTENDED  Quotation Reference Date
-//	134 SCT_LINE_TA EXTENDED  Date format
-	@Override
-	public void setQuotationLineID(String id) {
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "quotationReferencedDocument", id);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getQuotationReferencedDocument(), "lineID", id);
-	}
+	
 	// 130: 0..1 Quotation Reference ID
+	@Override
+	public void setQuotationID(String id) {
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "quotationReferencedDocument", id);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getQuotationReferencedDocument(), "issuerAssignedID", id);
+	}
 	@Override
 	public String getQuotationID() {
 		ReferencedDocumentType referencedDocument = super.getSpecifiedLineTradeAgreement()==null ? null 
 				: getSpecifiedLineTradeAgreement().getQuotationReferencedDocument();
-		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
+		return referencedDocument==null ? null : new ID(referencedDocument.getIssuerAssignedID()).getName();		
+	}
+	@Override
+	public void setQuotationLineID(String id) {
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "quotationReferencedDocument", id);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getQuotationReferencedDocument(), FIELD_lineID, id);
 	}
 	// 131: 0..1 Quotation Reference LineID
 	@Override
@@ -1041,6 +1147,9 @@ realistisches Beispiel:
 				: getSpecifiedLineTradeAgreement().getQuotationReferencedDocument();
 		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
 	}
+//	132 SCT_LINE_TA EXTENDED  (Quotation Reference Date)             TODO
+//	133 SCT_LINE_TA EXTENDED  Quotation Reference Date
+//	134 SCT_LINE_TA EXTENDED  Date format
 
 	
 //	135 SCT_LINE_TA EXTENDED  CONTRACT REFERENCE
@@ -1050,30 +1159,7 @@ realistisches Beispiel:
 //	139 SCT_LINE_TA EXTENDED  Contract Reference Date
 //	140 SCT_LINE_TA EXTENDED  Date format
 	
-	
-	// ??? TODO Unterschied zu 79: 0..n ADDITIONAL REFERENCED PRODUCT DOCUMENT (ist in SpecifiedTradeProduct)
-//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedTradeProduct/ram:AdditionalReferenceReferencedDocument
-//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem/ram:SpecifiedLineTradeAgreement/ram:AdditionalReferencedDocument
-//	141 SCT_LINE_TA COMFORT	  ADDITIONAL REFERENCED DOCUMENT (in SpecifiedLineTradeAgreement) 
-	// und mit Line ID, dh ===> SupportingDocument erweitern
-	
-	
-	// An additional document referenced in this line trade agreement.
-	public void addReferencedDocument(SupportingDocument supportigDocument) {
-		super.getSpecifiedLineTradeAgreement().getAdditionalReferencedDocument().add((ReferencedDocument)supportigDocument);
-//		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, supportigDocument);
-//		super.getSpecifiedTradeProduct().getAdditionalReferenceReferencedDocument().add((ReferencedDocument)supportigDocument);		
-	}
-	public List<SupportingDocument> getReferencedDocuments() {
-		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
-		if(super.getSpecifiedLineTradeAgreement()==null) return res;
-		List<ReferencedDocumentType> list = getSpecifiedLineTradeAgreement().getAdditionalReferencedDocument();
-		list.forEach(rd -> {
-			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
-			if(referencedDocument.isRelatedDocument()) res.add(referencedDocument);
-		});
-		return res;
-	}
+	// 141ff : 0..n ADDITIONAL REFERENCED DOCUMENT - An additional document referenced in SpecifiedLineTradeAgreement
 //	142 SCT_LINE_TA COMFORT	  Additional Referenced Document - ID
 //	143 SCT_LINE_TA COMFORT	  Additional Referenced Document - External document location
 //	144 SCT_LINE_TA COMFORT	  Additional Referenced Document + Line ID
@@ -1086,6 +1172,22 @@ realistisches Beispiel:
 //	151 SCT_LINE_TA EXTENDED  (Additional Referenced Document +  Date)
 //	152 SCT_LINE_TA EXTENDED  Additional Referenced Document -  Date
 //	153 SCT_LINE_TA EXTENDED  Date format
+	// Unterschied zu 79 ADDITIONAL REFERENCED PRODUCT DOCUMENT: 79 ist in SpecifiedTradeProduct
+	// factory gemeinsam mit 79, mit LineID siehe #createSupportigDocument() 
+	@Override // implements interface _141_AdditionalReferencedDocs
+	public void addReferencedDocument(SupportingDocument supportigDocument) {
+		super.getSpecifiedLineTradeAgreement().getAdditionalReferencedDocument().add((ReferencedDocument)supportigDocument);
+	}
+	public List<SupportingDocument> getReferencedDocuments() {
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
+		if(super.getSpecifiedLineTradeAgreement()==null) return res;
+		List<ReferencedDocumentType> list = getSpecifiedLineTradeAgreement().getAdditionalReferencedDocument();
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isRelatedDocument()) res.add(referencedDocument);
+		});
+		return res;
+	}
 	
 	// 154: BG.25.BT-128 0..1 Objektkennung // (OBJECT IDENTIFIER FOR INVOICE LINE)
 //	155 SCT_LINE_TA COMFORT	  Order line object identifier
@@ -1151,18 +1253,38 @@ realistisches Beispiel:
 		TradePriceType grossPrice = super.getSpecifiedLineTradeAgreement()==null ? null 
 				: getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice();
 		if(grossPrice==null) return null;
-		return grossPrice.getAppliedTradeAllowanceCharge().isEmpty() ? null
-				: TradeAllowanceCharge.create(grossPrice.getAppliedTradeAllowanceCharge().get(0));
+		if(grossPrice.getAppliedTradeAllowanceCharge().isEmpty()) return null;
+		List<TradeAllowanceCharge> resCandidate = new ArrayList<TradeAllowanceCharge>();
+		grossPrice.getAppliedTradeAllowanceCharge().forEach(e ->{
+			TradeAllowanceCharge tac = TradeAllowanceCharge.create(e);
+			// discount is ALLOWANCE!
+			if(tac.isAllowance()) resCandidate.add(tac);
+		});
+		return resCandidate.isEmpty() ? null : resCandidate.get(0);
 	}
 	@Override
 	public void setPriceDiscount(AllowancesAndCharges discount) {
-		// discount is ALLOWANCE!
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "grossPriceProductTradePrice", discount);
+		// discount is ALLOWANCE! ungeprüft: discount.isAllowance()
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), FIELD_grossPriceProductTradePrice, discount);
 		getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice()
 			.getAppliedTradeAllowanceCharge().add((TradeAllowanceCharge)discount);
 	}
 
 //	170 SCT_LINE_TA COMFORT	  (((Item price charge)))
+	@Override
+	public AllowancesAndCharges getPriceCharge() {
+		TradePriceType grossPrice = super.getSpecifiedLineTradeAgreement()==null ? null 
+				: getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice();
+		if(grossPrice==null) return null;
+		if(grossPrice.getAppliedTradeAllowanceCharge().isEmpty()) return null;
+		List<TradeAllowanceCharge> resCandidate = new ArrayList<TradeAllowanceCharge>();
+		grossPrice.getAppliedTradeAllowanceCharge().forEach(e ->{
+			TradeAllowanceCharge tac = TradeAllowanceCharge.create(e);
+			// only CHARGE is a candidate:
+			if(tac.isCharge()) resCandidate.add(tac);
+		});
+		return resCandidate.isEmpty() ? null : resCandidate.get(0);
+	}
 //	171 SCT_LINE_TA COMFORT	  ((Item price charge))
 //	172 SCT_LINE_TA COMFORT	  (Item price charge)
 //	173 SCT_LINE_TA EXTENDED  Item price charge CalculationPercent
@@ -1170,6 +1292,19 @@ realistisches Beispiel:
 //	175 SCT_LINE_TA COMFORT	  Item price charge amount
 //	176 SCT_LINE_TA COMFORT	  Item price charge Reason Code
 //	177 SCT_LINE_TA COMFORT	  Item price charge Reason
+	/* Item price charge Reason Code:
+	 * Use entries of the UNTDID 7161 code list. 
+	 * The order line level item trade price discount reason code and 
+	 * the order line level item trade price discount reason shall indicate the same item trade price charge reason. 
+	 * Example AEW for WEEE.
+	 */
+	@Override
+	public void setPriceCharge(AllowancesAndCharges charge) {
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), FIELD_grossPriceProductTradePrice, charge);
+		getSpecifiedLineTradeAgreement().getGrossPriceProductTradePrice()
+			.getAppliedTradeAllowanceCharge().add((TradeAllowanceCharge)charge);
+	}
+
 	
 	/* ------------------------------------------------------------------------------
 	 * BG-29 1..1 PRICE DETAILS
@@ -1177,7 +1312,6 @@ realistisches Beispiel:
 	 * BT-146   1..1      Item net price   ==> NetPriceProductTradePrice
 	 * BT-149-0 BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
 	 */
-	private static final String FIELD_netPriceProductTradePrice = "netPriceProductTradePrice";
 	// 179: price after subracting === korrekt
 	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
 	@Override
@@ -1216,7 +1350,7 @@ realistisches Beispiel:
 	// TODO INCLUDED TRADE TAX ist nicht BG-30
 // ram:SpecifiedLineTradeAgreement/ram:NetPriceProductTradePrice/ram:IncludedTradeTax
 	 A tax included in this trade price 
-	 (for instance in case of  other Tax, or B2C Order with VAT)
+	 (for instance in case of other Tax, or B2C Order with VAT)
 */
 	// 187: Included Tade Tax Calculated Amount
 	// 188: Included Tade Tax type code on line level
@@ -1241,7 +1375,7 @@ realistisches Beispiel:
 //	200 SCT_LINE_TA BASIC	  Blanket Order Referenced Line ID
 	public void setBlanketOrderReference(String id) {
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "blanketOrderReferencedDocument", id);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getBlanketOrderReferencedDocument(), "lineID", id);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getBlanketOrderReferencedDocument(), FIELD_lineID, id);
 	}
 	public String getBlanketOrderReference() {
 		ReferencedDocumentType refDoc = super.getSpecifiedLineTradeAgreement()==null ? null : getSpecifiedLineTradeAgreement().getBlanketOrderReferencedDocument();
@@ -1594,7 +1728,7 @@ A group of business terms providing information about where and when the goods a
 	// 340: BT-133 0..1 line Buyer accounting reference : ram:ReceivableSpecifiedTradeAccountingAccount
 	public void setBuyerAccountingReference(String text) {
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "receivableSpecifiedTradeAccountingAccount", text);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), "id", text);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), this.FIELD_id, text);
 	}
 	public String getBuyerAccountingReference() {
 		TradeAccountingAccountType taa = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount();

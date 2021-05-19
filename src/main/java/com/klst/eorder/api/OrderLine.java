@@ -130,7 +130,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
  	 * <p>
 	 * A unique identifier for this trade product.
 	 * <p>
-	 * Cardinality: 	0..n (optional)
+	 * Cardinality: 	0..1 (optional)
 	 * <br>Order-X-No: 	42
 	 * 
 	 * @param id
@@ -335,9 +335,40 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 //	public String getCountryOfOrigin();
 
 	// 79ff : ADDITIONAL REFERENCED PRODUCT DOCUMENT
+	// in interface _79_AdditionalReferencedProductDocs
 
-
-//	--------------------------------
+	// 98ff : SUBSTITUTED PRODUCT / OOR only
+	
+	// 99: Substituted Product ID
+	public void setSubstitutedProductID(String id);
+	public String getSubstitutedProductID();
+	
+	// 100: Substituted Product Global ID + Scheme ID
+	public void addSubstitutedIdentifier(Identifier id);
+	default Identifier createSubstitutedIdentifier(String globalID, String schemeID) {
+		return createStandardIdentifier(globalID, schemeID);
+	}
+	default void addSubstitutedIdentifier(String globalID, String schemeID) {
+		addSubstitutedIdentifier(createSubstitutedIdentifier(globalID, schemeID));
+	}
+	public List<Identifier> getSubstitutedIdentifier();
+	
+	// 102: Substituted Product Seller Assigned ID
+	public void setSubstitutedSellerAssignedID(String id);
+	public String getSubstitutedSellerAssignedID();
+	
+	// 103: Substituted Product Buyer Assigned ID
+	public void setSubstitutedBuyerAssignedID(String id);
+	public String getSubstitutedBuyerAssignedID();
+	
+	// 105: Substituted Product Name
+	public void setSubstitutedProductName(String text);
+	public String getSubstitutedProductName();
+	
+	// 106: Substituted Product Description
+	public void setSubstitutedProductDescription(String text);
+	public String getSubstitutedProductDescription();
+	
 	/**
 	 * line object identifier
 	 * <p>
@@ -469,7 +500,18 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	public String getOrderLineID();
 	
 	/**
-	 * The unique identifier of a line in this Quotation (???) referenced document.
+	 * The quotation document referenced in this line trade agreement.	
+	 * In case an Order refers to different quotation.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	130
+	 * 
+	 * @param id - Issuer Assigned quotation ID
+	 */
+	public void setQuotationID(String id);
+	public String getQuotationID();
+	/**
+	 * The unique identifier of a line in this Quotation referenced document.
 	 * 
 	 * The quotation document referenced in this line trade agreement	
 	 * In case an Order refers to different quotation
@@ -477,28 +519,10 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * Cardinality: 	0..1 (optional)
 	 * <br>Order-X-No: 	131
 	 * 
-	 * @param reference id
+	 * @param id
 	 */
 	public void setQuotationLineID(String id);
-	/**
-	 * The unique identifier of a line in this Quotation referenced document.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>Order-X-No: 	131
-	 * 
-	 * @return reference id
-	 */
 	public String getQuotationLineID();
-	/**
-	 * The quotation document referenced in this line trade agreement.	
-	 * In case an Order refers to different quotation.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>Order-X-No: 	130
-	 * 
-	 * @return reference id
-	 */
-	public String getQuotationID();
 	
 	/**
 	 * line Buyer accounting reference

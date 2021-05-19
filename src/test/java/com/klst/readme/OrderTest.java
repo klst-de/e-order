@@ -300,6 +300,11 @@ public class OrderTest {
 		 */
 		// 79:
 		line.addReferencedProductDocument("ADD_REF_PROD_ID", "6", "ADD_REF_PROD_Desc", "ADD_REF_PROD_URIID");
+		
+		// 98ff : SUBSTITUTED PRODUCT / OOR only
+		line.setSubstitutedProductID("SubstitutedProductID");
+		line.addSubstitutedIdentifier("global ID", "schemeID");
+		
 		// 141:
 		Reference lineID_5 = new ID("5");
 		byte[] content = getBytesFromTestFile(PDF);
