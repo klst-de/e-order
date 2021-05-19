@@ -11,6 +11,7 @@ import com.klst.edoc.api.PostalAddressFactory;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.MessageFunctionEnum;
 import com.klst.edoc.untdid.PaymentMeansEnum;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
@@ -104,6 +105,49 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 */
 //	void setTypeCode(DocumentNameCode code); // in factory
 	public DocumentNameCode getDocumentCode();
+	
+	/**
+	 * Language
+	 * <p>
+	 * A unique identifier for a language used in this exchanged document.	
+	 * <p>
+	 * Cardinality: 	0..n (optional)
+	 * <br>Order-X-No: 	18
+	 * 
+	 * @param id
+	 * to be chosen from the entries in UNTDID 3453 / ISO 639-1: de, en, es, ...
+	 */
+	public void addLanguage(String id);
+	public List<String> getLanguage();
+	
+	/**
+	 * Purpose Code
+	 * <p>
+	 * The purpose, expressed as UNTDID 1225 Message function code, of this exchanged document.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	19
+	 * 
+	 * @param code - potential values 
+	 * 	7 : Duplicate 
+	 * 	9 : Original 
+	 * 35 : Retransmission
+	 */
+	public void setPurpose(MessageFunctionEnum code);
+	public MessageFunctionEnum getPurposeCode();
+
+	/**
+	 * Requested Response Code
+	 * <p>
+	 * A code specifying a type of response requested for this exchanged document.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	20
+	 * 
+	 * @param code - "AC" to request an Order Response, defined in UNTDID 4343.
+	 */
+	public void setRequestedResponse(String code);
+	public String getRequestedResponse();
 
 	/**
 	 * ORDER CURRENCY

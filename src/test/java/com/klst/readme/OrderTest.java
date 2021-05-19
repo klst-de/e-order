@@ -31,6 +31,7 @@ import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.MessageFunctionEnum;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AbstactTransformer;
@@ -125,12 +126,15 @@ public class OrderTest {
 	public void cioTest() {
 		CoreOrder order;
 		order = CrossIndustryOrder.getFactory().createOrder(BG2_ProcessControl.PROFILE_COMFORT, null, DocumentNameCode.Order);
-		order.setId("Order#-1"); // BT-1 Identifier (mandatory)
+		order.setId("Order#-1"); // 9: BT-1 Identifier (mandatory)
 		
 		// ExchangedDocument.Name wird in einvoice nicht verwendet
 		
-		order.setIssueDate(DateTimeFormats.ymdToTs("20200331"));	 // BT-2 + 1..1
-		order.setIssueDate(DateTimeFormats.ymdToTs("2020-03-31"));	 // BT-2 + 1..1
+		order.setIssueDate(DateTimeFormats.ymdToTs("20200331"));	 // 14: BT-2
+		order.setIssueDate(DateTimeFormats.ymdToTs("2020-03-31"));
+		order.addLanguage("fr");                        // 18: Language
+		order.setPurpose(MessageFunctionEnum.Original); // 19: defined in UNTDID 1225
+		order.setRequestedResponse("AC");               // 20: defined in UNTDID 4343
 		
 		order.addNote( order.createNote("AAI", "Content of Note") );
 		
