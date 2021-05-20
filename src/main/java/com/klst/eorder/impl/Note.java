@@ -8,11 +8,13 @@ import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.OrderNoteFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.NoteType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._128.CodeType;
 
-/* implements BG-1 NOTE
+/* implements 21: BG-1 NOTE
  * 
- * also implements BG-25.BT-127 0..n IncludedNote.Content
+ * Alternative is to use delivery instructions, 
+ * but that's more applicable in a despatch message.
+ * 
+ * Also implements 37: BG-25.BT-127 0..n LINE NOTE
  */
 public class Note extends NoteType implements OrderNote, OrderNoteFactory {
 
@@ -63,21 +65,25 @@ public class Note extends NoteType implements OrderNote, OrderNoteFactory {
 			+" \""+getNote()+"\"]";
 	}
 
-	// BT-21 ++ 0..1 Invoice note subject code
+	// 22, 38: 0..1 EXTENDED Note Content Code
+	public void setNoteContentCode(String code) {
+		SCopyCtor.getInstance().set(this, "contentCode", code);
+	}
+	public String getNoteContentCode() {
+		return super.getContentCode()==null ? null : getContentCode().getValue();
+	}
+	
+	// 24: BG-1.BT-21 0..1 Invoice note subject code
 	@Override
 	public String getCode() {
 		return super.getSubjectCode()==null ? null : getSubjectCode().getValue();
 	}
-
 	void setCode(String code) {
-		if(code==null) return; 
-		CodeType subjectCode = new CodeType();
-		subjectCode.setValue(code);
-		super.setSubjectCode(subjectCode);
+		SCopyCtor.getInstance().set(this, "subjectCode", code);
 	}
 
-	// BG-1 .BT-22  1..1 Invoice note
-	// BG-25.BT-127 0..n IncludedNote.Content
+	// 23: BG-1.BT-22  1..1 Invoice note
+	// 39: BG-25.BT-127 0..n IncludedNote.Content
 	/*
 	 * in in Order-X_Extended content is mapped to List
 	 * @see https://github.com/klst-de/e-order/issues/3

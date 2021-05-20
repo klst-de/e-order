@@ -51,17 +51,18 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * Line status code
 	 * <p>
 	 * To be chosen from the entries in UNTDID 1229, Action code, in particular:
-1 : Order  line ADDED
-3 : Order  line CHANGED
-5 : Order line ACCEPTED WITHOUT AMENDMENT
-6 : Order line ACCEPTED WITH AMENDMENT
-7 : Order  line NOT ACCEPTED
-42 : Order  line ALREADY DELIVERED
-
-	 * TODO nur OOR OOC
+1 : Order line ADDED,
+3 : Order line CHANGED,
+5 : Order line ACCEPTED WITHOUT AMENDMENT,
+6 : Order line ACCEPTED WITH AMENDMENT,
+7 : Order line NOT ACCEPTED,
+42 : Order line ALREADY DELIVERED
 	 * <p>
 	 * Cardinality: 0..1 (optional)
 	 * <br>Order-X-No: 	36
+	 * <br>Rules:
+	 * An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code on each line, if it has lines.
+	 * An Order (Document Typecode BT-3 = 220) MUST NOT contain a Line Status Code.
 	 * 
 	 * @return status code
 	 */

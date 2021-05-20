@@ -256,7 +256,8 @@ public class OrderTest {
 		line.setSellerAssignedID("987654321");
 		line.setBuyerAssignedID("654987321");
 		
-		line.setLineObjectID("id", "schemeID", "AWV");// BG.25.BT-128
+		line.setStatus("Status");
+		line.setLineObjectID("id", "schemeID", "AWV"); // 154: BG.25.BT-128
 		line.setDescription("description"); // BG-31.BT-154
 		line.addClassificationIdentifier("4047247110051", "EN", null, null); // BG-31.BT-158
 		line.setCountryOfOrigin("FR"); // BG-31.BT-159

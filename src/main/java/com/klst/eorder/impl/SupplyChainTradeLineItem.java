@@ -491,44 +491,44 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	}
 
 /*
-		<ram:IncludedSupplyChainTradeLineItem>
-			<ram:AssociatedDocumentLineDocument>
-				<ram:LineID>1</ram:LineID>                                    <!-- BG.25.BT-126 1..1
-				<ram:IncludedNote>                                            <!-- BT-127 0..1 line note
-					<ram:Content>Content of Note</ram:Content>
-					<ram:SubjectCode>AAI</ram:SubjectCode>
-				</ram:IncludedNote>
-			</ram:AssociatedDocumentLineDocument>
-			<ram:SpecifiedTradeProduct>
-				<ram:GlobalID schemeID="0160">1234567890123</ram:GlobalID>
-				<ram:SellerAssignedID>987654321</ram:SellerAssignedID>
-				<ram:BuyerAssignedID>654987321</ram:BuyerAssignedID>
-				<ram:Name>Product Name</ram:Name>                             <!-- BG-31.BT-153 0..1
-			</ram:SpecifiedTradeProduct>
-			<ram:SpecifiedLineTradeAgreement>
-				<ram:BuyerOrderReferencedDocument>
-					<ram:LineID>1</ram:LineID>
-				</ram:BuyerOrderReferencedDocument>
-				<ram:NetPriceProductTradePrice>
-					<ram:ChargeAmount>10.00</ram:ChargeAmount>
-					<ram:BasisQuantity unitCode="C62">1.00</ram:BasisQuantity>
-				</ram:NetPriceProductTradePrice>
-				<ram:BlanketOrderReferencedDocument>
-					<ram:LineID>2</ram:LineID>
-				</ram:BlanketOrderReferencedDocument>
-			</ram:SpecifiedLineTradeAgreement>
-			<ram:SpecifiedLineTradeDelivery>
-				<ram:PartialDeliveryAllowedIndicator>
-					<udt:Indicator>true</udt:Indicator>
-				</ram:PartialDeliveryAllowedIndicator>
-				<ram:RequestedQuantity unitCode="C62">6</ram:RequestedQuantity> <!-- BT-129+BT-130 1..1
-			</ram:SpecifiedLineTradeDelivery>
-			<ram:SpecifiedLineTradeSettlement>
-				<ram:SpecifiedTradeSettlementLineMonetarySummation>
-					<ram:LineTotalAmount>60.00</ram:LineTotalAmount>            <!-- BT-131 1..1
-				</ram:SpecifiedTradeSettlementLineMonetarySummation>
-			</ram:SpecifiedLineTradeSettlement>
-		</ram:IncludedSupplyChainTradeLineItem>
+	<ram:IncludedSupplyChainTradeLineItem>                                <!-- 33: DOCUMENT LINE
+		<ram:AssociatedDocumentLineDocument>                              <!-- 34:
+			<ram:LineID>1</ram:LineID>                                    <!-- 35: BG.25.BT-126 1..1
+			<ram:IncludedNote>                                            <!-- 37: BT-127 0..1 line note
+				<ram:Content>Content of Note</ram:Content>
+				<ram:SubjectCode>AAI</ram:SubjectCode>
+			</ram:IncludedNote>
+		</ram:AssociatedDocumentLineDocument>
+		<ram:SpecifiedTradeProduct>
+			<ram:GlobalID schemeID="0160">1234567890123</ram:GlobalID>
+			<ram:SellerAssignedID>987654321</ram:SellerAssignedID>
+			<ram:BuyerAssignedID>654987321</ram:BuyerAssignedID>
+			<ram:Name>Product Name</ram:Name>                             <!-- BG-31.BT-153 0..1
+		</ram:SpecifiedTradeProduct>
+		<ram:SpecifiedLineTradeAgreement>
+			<ram:BuyerOrderReferencedDocument>
+				<ram:LineID>1</ram:LineID>
+			</ram:BuyerOrderReferencedDocument>
+			<ram:NetPriceProductTradePrice>
+				<ram:ChargeAmount>10.00</ram:ChargeAmount>
+				<ram:BasisQuantity unitCode="C62">1.00</ram:BasisQuantity>
+			</ram:NetPriceProductTradePrice>
+			<ram:BlanketOrderReferencedDocument>
+				<ram:LineID>2</ram:LineID>
+			</ram:BlanketOrderReferencedDocument>
+		</ram:SpecifiedLineTradeAgreement>
+		<ram:SpecifiedLineTradeDelivery>
+			<ram:PartialDeliveryAllowedIndicator>
+				<udt:Indicator>true</udt:Indicator>
+			</ram:PartialDeliveryAllowedIndicator>
+			<ram:RequestedQuantity unitCode="C62">6</ram:RequestedQuantity> <!-- BT-129+BT-130 1..1
+		</ram:SpecifiedLineTradeDelivery>
+		<ram:SpecifiedLineTradeSettlement>
+			<ram:SpecifiedTradeSettlementLineMonetarySummation>
+				<ram:LineTotalAmount>60.00</ram:LineTotalAmount>            <!-- BT-131 1..1
+			</ram:SpecifiedTradeSettlementLineMonetarySummation>
+		</ram:SpecifiedLineTradeSettlement>
+	</ram:IncludedSupplyChainTradeLineItem>
  */
 	// 35: BG.25.BT-126 1..1
 	@Override
