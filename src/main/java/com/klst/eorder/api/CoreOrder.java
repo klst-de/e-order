@@ -89,17 +89,6 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 		if(ymd!=null) setIssueDate(DateTimeFormats.ymdToTs(ymd));
 	}
 
-	/* BG-14 0..1 DELIVERY PERIOD with BT-73 start date and BT-74 end date
-	 * 
-	 * The Requested Date or Period on which Delivery is requested for Delivery, 
-	 * mutually exclusive with Pick up = Despatch (not in CII)
-	 * 
-	 * contains
-	 * Requested Delivery Date
-	 * Requested Delivery Period, at least 1 StartDate BT-73 or 1 EndDate BT-74
-	 *
-	 */
-	
 	/**
 	 * The Document TypeCode (BT-3) MUST be:
 - 220 for an ORDER
@@ -394,25 +383,6 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	public void setBuyerAccountingReference(Reference textReference);
 	public Reference getBuyerAccountingReference();
 
-	/**
-	 * PAYMENT TERMS
-	 * <p>
-	 * A textual description of the payment terms that apply to the amount due for payment 
-	 * (Including description of possible penalties).
-	 * This element may contain multiple lines and multiple terms.
-	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>EN16931-ID: 	BT-20
-	 * <br>Rule ID: 	 
-	 * <br>Order-X-No: 	925
-	 * 
-	 * @param description
-	 */
-	public void addPaymentTerm(String description);
-	public void setPaymentTerms(List<String> paymentTerms);
-	public List<String> getPaymentTerms();
-
-	
 	// 345: BG-4 1..1 SELLER @see BG4_Seller
 	// 390: BG-7 1..1 BUYER @see BG7_Buyer
 	
@@ -423,6 +393,17 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	// 643: BG-13 0..1 ShipToParty @see ShipTo
 	// 684: ULTIMATE SHIP TO PARTY TODO
 	// 725: ShipFromParty @see ShipFrom
+
+	/* 766: BG-14 0..1 DELIVERY PERIOD with BT-73 start date and BT-74 end date
+	 *
+	 * The Requested Date or Period on which Delivery is requested for Delivery, 
+	 * mutually exclusive with 777 Pick up = Despatch (not in CII)
+	 * 
+	 * contains
+	 * Requested Delivery Date
+	 * Requested Delivery Period, at least 1 StartDate BT-73 or 1 EndDate BT-74
+	 *
+	 */
 	
 	/* 874: BG-16 PAYMENT MEANS - A group of business terms providing information about the payment.
 example:
@@ -466,6 +447,24 @@ example:
 	public String getPaymentMeansText();
 	public void setPaymentMeansText(String text);
 
+	/**
+	 * PAYMENT TERMS
+	 * <p>
+	 * A textual description of the payment terms that apply to the amount due for payment 
+	 * (Including description of possible penalties).
+	 * This element may contain multiple lines and multiple terms.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-20
+	 * <br>Rule ID: 	 
+	 * <br>Order-X-No: 	925
+	 * 
+	 * @param description
+	 */
+	public void addPaymentTerm(String description);
+	public void setPaymentTerms(List<String> paymentTerms);
+	public List<String> getPaymentTerms();
+	
 	// 517: 0..1 DELIVERY TERMS, nicht in CII : ram:ApplicableTradeDeliveryTerms
 	// Added in CIO
 /*

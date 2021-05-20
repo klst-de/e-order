@@ -97,5 +97,31 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) return null;
 		return Period.create(getRequestedDeliverySupplyChainEvent().get(0).getOccurrenceSpecifiedPeriod());
 	}
+
+	// 778: Requested Pick up Date
+	void setPickupDate(Timestamp ts) {
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
+		if(super.getRequestedDespatchSupplyChainEvent().isEmpty()) {
+			getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
+	}
+	Timestamp getPickupDateAsTimestamp() {
+		if(super.getRequestedDespatchSupplyChainEvent().isEmpty()) return null;
+		DateTimeType dateTime = getRequestedDespatchSupplyChainEvent().get(0).getOccurrenceDateTime();
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
 	
+	// 781: Requested Pick up Period
+	void setPickupPeriod(IPeriod period) {
+		if(super.getRequestedDespatchSupplyChainEvent().isEmpty()) {
+			getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
+	}
+	IPeriod getPickupPeriod() {
+		if(super.getRequestedDespatchSupplyChainEvent().isEmpty()) return null;
+		return Period.create(getRequestedDespatchSupplyChainEvent().get(0).getOccurrenceSpecifiedPeriod());
+	}
+
 }

@@ -58,7 +58,11 @@ public class EX11 {
 	static final String C62 = "C62";
 	static final String MTK = "MTK"; // m²
 	static final String GTIN = "0160"; // Global Trade Item Number (GTIN)
-
+	// Coding Systems : 
+	// System Information et Repertoire des Entreprise et des Etablissements: SIRENE
+	static final String SIRENE = "0002"; // ICD Schema for SIRENE
+	static final String EAN_LOCO = "0088"; // ICD Schema for EAN Location Code
+	
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
 	Object object;
@@ -139,8 +143,8 @@ public class EX11 {
 		  , null
 		  , sellerAddress
 		  , null);
-		seller.setId("3020816001302", "0088");
-		seller.setCompanyId("50810215900334", "0002");
+		seller.setId("3020816001302", EAN_LOCO);
+		seller.setCompanyId("50810215900334", SIRENE);
 		seller.setVATRegistrationId("FR86508102159");
 		order.setSeller(seller);
 
@@ -157,8 +161,8 @@ public class EX11 {
 		  , buyerAddress
 		  , contact
 		  );
-		buyer.setId("3306949923804", "0088");
-		buyer.setCompanyId("57214188502180", "0002");
+		buyer.setId("3306949923804", EAN_LOCO);
+		buyer.setCompanyId("57214188502180", SIRENE);
 		buyer.setVATRegistrationId("FR94572141885");
 		buyer.setUriUniversalCommunication("alain.dupond@saint-gobain.com", "EM");
 		order.setBuyer(buyer);
@@ -167,27 +171,11 @@ public class EX11 {
 		  , null
 		  , sellerAddress
 		  , null);
-		shipFrom.setId("3020816001302", "0088");
+		shipFrom.setId("3020816001302", EAN_LOCO);
 		order.setShipFromParty(shipFrom);
 		
-//BUG:		order.setDeliveryDate("202001150900");
-/* IST:
-            <ram:RequestedDeliverySupplyChainEvent>
-                <ram:OccurrenceDateTime>
-                    <udt:DateTimeString format="102">24330223</udt:DateTimeString>
-                </ram:OccurrenceDateTime>
-            </ram:RequestedDeliverySupplyChainEvent>
-        </ram:ApplicableHeaderTradeDelivery>
-
-   SOLL:
-           <ram:RequestedDespatchSupplyChainEvent>
-                <ram:OccurrenceDateTime>
-                     <udt:DateTimeString format="203">202001150900</udt:DateTimeString>
-                </ram:OccurrenceDateTime>
-           </ram:RequestedDespatchSupplyChainEvent>
-      </ram:ApplicableHeaderTradeDelivery>
- */
-		order.setDocumentCurrency(EUR); // 790:
+		order.setPickupDate("2020-01-15 09:00:00"); // 778: format="203"
+		order.setDocumentCurrency(EUR);             // 790:
 		
 		order.createTotals(new Amount(new BigDecimal(1561.18)) // Sum of line net amount
 		, new Amount(new BigDecimal(1561.18))

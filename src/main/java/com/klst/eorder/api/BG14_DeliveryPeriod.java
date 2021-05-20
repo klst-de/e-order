@@ -28,6 +28,8 @@ import com.klst.edoc.untdid.DateTimeFormats;
 
 public interface BG14_DeliveryPeriod extends IPeriodFactory {
 	
+	// createPeriod in IPeriodFactory
+	
 	public void setDeliveryDate(Timestamp timestamp);
 	default void setDeliveryDate(String ymd) {
 		if(ymd!=null) setDeliveryDate(DateTimeFormats.ymdToTs(ymd));
@@ -43,4 +45,19 @@ public interface BG14_DeliveryPeriod extends IPeriodFactory {
 	}
 	public IPeriod getDeliveryPeriod();
 
+	// Pick up:
+	public void setPickupDate(Timestamp timestamp);
+	default void setPickupDate(String ymd) {
+		if(ymd!=null) setPickupDate(DateTimeFormats.ymdToTs(ymd));
+	}
+	public Timestamp getPickupDateAsTimestamp();
+
+	public void setPickupPeriod(IPeriod period);
+	default void setPickupPeriod(Timestamp start, Timestamp end) {
+		setPickupPeriod(createPeriod(start, end));
+	}
+	default void setPickupPeriod(String ymdStart, String ymdEnd) {
+		setPickupPeriod(createPeriod(ymdStart, ymdEnd));
+	}
+	public IPeriod getPickupPeriod();
 }

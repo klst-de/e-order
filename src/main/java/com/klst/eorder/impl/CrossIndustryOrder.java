@@ -507,6 +507,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeDelivery.getShipFromParty();
 	}
 
+	// 766: REQUESTED DELIVERY DATE or PERIOD
 	// 767: Requested Delivery Date
 	@Override
 	public void setDeliveryDate(Timestamp ts) {
@@ -531,6 +532,27 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeDelivery.getDeliveryPeriod();
 	}
 
+	// 777: Requested Pick up Date or Period
+	// 778: Requested Pick up Date
+	@Override
+	public void setPickupDate(Timestamp ts) {
+		applicableHeaderTradeDelivery.setPickupDate(ts);
+	}
+	@Override
+	public Timestamp getPickupDateAsTimestamp() {
+		return applicableHeaderTradeDelivery.getPickupDateAsTimestamp();
+	}
+
+	// 781: Requested Pick up Period
+	@Override
+	public void setPickupPeriod(IPeriod period) {
+		applicableHeaderTradeDelivery.setPickupPeriod(period);
+	}
+	@Override
+	public IPeriod getPickupPeriod() {
+		return applicableHeaderTradeDelivery.getPickupPeriod();
+	}
+	
 	// 789: BT-6 0..1 REQUESTED TAX CURRENCY IN INVOICE
 	@Override
 	public void setTaxCurrency(String isoCurrencyCode) {
