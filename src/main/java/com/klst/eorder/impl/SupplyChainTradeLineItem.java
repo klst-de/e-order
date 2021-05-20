@@ -473,7 +473,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 		setLineTotalAmount(lineTotalAmount);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
-		setTaxCategoryAndRate(taxCat, percent);
+		if(taxCat!=null) setTaxCategoryAndRate(taxCat, percent);
 	}
 	
 	public String toString() {

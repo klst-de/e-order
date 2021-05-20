@@ -26,6 +26,10 @@ public interface BG25_OrderLine extends OrderLineFactory {
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			IAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent);
+	default OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
+			IAmount priceAmount, String itemName) {
+		return createOrderLine(id, quantity, lineTotalAmount, priceAmount, itemName, null, null);
+	}
 
 	// setter
 	public void addLine(OrderLine line);
