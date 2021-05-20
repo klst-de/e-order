@@ -1,11 +1,12 @@
 ﻿
 <!--Sample file Order-x.xml - BASIC Profile, created by Cyrille Sautereau, Admarel-->
 <rsm:SCRDMCCBDACIOMessageStructure
-xmlns:rsm="urn:un:unece:uncefact:data:SCRDMCCBDACIOMessageStructure:100"
+xmlns:rsm="urn:un:unece:uncefact:data:SCRDMCCBDACIOMessageStructure:1"
 xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:128"
 xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:128"
 xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:128"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="urn:un:unece:uncefact:data:standard:SCRDMCCBDACIOMessageStructure:1 ../../../bin/xsd/SCRDMCCBDACIOMessageStructure_1p0.xsd">
      <rsm:ExchangedDocumentContext>
           <ram:TestIndicator>
                <udt:Indicator>false</udt:Indicator>
