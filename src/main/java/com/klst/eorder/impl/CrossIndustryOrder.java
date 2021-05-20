@@ -99,7 +99,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		if(processType!=null) { // optional
 			DocumentContextParameterType businessProcessSpecifiedDocumentContextParameter = new DocumentContextParameterType();
 			businessProcessSpecifiedDocumentContextParameter.setID(new ID(processType));
-			super.getExchangedDocumentContext().setBusinessProcessSpecifiedDocumentContextParameter(guidelineSpecifiedDocumentContextParameter);
+			super.getExchangedDocumentContext().setBusinessProcessSpecifiedDocumentContextParameter(businessProcessSpecifiedDocumentContextParameter);
 		}
 		
 		super.setExchangedDocument(new ExchangedDocumentType());
@@ -121,8 +121,11 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		</ram:GuidelineSpecifiedDocumentContextParameter>
 	</rsm:ExchangedDocumentContext>
  */
-	public static final boolean PROD = false;
-	public static final boolean TEST = true;
+	@Override
+	public void setTestIndicator(boolean indicator) {
+		SCopyCtor.getInstance().set(getExchangedDocumentContext(), "testIndicator", indicator);
+	}
+	@Override
 	public boolean isTest() {
 		IndicatorType indicator = super.getExchangedDocumentContext().getTestIndicator();
 		return indicator!=null && indicator.isIndicator().equals(TEST);
@@ -199,7 +202,11 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 	}
 	
 	// 16: ram:CopyIndicator 
-	public static final boolean COPY = true;
+	@Override
+	public void setCopyIndicator(boolean indicator) {
+		SCopyCtor.getInstance().set(super.getExchangedDocument(), "copyIndicator", indicator);
+	}
+	@Override
 	public boolean isCopy() {
 		IndicatorType indicator = super.getExchangedDocument().getCopyIndicator();
 		return indicator!=null && indicator.isIndicator().equals(COPY);

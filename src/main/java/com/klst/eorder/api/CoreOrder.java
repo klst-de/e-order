@@ -20,6 +20,19 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	ShipTo, ShipFrom,
 	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory, IPeriodFactory {
 
+	public static final boolean PROD = false;
+	public static final boolean TEST = true;
+	/**
+	 * set Test Indicator
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	2
+	 * 
+	 * @param indicator - TEST or PROD
+	 */
+	public void setTestIndicator(boolean indicator);
+	public boolean isTest();
+
 	/**
 	 * Document number   - A unique identification of the Document.
 	 * <p>
@@ -53,7 +66,19 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 */
 	public void setIssueDate(Timestamp timestamp);
 	public Timestamp getIssueDateAsTimestamp();
-	
+
+	public static final boolean COPY = true;
+	/**
+	 * set Copy Indicator
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	16
+	 * 
+	 * @param indicator - COPY or !COPY
+	 */
+	public void setCopyIndicator(boolean indicator);
+	public boolean isCopy();
+
 	/**
 	 * Document issue date
 	 * 
