@@ -12,9 +12,9 @@ public interface CoreOrderFactory {
 	/**
 	 * factory method to create an order object, uses PROCESS CONTROL (BG-2) params
 	 * 
-	 * @param CustomizationID aka profile Identifier String, f.i. PROFILE_EN_16931, BG-2.BT-24
-	 * @param processType (optional) Textstring identifying the business process context, BG-2.BT-23
-	 * @param Invoice type code - A code specifying the functional type of the Order, BT-3
+	 * @param profile aka Customization Identifier, f.i. PROFILE_EN_16931, 7:BG-2.BT-24
+	 * @param processType (optional) Textstring identifying the business process context, 5:BG-2.BT-23
+	 * @param code - DocumentNameCode specifying the functional type of the Document, f.i. Order or OrderResponse, 11:BT-3
 	 * 
 	 * @return order object
 	 * 
