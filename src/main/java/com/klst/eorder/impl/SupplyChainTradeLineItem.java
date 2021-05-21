@@ -912,7 +912,7 @@ realistisches Beispiel:
 	public void setCountryOfOrigin(String code) {
 		SCopyCtor.getInstance().newFieldInstance(this, FIELD_specifiedTradeProduct, code);
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedTradeProduct(), "originTradeCountry", code);		
-		SCopyCtor.getInstance().set(getSpecifiedTradeProduct().getOriginTradeCountry(), this.FIELD_id, ISOTwoletterCountryCodeContentType.fromValue(code));
+		SCopyCtor.getInstance().set(getSpecifiedTradeProduct().getOriginTradeCountry(), FIELD_id, ISOTwoletterCountryCodeContentType.fromValue(code));
 	}
 	@Override
 	public String getCountryOfOrigin() {
@@ -1548,26 +1548,62 @@ A group of business terms providing information about where and when the goods a
 //	282 SCT_LINE_TD EXTENDED  Ultimate Ship TO VAT Identifier
 //	283 SCT_LINE_TD EXTENDED
 	
-	// 284: SCT_LINE_TD COMFORT	  LINE REQUESTED PICK UP DATE - PERIOD
-	//ram:SpecifiedLineTradeDelivery/ram:RequestedDespatchSupplyChainEvent
-	//ram:SpecifiedLineTradeDelivery/ram:RequestedDespatchSupplyChainEvent/ram:OccurrenceDateTime 285
-// TODO ich sehe keinen Unterschiedd zwischen 284ff bzw. 297ff - dem Namen nach ist es 297ff
-	// 297: SCT_LINE_TD COMFORT	  LINE REQUESTED DELIVERY DATE - PERIOD
-	//ram:SpecifiedLineTradeDelivery/ram:RequestedDeliverySupplyChainEvent
-	//ram:SpecifiedLineTradeDelivery/ram:RequestedDeliverySupplyChainEvent/ram:OccurrenceDateTime 298
-	// --------------------------
+	// 284: LINE REQUESTED PICK UP DATE or PERIOD
+	// 285: LINE REQUESTED PICK UP DATE
+	@Override
+	public void setLinePickupDate(Timestamp ts) {
+		if(ts==null) return;
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
+		if (getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().isEmpty()) {
+			getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
+	}
+	@Override
+	public Timestamp getLinePickupDateAsTimestamp() {
+		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
+		if (list.isEmpty()) return null;
+		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
+		return dateTime == null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
+	// 290: LINE REQUESTED PICK UP PERIOD
+	@Override
+	public void setLinePickupPeriod(IPeriod period) {
+		if(period==null) return;
+		if(getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().isEmpty()) {
+			getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
+	}
+	@Override
+	public IPeriod getLinePickupPeriod() {
+		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
+		if (list.isEmpty()) return null;
+		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();
+		return period == null ? null : Period.create(period);
+	}
+
+// TODO	288 SCT_LINE_TD EXTENDED  Unit Quantity to be pick up in this event
+// TODO	289 SCT_LINE_TD EXTENDED  Unit of measure Code for Unit Quantity to be pick up in this event
+	
+	// 291..393 + 294..296
+	// 304..306 + 305..307
+	@Override
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return Period.create(start, end);
+	}
+
+	// 297: LINE REQUESTED DELIVERY DATE or PERIOD
 	// 298: BG-26 0..1 Date on which Delivery is requested
 	// wie HeaderTradeDelivery#setLineDeliveryDate
 	public void setLineDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		//SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", ts);
-		// newFieldInstance nicht notwendig, da .getRequestedDeliverySupplyChainEvent() dasselbe bewirkt:
 		if (getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
-
 	public Timestamp getLineDeliveryDateAsTimestamp() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
 		if (list.isEmpty()) return null;
@@ -1575,21 +1611,14 @@ A group of business terms providing information about where and when the goods a
 		return dateTime == null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 
-	// 304..306 + 305..307
-	@Override
-	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-		return Period.create(start, end);
-	}
-
 	// 303: BG-26 0..1 Period on which Delivery is requested
+	@Override
 	public void setLineDeliveryPeriod(IPeriod period) {
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", period);
 		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
 	}
-
 	@Override
 	public IPeriod getLineDeliveryPeriod() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
@@ -1728,7 +1757,7 @@ A group of business terms providing information about where and when the goods a
 	// 340: BT-133 0..1 line Buyer accounting reference : ram:ReceivableSpecifiedTradeAccountingAccount
 	public void setBuyerAccountingReference(String text) {
 		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "receivableSpecifiedTradeAccountingAccount", text);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), this.FIELD_id, text);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount(), FIELD_id, text);
 	}
 	public String getBuyerAccountingReference() {
 		TradeAccountingAccountType taa = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getReceivableSpecifiedTradeAccountingAccount();

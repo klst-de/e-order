@@ -9,8 +9,8 @@ import com.klst.edoc.untdid.DateTimeFormats;
 /**
  * BG-26 DELIVERY DATE or PERIOD with BT-134 line period start date and BT-135 line period end date
  * <p>
- * The Requested Date or Period on which Pick up is requested
- * A group of business terms providing information about the delivery date or period relevant for the Order line.
+ * The Requested Date or Period on which Pick up is requested.
+ * Or a group of business terms providing information about the delivery date or period relevant for the Order line.
  * <p>
  * Requested Delivery Date
  * Requested Delivery Period, at least 1 StartDate or 1 EndDate
@@ -41,5 +41,21 @@ public interface BG26_LineDeliveryPeriod extends IPeriodFactory {
 		setLineDeliveryPeriod(createPeriod(ymdStart, ymdEnd));
 	}
 	public IPeriod getLineDeliveryPeriod();
+
+	// Pick up:
+	public void setLinePickupDate(Timestamp timestamp);
+	default void setLinePickupDate(String ymd) {
+		if(ymd!=null) setLinePickupDate(DateTimeFormats.ymdToTs(ymd));
+	}
+	public Timestamp getLinePickupDateAsTimestamp();
+
+	public void setLinePickupPeriod(IPeriod period);
+	default void setLinePickupPeriod(Timestamp start, Timestamp end) {
+		setLinePickupPeriod(createPeriod(start, end));
+	}
+	default void setLinePickupPeriod(String ymdStart, String ymdEnd) {
+		setLinePickupPeriod(createPeriod(ymdStart, ymdEnd));
+	}
+	public IPeriod getLinePickupPeriod();
 
 }

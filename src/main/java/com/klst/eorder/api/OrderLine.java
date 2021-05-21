@@ -541,7 +541,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	public void setBuyerAccountingReference(String text);
 	public String getBuyerAccountingReference();
 
-	// 297: BG-26 0..1 LINE REQUESTED DELIVERY DATE - PERIOD with 
+	// 297: BG-26 0..1 LINE REQUESTED DELIVERY DATE or PERIOD with 
 	//       BT-134 0..1 Invoice line period start date
 	//       BT-135 0..1 Invoice line period end date
 	
