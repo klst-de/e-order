@@ -1,5 +1,9 @@
 package com.klst.readme;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,6 +11,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -93,7 +98,7 @@ public class EX11 {
 		try {
 			InputStream is = new FileInputStream(testFile);
 			object = transformer.unmarshal(is);
-			LOG.info(">>>>"+object);
+			LOG.info("unmarshaled object:"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 			// dynamisch:
 			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
@@ -112,15 +117,26 @@ public class EX11 {
 //		writeBytesToFile(xml, "EX11-TestResult.xml");
 	}
 
+	static final Timestamp issueDate = DateTimeFormats.ymdToTs("2020-01-09");
+
 	@Test
     public void readFile() {
 		File testFile = getTestFile(TESTDIR+"ORDER-X_EX11_ORDER_PICK-UP-BASIC.xml");
 		transformer = cioTransformer;
 		CoreOrder cio = null;
-		// toModel:
+		// unmarshal toModel:
 		if(transformer.isValid(testFile)) {
 			cio = unmarshal(testFile);
 		}
+		assertFalse(cio.isTest());                                        // 2
+		assertEquals(BG2_ProcessControl.PROFILE_BASIC, cio.getProfile()); // 7
+		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());      // 11
+		assertEquals(issueDate, cio.getIssueDateAsTimestamp());
+		assertFalse(cio.isCopy());
+		assertEquals(MessageFunctionEnum.Original, cio.getPurposeCode());
+		assertEquals("AC", cio.getRequestedResponse()); // 20: "AC" to request an Order Response
+		
+		assertEquals(3, cio.getLines().size());
 	}
 
 	@Test

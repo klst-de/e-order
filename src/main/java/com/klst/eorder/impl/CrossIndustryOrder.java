@@ -234,11 +234,11 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 	// 19: Purpose Code
 	@Override
 	public void setPurpose(MessageFunctionEnum code) {
-		SCopyCtor.getInstance().set(getExchangedDocument(), "requestedResponseTypeCode", code.getValueAsString());
+		SCopyCtor.getInstance().set(getExchangedDocument(), "purposeCode", code.getValueAsString());
 	}
 	private String getPurpose() {
 		if(super.getExchangedDocument().getPurposeCode()==null) return null;
-		return getExchangedDocument().getRequestedResponseTypeCode().getValue();
+		return getExchangedDocument().getPurposeCode().getValue();
 	}
 	@Override
 	public MessageFunctionEnum getPurposeCode() {
