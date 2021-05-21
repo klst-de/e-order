@@ -3,6 +3,7 @@ package com.klst.readme;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -54,14 +55,18 @@ public class EX11 {
 	}
 //	private static final Logger LOG = Logger.getLogger(OrderTest.class.getName());
 
+	static private final String TESTDIR = "src/test/resources/";
+
 	static final String EUR = "EUR";
 	static final String C62 = "C62";
 	static final String MTK = "MTK"; // m²
-	static final String GTIN = "0160"; // Global Trade Item Number (GTIN)
-	// Coding Systems : 
+	static final String PRD = "PRD"; // UNTDID 4451: Product information
+
+	// Coding Systems aka ICD Schemas : 
 	// System Information et Repertoire des Entreprise et des Etablissements: SIRENE
-	static final String SIRENE = "0002"; // ICD Schema for SIRENE
-	static final String EAN_LOCO = "0088"; // ICD Schema for EAN Location Code
+	static final String SIRENE 		= "0002"; // ICD Schema for SIRENE
+	static final String EAN_LOCO 	= "0088"; // ICD Schema for EAN Location Code
+	static final String GTIN 		= "0160"; // Global Trade Item Number (GTIN)
 	
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
@@ -78,8 +83,48 @@ public class EX11 {
 	   	object = null;
     }
 
+	private File getTestFile(String uri) {
+		File file = new File(uri);
+		LOG.info("test file "+file.getAbsolutePath() + " canRead:"+file.canRead());
+		return file;
+	}
+
+	private CoreOrder unmarshal(File testFile) {
+		try {
+			InputStream is = new FileInputStream(testFile);
+			object = transformer.unmarshal(is);
+			LOG.info(">>>>"+object);
+			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
+			// dynamisch:
+			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			LOG.severe(ex.getMessage());
+		}
+		return null;
+	}
+
+	private void marshal() {
+		LOG.info("object.Class:"+object.getClass());
+		
+		byte[] xml = transformer.marshal(object);
+		LOG.info(new String(xml));
+//		writeBytesToFile(xml, "EX11-TestResult.xml");
+	}
+
 	@Test
-	public void cioTest() {
+    public void readFile() {
+		File testFile = getTestFile(TESTDIR+"ORDER-X_EX11_ORDER_PICK-UP-BASIC.xml");
+		transformer = cioTransformer;
+		CoreOrder cio = null;
+		// toModel:
+		if(transformer.isValid(testFile)) {
+			cio = unmarshal(testFile);
+		}
+	}
+
+	@Test
+	public void create() {
 		CoreOrder order;
 		order = CrossIndustryOrder.getFactory().createOrder(BG2_ProcessControl.PROFILE_BASIC, "A1", DocumentNameCode.Order);
 		order.setTestIndicator(CoreOrder.PROD);                  // 2:
@@ -101,7 +146,7 @@ public class EX11 {
 		  , new UnitPriceAmount(new BigDecimal(18.74)) // price
 		  , "HPL 0.8 mm  3070x1320"                    // itemName
 		  );
-		line1.addNote("PRD", "certifiés  PEFC mini 90% PEFC/10-34-97");
+		line1.addNote(PRD, "certifiés  PEFC mini 90% PEFC/10-34-97");
 		line1.setUnitPriceQuantity(new Quantity(MTK, new BigDecimal(1))); // (optional) price base quantity
 		line1.setPartialDeliveryIndicator(OrderLine.NO);
 		line1.addStandardIdentifier("3607765426686", GTIN);
@@ -183,15 +228,7 @@ public class EX11 {
 		
 		transformer = cioTransformer;
 		object = order;
-		commercialOrderTest();
-	}
-
-	void commercialOrderTest() {
-		LOG.info("object.Class:"+object.getClass());
-		
-		byte[] xml = transformer.marshal(object);
-		LOG.info(new String(xml));
-//		writeBytesToFile(xml, "EX11-TestResult.xml");
+		marshal();
 	}
 
 }

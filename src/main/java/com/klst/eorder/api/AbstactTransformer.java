@@ -90,7 +90,7 @@ public abstract class AbstactTransformer implements NamespacePrefixMapperFactory
 		return getSchemaValidator(getResource());
 	}
 	
-	public abstract <T> T unmashal(InputStream xmlInputStream);
+	public abstract <T> T unmarshal(InputStream xmlInputStream);
 	
 	protected <T extends Object> T unmarshal(InputStream xmlInputStream, Class<T> declaredType) {
 		try {

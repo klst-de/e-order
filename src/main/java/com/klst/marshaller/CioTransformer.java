@@ -62,7 +62,7 @@ public class CioTransformer extends AbstactTransformer {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Object> T unmashal(InputStream xmlInputStream) {
+	public <T extends Object> T unmarshal(InputStream xmlInputStream) {
 		Class<?> type = loadClass();
 		Object result = this.unmarshal(xmlInputStream, type);
 		return (T) result;

@@ -111,7 +111,7 @@ public class OrderTransformerTest {
 			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder laden
 //			CoreOrder order = new CrossIndustryOrder(transformer.toModel(is));
 			// dynamisch:
-			Object o = transformer.unmashal(is);
+			Object o = transformer.unmarshal(is);
 			CoreOrder order = CoreOrder.class.cast(type.getConstructor(o.getClass()).newInstance(o));
 			assertEquals(DocumentNameCode.Order, order.getDocumentCode());
 		} catch (Exception ex) {
@@ -148,7 +148,7 @@ public class OrderTransformerTest {
 		try {
 			InputStream is = new FileInputStream(file);
 //			Object o = 
-					transformer.unmashal(is);
+					transformer.unmarshal(is);
 			// expected Exception because input is not CIO
 			fail("UnmarshalException not thrown");
 		} catch (Exception ex) {
