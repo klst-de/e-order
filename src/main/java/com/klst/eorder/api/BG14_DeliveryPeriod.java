@@ -2,15 +2,14 @@ package com.klst.eorder.api;
 
 import java.sql.Timestamp;
 
-import com.klst.edoc.api.IPeriod;
-import com.klst.edoc.api.IPeriodFactory;
 import com.klst.edoc.untdid.DateTimeFormats;
 
 /**
- * BG-14 DELIVERY DATE or PERIOD with BT-73 start date and BT-74 end date
+ * BG-14 DELIVERY or PICK UP
+ * DATE or PERIOD with BT-73 start date and BT-74 end date
  * <p>
  * The Requested Date or Period on which Delivery is requested, 
- * mutually exclusive with Pick up = Despatch (not in CII)
+ * mutually exclusive with Pick up aka Despatch
  * <p>
  * Requested Delivery Date
  * Requested Delivery Period, at least 1 StartDate or 1 EndDate
@@ -25,39 +24,30 @@ import com.klst.edoc.untdid.DateTimeFormats;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
+public interface BG14_DeliveryPeriod extends DeliveryPeriod, PickupPeriod {
+/*	
+--DeliveryDate--PickupDate
+DeliveryPeriod
+PickupPeriod
 
-public interface BG14_DeliveryPeriod extends IPeriodFactory {
-	
-	// createPeriod in IPeriodFactory
-	
+dann in BG14 und in BG26
+extends IPeriodFactory, DeliveryDate, DeliveryPeriod,
+PickupDate, PickupPeriod
+
+BG14_DeliveryPeriod umbenennen in BG14_DeliveryOrPickup
+ */
+	// 767: Delivery Date
 	public void setDeliveryDate(Timestamp timestamp);
 	default void setDeliveryDate(String ymd) {
 		if(ymd!=null) setDeliveryDate(DateTimeFormats.ymdToTs(ymd));
 	}
 	public Timestamp getDeliveryDateAsTimestamp();
 
-	public void setDeliveryPeriod(IPeriod period);
-	default void setDeliveryPeriod(Timestamp start, Timestamp end) {
-		setDeliveryPeriod(createPeriod(start, end));
-	}
-	default void setDeliveryPeriod(String ymdStart, String ymdEnd) {
-		setDeliveryPeriod(createPeriod(ymdStart, ymdEnd));
-	}
-	public IPeriod getDeliveryPeriod();
-
-	// Pick up:
+	// 778: Pick up Date
 	public void setPickupDate(Timestamp timestamp);
 	default void setPickupDate(String ymd) {
 		if(ymd!=null) setPickupDate(DateTimeFormats.ymdToTs(ymd));
 	}
 	public Timestamp getPickupDateAsTimestamp();
 
-	public void setPickupPeriod(IPeriod period);
-	default void setPickupPeriod(Timestamp start, Timestamp end) {
-		setPickupPeriod(createPeriod(start, end));
-	}
-	default void setPickupPeriod(String ymdStart, String ymdEnd) {
-		setPickupPeriod(createPeriod(ymdStart, ymdEnd));
-	}
-	public IPeriod getPickupPeriod();
 }
