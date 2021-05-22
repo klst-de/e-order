@@ -1551,7 +1551,7 @@ A group of business terms providing information about where and when the goods a
 	// 284: LINE REQUESTED PICK UP DATE or PERIOD
 	// 285: LINE REQUESTED PICK UP DATE
 	@Override
-	public void setLinePickupDate(Timestamp ts) {
+	public void setPickupDate(Timestamp ts) {
 		if(ts==null) return;
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		if (getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().isEmpty()) {
@@ -1560,7 +1560,7 @@ A group of business terms providing information about where and when the goods a
 		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
 	@Override
-	public Timestamp getLinePickupDateAsTimestamp() {
+	public Timestamp getPickupDateAsTimestamp() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
 		if (list.isEmpty()) return null;
 		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
@@ -1569,7 +1569,7 @@ A group of business terms providing information about where and when the goods a
 
 	// 290: LINE REQUESTED PICK UP PERIOD
 	@Override
-	public void setLinePickupPeriod(IPeriod period) {
+	public void setPickupPeriod(IPeriod period) {
 		if(period==null) return;
 		if(getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
@@ -1577,7 +1577,7 @@ A group of business terms providing information about where and when the goods a
 		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
 	}
 	@Override
-	public IPeriod getLinePickupPeriod() {
+	public IPeriod getPickupPeriod() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
 		if (list.isEmpty()) return null;
 		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();
@@ -1595,16 +1595,36 @@ A group of business terms providing information about where and when the goods a
 	}
 
 	// 297: LINE REQUESTED DELIVERY DATE or PERIOD
+/* TODO
+288: Unit Quantity to be pick up in this event
+//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem
+ //ram:SpecifiedLineTradeDelivery/ram:RequestedDespatchSupplyChainEvent/ram:UnitQuantity
+	A number of units for this supply chain event.	
+	To be used in case of multiple delivery date or period
+289: Unit of measure Code for Unit Quantity to be pick up in this event
+
+301: Unit Quantity to be delivered in this event
+//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem
+ //ram:SpecifiedLineTradeDelivery/ram:RequestedDeliverySupplyChainEvent/ram:UnitQuantity
+//	@Override
+	public void setLineDeliveryUnitQuantity(IQuantity quantity) {
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", quantity);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent(), "unitQuantity", quantity);
+		// protected QuantityType unitQuantity;
+	}
+
+302: Unit of measure Code for Unit Quantity to be delivered
+ */
 	// 298: BG-26 0..1 Date on which Delivery is requested
 	// wie HeaderTradeDelivery#setLineDeliveryDate
-	public void setLineDeliveryDate(Timestamp ts) {
+	public void setDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		if (getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
-	public Timestamp getLineDeliveryDateAsTimestamp() {
+	public Timestamp getDeliveryDateAsTimestamp() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
 		if (list.isEmpty()) return null;
 		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
@@ -1613,14 +1633,14 @@ A group of business terms providing information about where and when the goods a
 
 	// 303: BG-26 0..1 Period on which Delivery is requested
 	@Override
-	public void setLineDeliveryPeriod(IPeriod period) {
+	public void setDeliveryPeriod(IPeriod period) {
 		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
 	}
 	@Override
-	public IPeriod getLineDeliveryPeriod() {
+	public IPeriod getDeliveryPeriod() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
 		if (list.isEmpty()) return null;
 		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();

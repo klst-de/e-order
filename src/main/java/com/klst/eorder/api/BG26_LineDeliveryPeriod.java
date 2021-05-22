@@ -27,35 +27,35 @@ import com.klst.edoc.untdid.DateTimeFormats;
  */
 public interface BG26_LineDeliveryPeriod extends IPeriodFactory {
 
-	public void setLineDeliveryDate(Timestamp timestamp);
-	default void setLineDeliveryDate(String ymd) {
-		if(ymd!=null) setLineDeliveryDate(DateTimeFormats.ymdToTs(ymd));
+	public void setDeliveryDate(Timestamp timestamp);
+	default void setDeliveryDate(String ymd) {
+		if(ymd!=null) setDeliveryDate(DateTimeFormats.ymdToTs(ymd));
 	}
-	public Timestamp getLineDeliveryDateAsTimestamp();
+	public Timestamp getDeliveryDateAsTimestamp();
 
-	public void setLineDeliveryPeriod(IPeriod period);
-	default void setLineDeliveryPeriod(Timestamp start, Timestamp end) {
-		setLineDeliveryPeriod(createPeriod(start, end));
+	public void setDeliveryPeriod(IPeriod period);
+	default void setDeliveryPeriod(Timestamp start, Timestamp end) {
+		setDeliveryPeriod(createPeriod(start, end));
 	}
-	default void setLineDeliveryPeriod(String ymdStart, String ymdEnd) {
-		setLineDeliveryPeriod(createPeriod(ymdStart, ymdEnd));
+	default void setDeliveryPeriod(String ymdStart, String ymdEnd) {
+		setDeliveryPeriod(createPeriod(ymdStart, ymdEnd));
 	}
-	public IPeriod getLineDeliveryPeriod();
+	public IPeriod getDeliveryPeriod();
 
 	// Pick up:
-	public void setLinePickupDate(Timestamp timestamp);
-	default void setLinePickupDate(String ymd) {
-		if(ymd!=null) setLinePickupDate(DateTimeFormats.ymdToTs(ymd));
+	public void setPickupDate(Timestamp timestamp);
+	default void setPickupDate(String ymd) {
+		if(ymd!=null) setPickupDate(DateTimeFormats.ymdToTs(ymd));
 	}
-	public Timestamp getLinePickupDateAsTimestamp();
+	public Timestamp getPickupDateAsTimestamp();
 
-	public void setLinePickupPeriod(IPeriod period);
-	default void setLinePickupPeriod(Timestamp start, Timestamp end) {
-		setLinePickupPeriod(createPeriod(start, end));
+	public void setPickupPeriod(IPeriod period);
+	default void setPickupPeriod(Timestamp start, Timestamp end) {
+		setPickupPeriod(createPeriod(start, end));
 	}
-	default void setLinePickupPeriod(String ymdStart, String ymdEnd) {
-		setLinePickupPeriod(createPeriod(ymdStart, ymdEnd));
+	default void setPickupPeriod(String ymdStart, String ymdEnd) {
+		setPickupPeriod(createPeriod(ymdStart, ymdEnd));
 	}
-	public IPeriod getLinePickupPeriod();
+	public IPeriod getPickupPeriod();
 
 }
