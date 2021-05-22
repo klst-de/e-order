@@ -79,6 +79,7 @@ public interface BG29_PriceDetails {
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BG-29.BT-150 + BG-29.BT-149
+	 * <br>Order-X-No:  180+181	
 	 * 
 	 * @return UnitPriceQuantity
 	 * @see #getQuantity
