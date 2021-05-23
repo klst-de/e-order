@@ -1565,40 +1565,45 @@ A group of business terms providing information about where and when the goods a
 	@Override
 	public void setPickupDate(Timestamp ts) {
 		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		if (getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().isEmpty()) {
-			getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
-		}
-		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
+		addPickupEvent(createSupplyChainEvent(null, ts));
+//		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
+//		if (getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().isEmpty()) {
+//			getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
+//		}
+//		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
 	@Override
 	public Timestamp getPickupDateAsTimestamp() {
-		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
+//		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
+//		if (list.isEmpty()) return null;
+//		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
+//		return dateTime == null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+		List<ISupplyChainEvent> list = getPickupEvents();
 		if (list.isEmpty()) return null;
-		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
-		return dateTime == null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+		return list.get(0).getOccurrenceDateAsTimestamp();
 	}
 
 	// 290: LINE REQUESTED PICK UP PERIOD
 	@Override
 	public void setPickupPeriod(IPeriod period) {
 		if(period==null) return;
-		if(getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().isEmpty()) {
-			getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
-		}
-		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
+		addPickupEvent(createSupplyChainEvent(null, period));
+//		if(getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().isEmpty()) {
+//			getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
+//		}
+//		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
 	}
 	@Override
 	public IPeriod getPickupPeriod() {
-		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
+//		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
+//		if (list.isEmpty()) return null;
+//		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();
+//		return period == null ? null : Period.create(period);
+		List<ISupplyChainEvent> list = getPickupEvents();
 		if (list.isEmpty()) return null;
-		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();
-		return period == null ? null : Period.create(period);
+		return list.get(0).getOccurrencePeriod();
 	}
 
-// TODO	288 SCT_LINE_TD EXTENDED  Unit Quantity to be pick up in this event
-// TODO	289 SCT_LINE_TD EXTENDED  Unit of measure Code for Unit Quantity to be pick up in this event
-	
 	// 291..393 + 294..296
 	// 304..306 + 305..307
 	@Override
@@ -1632,74 +1637,48 @@ A group of business terms providing information about where and when the goods a
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add((SupplyChainEvent)supplyChainEvent);
 	}
 
-//------------------------
-/* TODO
-288: Unit Quantity to be pick up in this event
-//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem
- //ram:SpecifiedLineTradeDelivery/ram:RequestedDespatchSupplyChainEvent/ram:UnitQuantity
-	A number of units for this supply chain event.	
-	To be used in case of multiple delivery date or period
-289: Unit of measure Code for Unit Quantity to be pick up in this event
-
-301: Unit Quantity to be delivered in this event
-//rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem
- //ram:SpecifiedLineTradeDelivery/ram:RequestedDeliverySupplyChainEvent/ram:UnitQuantity
-302: Unit of measure Code for Unit Quantity to be delivered
- */
 	// 298: BG-26 0..1 Date on which Delivery is requested
 	// wie HeaderTradeDelivery#setLineDeliveryDate
 	@Override
 	public void setDeliveryDate(Timestamp ts) {
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		if (getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
-			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
-		}
-		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
+		if(ts==null) return;
+		addDeliveryEvent(createSupplyChainEvent(null, ts));
+//		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
+//		if (getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
+//			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
+//		}
+//		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
 	@Override
 	public Timestamp getDeliveryDateAsTimestamp() {
-		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
-		if (list.isEmpty()) return null;
-		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
-		return dateTime == null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
-	}
-
-	// 301: Unit Quantity (+Unit of measure Code) to be delivered in this event
-	// List<SupplyChainEventType> getRequestedDeliverySupplyChainEvent()
-//	@Override
-//	public void setDeliveryUnitQuantity(IQuantity quantity) {
-//		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", quantity);
-//		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent(), "unitQuantity", quantity);
-//	}
-//	@Override
-//	public IQuantity getDeliveryUnitQuantity() {
 //		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
 //		if (list.isEmpty()) return null;
-///*
-//TODO für (extended) SupplyChainEvent
-//public class SupplyChainEventType {
-//
-//    protected DateTimeType occurrenceDateTime;
-//    protected QuantityType unitQuantity;
-//    protected SpecifiedPeriodType occurrenceSpecifiedPeriod;
-//
-// */
-//	}
+//		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
+//		return dateTime == null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+		List<ISupplyChainEvent> list = getDeliveryEvents();
+		if (list.isEmpty()) return null;
+		return list.get(0).getOccurrenceDateAsTimestamp();
+	}
 
 	// 303: BG-26 0..1 Period on which Delivery is requested
 	@Override
 	public void setDeliveryPeriod(IPeriod period) {
-		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
-			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
-		}
-		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
+		if(period==null) return;
+		addDeliveryEvent(createSupplyChainEvent(null, period));
+//		if(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
+//			getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
+//		}
+//		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
 	}
 	@Override
 	public IPeriod getDeliveryPeriod() {
-		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
+//		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
+//		if (list.isEmpty()) return null;
+//		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();
+//		return period == null ? null : Period.create(period);
+		List<ISupplyChainEvent> list = getDeliveryEvents();
 		if (list.isEmpty()) return null;
-		SpecifiedPeriodType period = list.get(0).getOccurrenceSpecifiedPeriod();
-		return period == null ? null : Period.create(period);
+		return list.get(0).getOccurrencePeriod();
 	}
 	
 //	310 SCT_LINE_TS BASIC	  LINE TRADE SETTLEMENT

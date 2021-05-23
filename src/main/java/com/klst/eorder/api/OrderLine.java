@@ -24,7 +24,7 @@ import com.klst.eorder.impl.TradeProductInstance;
 public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	_79_AdditionalReferencedProductDocs, // 79 : ADDITIONAL REFERENCED PRODUCT DOCUMENT
 	_141_AdditionalReferencedDocs,       //	141: ADDITIONAL REFERENCED DOCUMENT
-	BG26_LineDeliveryPeriod, 
+	BG26_LineDeliveryOrPickup, 
 	BG27_LineLevelAllowences, 
 	BG28_LineLevelCharges,
 	BG29_PriceDetails, 

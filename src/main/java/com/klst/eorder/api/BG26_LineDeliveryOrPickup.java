@@ -21,47 +21,34 @@ import com.klst.edoc.untdid.DateTimeFormats;
  * <br>EN16931-ID: 	BG-26
  * <br>Rule ID:
  * <br>Order-X-No: 	284ff (Pick up) , 297ff (Delivery)
- * <p>
- * BT-134 and BT-135
- * Cardinality: 	0..1
  * 
- * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
+ * @see ISupplyChainEvent
  */
-public interface BG26_LineDeliveryPeriod extends DeliveryPeriod, PickupPeriod, ISupplyChainEventFactory {
+public interface BG26_LineDeliveryOrPickup extends DeliveryPeriod, PickupPeriod, ISupplyChainEventFactory {
 
-	// 285: Pick up Date
+	// 285: Pick up Date, use this in BASIC and COMFORT
 	public void setPickupDate(Timestamp timestamp);
 	default void setPickupDate(String ymd) {
 		if(ymd!=null) setPickupDate(DateTimeFormats.ymdToTs(ymd));
 	}
 	public Timestamp getPickupDateAsTimestamp();
 
-	// (extended) 288: Unit Quantity to be delivered in this event
-//	public void setPickupUnitQuantity(IQuantity quantity);
-//	public IQuantity getPickupUnitQuantity();
-
-	// 298: Requested Delivery Date
+	// 298: Requested Delivery Date, use this in BASIC and COMFORT
 	public void setDeliveryDate(Timestamp timestamp);
 	default void setDeliveryDate(String ymd) {
 		if(ymd!=null) setDeliveryDate(DateTimeFormats.ymdToTs(ymd));
 	}
 	public Timestamp getDeliveryDateAsTimestamp();
 	
-	// (extended) 301: Unit Quantity to be delivered in this event
-//	public void setDeliveryUnitQuantity(IQuantity quantity);
-//	public IQuantity getDeliveryUnitQuantity();
-	
-	/*
-TODO: für (extended)
-public void addDeliveryEvent(IQuantity quantity, Timestamp timestamp);
-public void addDeliveryEvent(IQuantity quantity, IPeriod period);
-List<AbstractSupplyChainEvent> getDeliveryEvent();
-  oder
-List<ISupplyChainEvent> getDeliveryEvents();
-	 */
 	// 284 (Pick up) 0..1 / extended: 0..n
 	public List<ISupplyChainEvent> getPickupEvents();
 	public void addPickupEvent(ISupplyChainEvent supplyChainEvent);
+	default void addPickupEvent(IQuantity quantity, Timestamp timestamp) {
+		addPickupEvent(createSupplyChainEvent(quantity, timestamp));
+	}
+	default void addPickupEvent(IQuantity quantity, IPeriod period) {
+		addPickupEvent(createSupplyChainEvent(quantity, period));
+	}
 	
 	// 297 (Delivery)  0..1 / extended: 0..n
 	public List<ISupplyChainEvent> getDeliveryEvents();
