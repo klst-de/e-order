@@ -513,7 +513,7 @@ public class SCopyCtor {
 		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
 		while(valueSuperType.getPackage()!=packageCCTSM) {
 			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
-			LOG.info("search for proper package to "+valueSuperType.getCanonicalName());
+			LOG.config("search for proper package to "+valueSuperType.getCanonicalName());
 			valueSuperType = valueSuperType.getSuperclass();
 		}
 

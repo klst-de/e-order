@@ -15,17 +15,6 @@ import com.klst.edoc.untdid.TaxCategoryCode;
  */
 public interface ITaxCategory extends ITaxCategoryFactory, ITaxType {
 	
-	// ALLOWANCES (BG-20) and CHARGES (BG-21) BT-95-0, BT-102-0
-	// VAT BREAKDOWN BG-23.BT-118-0
-	// LINE VAT INFORMATION : BG-30.BT-151-0
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public void setTaxType(String type);
-//	@Override
-//	public String getTaxType();
-	
 	/**
 	 * VAT/tax category code 
 	 * <p>
@@ -34,7 +23,6 @@ public interface ITaxCategory extends ITaxCategoryFactory, ITaxType {
 	 * Cardinality: 1..1 (mandatory)
 	 * <br>EN16931-ID: 	BG-23.BT-118, also used in BG-20.BT-95 , BG-21.BT-102 and BG-30.BT-151
 	 * <br>Rule ID: 	BR-47
-	 * <br>Request ID: 	R38, R45, R49
 	 * <br>Order-X-No: 	884, 901, 
 	 * 
 	 * @param code typically S for StandardRate
@@ -71,7 +59,6 @@ public interface ITaxCategory extends ITaxCategoryFactory, ITaxType {
 	 * Cardinality: 0..1 (optional)
 	 * <br>EN16931-ID: 	BG-23.BT-119, also used in BG-20.BT-96 , BG-21.BT-103 and BG-30.BT-152
 	 * <br>Rule ID: 	BR-48 , BR-DE-14 (mandatory)
-	 * <br>Request ID: 	R38, R49
 	 * 
 	 * @param taxRate
 	 */
