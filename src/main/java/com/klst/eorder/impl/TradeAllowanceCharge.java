@@ -12,7 +12,6 @@ import com.klst.eorder.api.ITaxCategory;
 
 import un.unece.uncefact.codelist.standard.unece.dutyortaxorfeecategorycode.d20a.DutyorTaxorFeeCategoryCodeContentType;
 import un.unece.uncefact.codelist.standard.unece.dutytaxfeetypecode.d20a.DutyTaxFeeTypeCodeContentType;
-import un.unece.uncefact.data.standard.qualifieddatatype._128.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.IndicatorType;
 

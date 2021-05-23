@@ -14,7 +14,6 @@ import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
 import com.klst.edoc.api.Reference;
-import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
@@ -34,7 +33,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.ProductClassificationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SpatialDimensionType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SupplyChainEventType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SupplyChainPackagingType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.SupplyChainTradeLineItemType;
@@ -42,7 +40,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeSettlementLineMonetarySummationType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._128.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._128.IndicatorType;
 import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;

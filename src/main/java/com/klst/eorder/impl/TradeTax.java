@@ -1,7 +1,6 @@
 package com.klst.eorder.impl;
 
 import java.math.BigDecimal;
-import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
@@ -16,18 +15,6 @@ import un.unece.uncefact.data.standard.qualifieddatatype._128.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.TradeTaxType;
 
 public class TradeTax extends TradeTaxType implements ITaxCategory {
-
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	// implements VatBreakdownFactory
-//	@Override
-//	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
-//		return create(taxableAmount, taxAmount, taxCode, taxRate);
-//	}
-//	static TradeTax create(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
-//		return new TradeTax(taxableAmount, taxAmount, taxCode, taxRate);
-//	}
 
 	/**
 	 * {@inheritDoc}
@@ -100,60 +87,27 @@ public class TradeTax extends TradeTaxType implements ITaxCategory {
 		return stringBuilder.toString();
 	}
 
-	// BT-7 0..1 Value added tax point date
-	//  Die Verwendung von BT-7 und BT-8 schließt sich gegenseitig aus.
-//	public void setTaxPointDate(Timestamp ts) {
-//		if(ts!=null) super.setTaxPointDate(DateTimeFormatStrings.toDate(ts));
-//	}
-//	public Timestamp getTaxPointDateAsTimestamp() {
-//		DateType date = super.getTaxPointDate();
-//		return date==null ? null : DateTimeFormats.ymdToTs(date.getDateString().getValue());		
-//	}
-	
-	// BT-8 0..1 Value added tax point date code
-	//  Die Verwendung von BT-7 und BT-8 schließt sich gegenseitig aus.
-/*
-Anwendung: 
-Die in der Norm zitierten semantischen Werte, die durch die Werte 3, 35, 432 in UNTDID 2005 repräsentiert werden, 
-werden auf die folgenden Werte von UNTDID2475 abgebildet, das ist die von CII 16B unterstützte relevante Codeliste:
-- 5: Ausstellungsdatum des Rechnungsbelegs
-- 29: Liefertermin, Ist-Zustand
-- 72: Bis heute bezahlt
-
-In Deutschland ist das Liefer- und Leistungsdatum maßgebend (BT-72) SupplyChainTradeTransaction/ApplicableHeaderTradeDelivery/ActualDeliverySupplyChainEvent/OccurrenceDateTime/DateTimeString).
-. Codeliste: UNTDID 2475 Untermenge
-
-keine Beispiele für Tests!
-
- */
-//	0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung            BG-23
-//	0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit   BT-8
-	public void setTaxPointDateCode(String code) {
+	void setTaxPointDateCode(String code) {
 		if(code==null) return;		
 		SCopyCtor.getInstance().set(this, "dueDateTypeCode", code);
 	}
-	public String getTaxPointDateCode() {
+	String getTaxPointDateCode() {
 		return super.getDueDateTypeCode()==null ? null : getDueDateTypeCode().getValue();		
 	}
 	
 	// BT-116 1..1 BasisAmount Steuerbasisbetrag
-//	@Override
-	public void setTaxBaseAmount(IAmount amount) {
+	private void setTaxBaseAmount(IAmount amount) {
 		if(amount!=null) super.setBasisAmount((Amount)amount);
 	}
-//	@Override
-	public IAmount getTaxBaseAmount() {
+	private IAmount getTaxBaseAmount() {
 		return super.getBasisAmount()==null ? null : Amount.create(getBasisAmount());
 	}
 
 	// BT-117 1..1 CalculatedAmount Kategoriespezifischer Steuerbetrag
-//	@Override
-	public void setCalculatedTaxAmount(IAmount amount) {
+	private void setCalculatedTaxAmount(IAmount amount) {
 		if(amount!=null) super.setCalculatedAmount((Amount)amount);
 	}
-
-//	@Override
-	public IAmount getCalculatedTaxAmount() {
+	private IAmount getCalculatedTaxAmount() {
 		return super.getCalculatedAmount()==null ? null : Amount.create(getCalculatedAmount());
 	}
 
@@ -167,7 +121,6 @@ keine Beispiele für Tests!
 		ttc.setValue(DutyTaxFeeTypeCodeContentType.fromValue(code));
 		super.setTypeCode(ttc);
 	}
-
 	@Override
 	public String getTaxType() {
 		return super.getTypeCode()==null ? null : super.getTypeCode().getValue().value();
