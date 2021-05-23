@@ -55,7 +55,7 @@ public class TradeTax extends TradeTaxType implements ITaxCategory {
 		}
 	}
 
-	private static final Logger LOG = Logger.getLogger(TradeTax.class.getName());
+//	private static final Logger LOG = Logger.getLogger(TradeTax.class.getName());
 
 	private TradeTax(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		setTaxBaseAmount(taxableAmount);

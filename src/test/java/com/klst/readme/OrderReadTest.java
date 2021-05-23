@@ -176,7 +176,7 @@ public class OrderReadTest {
 		List<OrderLine> lines = cio.getLines();
 		assertEquals(3, lines.size());
 		lines.forEach(line -> {
-			assertNull(line.getLineDeliveryPeriod());
+			assertNull(line.getDeliveryPeriod());
 		});
 	}
 	
@@ -232,14 +232,14 @@ public class OrderReadTest {
 		List<OrderLine> lines = cio.getLines();
 		assertEquals(3, lines.size());
 		OrderLine line = lines.get(0);
-		LOG.info("LineDeliveryPeriod:"+line.getLineDeliveryPeriod().getEndDateAsTimestamp());
-		assertEquals("202004150900", DateTimeFormats.tsToCCYYMMDDHHMM(line.getLineDeliveryPeriod().getStartDateAsTimestamp()));
-		assertEquals("202004301800", DateTimeFormats.tsToCCYYMMDDHHMM(line.getLineDeliveryPeriod().getEndDateAsTimestamp()));
-		line.setLineDeliveryDate("20210101");
+		LOG.info("LineDeliveryPeriod:"+line.getDeliveryPeriod().getEndDateAsTimestamp());
+		assertEquals("202004150900", DateTimeFormats.tsToCCYYMMDDHHMM(line.getDeliveryPeriod().getStartDateAsTimestamp()));
+		assertEquals("202004301800", DateTimeFormats.tsToCCYYMMDDHHMM(line.getDeliveryPeriod().getEndDateAsTimestamp()));
+		line.setDeliveryDate("20210101");
 		
 		line = lines.get(1); // the second! the first has index 0!
-		assertNull(line.getLineDeliveryPeriod());
-		line.setLineDeliveryPeriod("20200415", "20200430");
+		assertNull(line.getDeliveryPeriod());
+		line.setDeliveryPeriod("20200415", "20200430");
 		assertEquals("FR", line.getCountryOfOrigin());
 		Properties attributes = line.getItemAttributes();
 		assertEquals(1, attributes.size());
