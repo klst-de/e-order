@@ -1,8 +1,10 @@
 package com.klst.eorder.api;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.untdid.DateTimeFormats;
 
 /**
@@ -25,7 +27,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-public interface BG26_LineDeliveryPeriod extends DeliveryPeriod, PickupPeriod  {
+public interface BG26_LineDeliveryPeriod extends DeliveryPeriod, PickupPeriod, ISupplyChainEventFactory {
 
 	// 285: Pick up Date
 	public void setPickupDate(Timestamp timestamp);
@@ -51,7 +53,24 @@ public interface BG26_LineDeliveryPeriod extends DeliveryPeriod, PickupPeriod  {
 	
 	/*
 TODO: für (extended)
-public void addDelivery(IQuantity quantity, Timestamp timestamp);
-public void addDelivery(IQuantity quantity, IPeriod period);
+public void addDeliveryEvent(IQuantity quantity, Timestamp timestamp);
+public void addDeliveryEvent(IQuantity quantity, IPeriod period);
+List<AbstractSupplyChainEvent> getDeliveryEvent();
+  oder
+List<ISupplyChainEvent> getDeliveryEvents();
 	 */
+	// 284 (Pick up) 0..1 / extended: 0..n
+	public List<ISupplyChainEvent> getPickupEvents();
+	public void addPickupEvent(ISupplyChainEvent supplyChainEvent);
+	
+	// 297 (Delivery)  0..1 / extended: 0..n
+	public List<ISupplyChainEvent> getDeliveryEvents();
+	public void addDeliveryEvent(ISupplyChainEvent supplyChainEvent);
+	default void addDeliveryEvent(IQuantity quantity, Timestamp timestamp) {
+		addDeliveryEvent(createSupplyChainEvent(quantity, timestamp));
+	}
+	default void addDeliveryEvent(IQuantity quantity, IPeriod period) {
+		addDeliveryEvent(createSupplyChainEvent(quantity, period));
+	}
+	
 }

@@ -20,6 +20,7 @@ import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
+import com.klst.eorder.api.ISupplyChainEvent;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
@@ -451,11 +452,7 @@ public class SupplyChainTradeLineItem extends SupplyChainTradeLineItemType imple
 	
 	// copy ctor
 	private SupplyChainTradeLineItem(SupplyChainTradeLineItemType line) {
-		super();
-		if(line!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, line);
-			LOG.fine("copy ctor:"+this);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, line);
 		this.order = null;
 		tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax()==null ? null 
 				: TradeTax.create(specifiedLineTradeSettlement.getApplicableTradeTax());
@@ -1549,6 +1546,21 @@ A group of business terms providing information about where and when the goods a
 //	283 SCT_LINE_TD EXTENDED
 	
 	// 284: LINE REQUESTED PICK UP DATE or PERIOD
+	@Override
+	public List<ISupplyChainEvent> getPickupEvents() {
+		List<ISupplyChainEvent> res = new ArrayList<ISupplyChainEvent>();
+		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent();
+		list.forEach(e -> {
+			res.add(SupplyChainEvent.create(e));
+		});
+		return res;
+	}
+	@Override
+	public void addPickupEvent(ISupplyChainEvent supplyChainEvent) {
+		if(supplyChainEvent==null) return;
+		getSpecifiedLineTradeDelivery().getRequestedDespatchSupplyChainEvent().add((SupplyChainEvent)supplyChainEvent);
+	}
+
 	// 285: LINE REQUESTED PICK UP DATE
 	@Override
 	public void setPickupDate(Timestamp ts) {
@@ -1593,8 +1605,34 @@ A group of business terms providing information about where and when the goods a
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
 		return Period.create(start, end);
 	}
+	
+	@Override
+	public ISupplyChainEvent createSupplyChainEvent(IQuantity quantity, Timestamp timestamp) {
+		return SupplyChainEvent.create(quantity, timestamp, null);
+	}
+
+	@Override
+	public ISupplyChainEvent createSupplyChainEvent(IQuantity quantity, IPeriod period) {
+		return SupplyChainEvent.create(quantity, null, period);
+	}
 
 	// 297: LINE REQUESTED DELIVERY DATE or PERIOD
+	@Override
+	public List<ISupplyChainEvent> getDeliveryEvents() {
+		List<ISupplyChainEvent> res = new ArrayList<ISupplyChainEvent>();
+		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
+		list.forEach(e -> {
+			res.add(SupplyChainEvent.create(e));
+		});
+		return res;
+	}
+	@Override
+	public void addDeliveryEvent(ISupplyChainEvent supplyChainEvent) {
+		if(supplyChainEvent==null) return;
+		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().add((SupplyChainEvent)supplyChainEvent);
+	}
+
+//------------------------
 /* TODO
 288: Unit Quantity to be pick up in this event
 //rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem
@@ -1606,17 +1644,11 @@ A group of business terms providing information about where and when the goods a
 301: Unit Quantity to be delivered in this event
 //rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem
  //ram:SpecifiedLineTradeDelivery/ram:RequestedDeliverySupplyChainEvent/ram:UnitQuantity
-//	@Override
-	public void setLineDeliveryUnitQuantity(IQuantity quantity) {
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", quantity);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent(), "unitQuantity", quantity);
-		// protected QuantityType unitQuantity;
-	}
-
 302: Unit of measure Code for Unit Quantity to be delivered
  */
 	// 298: BG-26 0..1 Date on which Delivery is requested
 	// wie HeaderTradeDelivery#setLineDeliveryDate
+	@Override
 	public void setDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		if (getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().isEmpty()) {
@@ -1624,12 +1656,35 @@ A group of business terms providing information about where and when the goods a
 		}
 		getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
 	}
+	@Override
 	public Timestamp getDeliveryDateAsTimestamp() {
 		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
 		if (list.isEmpty()) return null;
 		DateTimeType dateTime = list.get(0).getOccurrenceDateTime();
 		return dateTime == null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
+
+	// 301: Unit Quantity (+Unit of measure Code) to be delivered in this event
+	// List<SupplyChainEventType> getRequestedDeliverySupplyChainEvent()
+//	@Override
+//	public void setDeliveryUnitQuantity(IQuantity quantity) {
+//		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeDelivery(), "requestedDeliverySupplyChainEvent", quantity);
+//		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent(), "unitQuantity", quantity);
+//	}
+//	@Override
+//	public IQuantity getDeliveryUnitQuantity() {
+//		List<SupplyChainEventType> list = super.getSpecifiedLineTradeDelivery().getRequestedDeliverySupplyChainEvent();
+//		if (list.isEmpty()) return null;
+///*
+//TODO für (extended) SupplyChainEvent
+//public class SupplyChainEventType {
+//
+//    protected DateTimeType occurrenceDateTime;
+//    protected QuantityType unitQuantity;
+//    protected SpecifiedPeriodType occurrenceSpecifiedPeriod;
+//
+// */
+//	}
 
 	// 303: BG-26 0..1 Period on which Delivery is requested
 	@Override
