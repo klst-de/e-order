@@ -54,10 +54,7 @@ public class Note extends NoteType implements OrderNote, OrderNoteFactory {
 	}
 	// copy ctor
 	private Note(NoteType note) {
-		super();
-		if(note!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, note);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, note);
 	}
 
 	public String toString() {

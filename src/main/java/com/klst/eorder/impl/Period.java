@@ -31,9 +31,7 @@ public class Period extends SpecifiedPeriodType implements IPeriod {
 
 	// copy ctor
 	private Period(SpecifiedPeriodType object) {
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	private Period(Timestamp start, Timestamp end) {

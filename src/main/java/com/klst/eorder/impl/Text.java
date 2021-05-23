@@ -35,10 +35,7 @@ public class Text extends TextType {
 	}
 	
 	private Text(TextType object) {
-		super();
-		if (object != null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 }

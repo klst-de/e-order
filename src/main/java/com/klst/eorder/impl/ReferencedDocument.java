@@ -163,9 +163,7 @@ Beispiel:
 
 	// copy ctor
 	private ReferencedDocument(ReferencedDocumentType object) {
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	private ReferencedDocument(String docRefId, Reference lineId, String description) {

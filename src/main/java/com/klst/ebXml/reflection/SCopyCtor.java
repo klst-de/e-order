@@ -179,6 +179,7 @@ public class SCopyCtor {
 	 */
 	public void invokeCopy(Object obj, Object doc) {
 		LOG.fine("for "+doc);
+		if(doc==null) return;
 		getFieldsByName(doc.getClass());
 		getSettersByName(doc.getClass());
 		getGettersByName(doc.getClass());

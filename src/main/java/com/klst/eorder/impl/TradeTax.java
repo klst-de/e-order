@@ -72,12 +72,8 @@ public class TradeTax extends TradeTaxType implements ITaxCategory {
 	}
 	
 	// copy ctor
-	private TradeTax(TradeTaxType doc) {
-		super();
-		if(doc!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, doc);
-			LOG.config("copy ctor:"+this);
-		}
+	private TradeTax(TradeTaxType object) {
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 	
 	public String toString() {

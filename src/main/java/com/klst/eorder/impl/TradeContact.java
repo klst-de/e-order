@@ -35,10 +35,7 @@ public class TradeContact extends TradeContactType implements ContactInfoExt {
 
 	// copy ctor
 	private TradeContact(TradeContactType contact) {
-		super();
-		if(contact!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, contact);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, contact);
 	}
 
 	/**

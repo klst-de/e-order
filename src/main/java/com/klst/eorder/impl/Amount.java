@@ -59,10 +59,7 @@ public class Amount extends AmountType implements IAmount {
 
 	// copy ctor
 	private Amount(AmountType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	public Amount(BigDecimal amount) {

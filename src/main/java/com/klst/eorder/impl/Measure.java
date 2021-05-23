@@ -61,10 +61,7 @@ public class Measure extends MeasureType implements IQuantity, IMeasureFactory {
 
 	// copy ctor
 	private Measure(MeasureType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	public Measure(String unitCode, BigDecimal value) {

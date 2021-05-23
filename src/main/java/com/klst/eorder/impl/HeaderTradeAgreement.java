@@ -39,10 +39,7 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	
 	// copy ctor
 	private HeaderTradeAgreement(HeaderTradeAgreementType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	// 344: BT-10 0..1 Buyer reference

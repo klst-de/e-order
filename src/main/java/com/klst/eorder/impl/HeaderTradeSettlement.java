@@ -32,10 +32,7 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 
 	// copy ctor
 	private HeaderTradeSettlement(HeaderTradeSettlementType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	// 789: BT-6 0..1 REQUESTED TAX CURRENCY IN INVOICE

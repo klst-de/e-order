@@ -51,10 +51,7 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 	HeaderTradeSettlement applicableHeaderTradeSettlement; // <ram:ApplicableHeaderTradeSettlement>
 	
 	public CrossIndustryOrder(SCRDMCCBDACIOMessageStructureType doc) {
-		super();
-		if(doc!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, doc);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, doc);
 
 		supplyChainTradeTransaction = SupplyChainTradeTransaction.create(super.getSupplyChainTradeTransaction(), this);
 		applicableHeaderTradeAgreement = supplyChainTradeTransaction.createtHeaderTradeAgreement();

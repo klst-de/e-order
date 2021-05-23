@@ -32,10 +32,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 
 	// copy ctor
 	private HeaderTradeDelivery(HeaderTradeDeliveryType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	// 643: ShipToParty @see ShipTo

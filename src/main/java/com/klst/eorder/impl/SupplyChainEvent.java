@@ -18,10 +18,7 @@ public class SupplyChainEvent extends SupplyChainEventType {
 
 	// copy ctor
 	private SupplyChainEvent(SupplyChainEventType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 }

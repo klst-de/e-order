@@ -38,10 +38,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 
 	// copy ctor
 	private TradeAddress(TradeAddressType address) {
-		super();
-		if(address!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, address);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, address);
 	}
 	
 	private TradeAddress(String countryCode, String postalCode, String city, String street) {
