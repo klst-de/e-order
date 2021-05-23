@@ -24,18 +24,8 @@ import com.klst.edoc.untdid.DateTimeFormats;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-public interface BG14_DeliveryPeriod extends DeliveryPeriod, PickupPeriod {
-/*	
---DeliveryDate--PickupDate
-DeliveryPeriod
-PickupPeriod
+public interface BG14_DeliveryOrPickup extends DeliveryPeriod, PickupPeriod {
 
-dann in BG14 und in BG26
-extends IPeriodFactory, DeliveryDate, DeliveryPeriod,
-PickupDate, PickupPeriod
-
-BG14_DeliveryPeriod umbenennen in BG14_DeliveryOrPickup
- */
 	// 767: Delivery Date
 	public void setDeliveryDate(Timestamp timestamp);
 	default void setDeliveryDate(String ymd) {

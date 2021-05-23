@@ -15,7 +15,7 @@ import com.klst.edoc.untdid.MessageFunctionEnum;
 import com.klst.edoc.untdid.PaymentMeansEnum;
 
 public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessControl, BG4_Seller, BG7_Buyer,
-	BG14_DeliveryPeriod, BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
+	BG14_DeliveryOrPickup, BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG24_AdditionalSupportingDocs, BG25_OrderLine, 	
 	ShipTo, ShipFrom,
 	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory, IPeriodFactory {
