@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.LogManager;
@@ -238,8 +239,27 @@ public class OrderReadTest {
 		line.setDeliveryDate("20210101");
 		
 		line = lines.get(1); // the second! the first has index 0!
-		assertNull(line.getDeliveryPeriod());
+/*
+               <ram:SpecifiedLineTradeDelivery>
+                    <ram:PartialDeliveryAllowedIndicator>
+                         <udt:Indicator>true</udt:Indicator>
+                    </ram:PartialDeliveryAllowedIndicator>
+                    <ram:RequestedQuantity unitCode="C62">10.00</ram:RequestedQuantity>
+                    <ram:PackageQuantity unitCode="C62">5</ram:PackageQuantity>
+                    <ram:PerPackageUnitQuantity unitCode="C62">2</ram:PerPackageUnitQuantity>
+                    <ram:RequestedDeliverySupplyChainEvent>
+                         <ram:OccurrenceDateTime>
+                                   <udt:DateTimeString format="102">20200415</udt:DateTimeString>
+                         </ram:OccurrenceDateTime>
+                    </ram:RequestedDeliverySupplyChainEvent>
+               </ram:SpecifiedLineTradeDelivery>
+ */
+		assertEquals("2", line.getId());
+		Timestamp deliveryDate = DateTimeFormats.ymdToTs("20200415");
+		assertEquals(deliveryDate, line.getDeliveryDateAsTimestamp());
 		line.setDeliveryPeriod("20200415", "20200430");
+		assertEquals(2, line.getDeliveryEvents().size()); // 1:Date, 2:Period
+		assertNull(line.getPickupDateAsTimestamp());
 		assertEquals("FR", line.getCountryOfOrigin());
 		Properties attributes = line.getItemAttributes();
 		assertEquals(1, attributes.size());
