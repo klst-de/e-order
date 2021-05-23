@@ -30,7 +30,9 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._128.QuantityType;
  * The quantity of items (goods or services) that is charged in the Order/Invoice line.
  * 
  */
-public class Quantity extends QuantityType implements IQuantity {
+public class Quantity extends QuantityType implements IQuantity
+//, Comparable<QuantityType> 
+{
 
 	@Override
 	public IQuantity createQuantity(String unitCode, BigDecimal value) {
@@ -61,10 +63,7 @@ public class Quantity extends QuantityType implements IQuantity {
 
 	// copy ctor
 	private Quantity(QuantityType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	public Quantity(String unitCode, BigDecimal value) {
@@ -88,5 +87,11 @@ public class Quantity extends QuantityType implements IQuantity {
 		return getValue()==null ? "" : getValue(RoundingMode.HALF_UP) 
 				+ (getUnitCode()==null ? "" : getUnitCode());
 	}
+
+//	@Override
+//	public int compareTo(QuantityType o) {
+//		Quantity q = Quantity.create(o);
+//		return this.toString().compareTo(q.toString());
+//	}
 
 }
