@@ -11,6 +11,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -24,8 +28,10 @@ import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.MessageFunctionEnum;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AbstactTransformer;
@@ -34,6 +40,7 @@ import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.ContactInfoExt;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.Amount;               // impl.jar
 import com.klst.eorder.impl.CrossIndustryOrder;   // impl.jar
 import com.klst.eorder.impl.ID;                   // ...
@@ -72,6 +79,10 @@ public class OrderTest {
 	static final String C62 = "C62";
 	static final String MTR = "MTR";
 	static final String GTIN = "0160"; // Global Trade Item Number (GTIN)
+	static final String TESTDIR = "src/test/resources/";
+	// file content: "Das könnte eine Anlage sein."
+	static final String PDF = "01_15_Anhang_01.pdf";
+	static final String MIME = "application/pdf";
 
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
@@ -88,16 +99,42 @@ public class OrderTest {
 	   	object = null;
     }
 
+	// https://stackoverflow.com/questions/4350084/byte-to-file-in-java
+	private byte[] getBytesFromTestFile(String fileName) {
+		Path path = Paths.get(TESTDIR+fileName);
+		byte[] data = null;
+		try {
+			data = Files.readAllBytes(path);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
+	}
+	private void writeBytesToFile(byte[] bytes, String fileName) {
+		File file = new File(fileName);
+		Path path = Paths.get(file.getAbsolutePath());
+		try {
+			Files.write(path, bytes);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
 	@Test
 	public void cioTest() {
 		CoreOrder order;
 		order = CrossIndustryOrder.getFactory().createOrder(BG2_ProcessControl.PROFILE_COMFORT, null, DocumentNameCode.Order);
-		order.setId("Order#-1"); // BT-1 Identifier (mandatory)
+		order.setId("Order#-1"); // 9: BT-1 Identifier (mandatory)
 		
 		// ExchangedDocument.Name wird in einvoice nicht verwendet
 		
-		order.setIssueDate(DateTimeFormats.ymdToTs("20200331"));	 // BT-2 + 1..1
-		order.setIssueDate(DateTimeFormats.ymdToTs("2020-03-31"));	 // BT-2 + 1..1
+		order.setIssueDate(DateTimeFormats.ymdToTs("20200331"));	 // 14: BT-2
+		order.setIssueDate(DateTimeFormats.ymdToTs("2020-03-31"));
+		order.addLanguage("fr");                        // 18: Language
+		order.setPurpose(MessageFunctionEnum.Original); // 19: defined in UNTDID 1225
+		order.setRequestedResponse("AC");               // 20: defined in UNTDID 4343
 		
 		order.addNote( order.createNote("AAI", "Content of Note") );
 		
@@ -186,18 +223,31 @@ public class OrderTest {
 		allowance.setTaxPercentage(new BigDecimal(20));
 		order.addAllowanceCharge(allowance);
 		
-		// BG-24 ADDITIONAL SUPPORTING DOCUMENTS
-		// <ram:TypeCode>916</ram:TypeCode>
+		// 549: BG-24 ADDITIONAL SUPPORTING DOCUMENTS ==> <ram:TypeCode>916</ram:TypeCode>
 //		Use for "ADDITIONAL SUPPORTING DOCUMENTS" with TypeCode Value = 916, 
 //		or for "OBJECT IDENTIFIER with Type Code Value = 130, "
 //		or for "TENDER OR LOT REFERENCE" with Type Code Value = 50
 		order.addSupportigDocument("ADD_REF_DOC_ID", "ADD_REF_DOC_Desc", "ADD_REF_DOC_URIID");
+		// 561: BT-17 0..1 Tender or lot reference
+		String TENDER_ID = "TENDER_ID";
+		order.setTenderOrLotReference(TENDER_ID);
+		// 564: BT-18 0..1 (OBJECT IDENTIFIER FOR INVOICE)
+		String OBJECT_ID = "OBJECT_ID";
+		order.setInvoicedObject(OBJECT_ID, "AWV"); // AWV == Phone number
+
+		List<SupportingDocument> supportingDocs = order.getAdditionalSupportingDocuments();
+		assertEquals(TENDER_ID, order.getTenderOrLotReference());
+		assertEquals(1, supportingDocs.size());
+		SupportingDocument supportingDoc = supportingDocs.get(0);
+		assertEquals(DocumentNameCode.RelatedDocument.getValueAsString(), supportingDoc.getDocumentCode());
+		assertEquals(OBJECT_ID, order.getInvoicedObject());
 		
 		OrderLine line = order.createOrderLine("1"    // order line number
 				  , new Quantity("C62", new BigDecimal(6))              // one unit/C62
 				  , new Amount(EUR, new BigDecimal(60.00))				// line net amount
 				  , new UnitPriceAmount(EUR, new BigDecimal(10.00))	    // price
 				  , "Zeitschrift [...]"									// itemName
+				  , TaxCategoryCode.StandardRate, new BigDecimal(7)     // VAT category code, rate 7%
 				  );
 		line.addNote("AAI", "Content of Note");
 		line.setUnitPriceQuantity(new Quantity("C62", new BigDecimal(1))); // (optional) price base quantity
@@ -206,7 +256,8 @@ public class OrderTest {
 		line.setSellerAssignedID("987654321");
 		line.setBuyerAssignedID("654987321");
 		
-		line.setLineObjectID("id", "schemeID", "AWV");// BG.25.BT-128
+		line.setStatus("Status");
+		line.setLineObjectID("id", "schemeID", "AWV"); // 154: BG.25.BT-128
 		line.setDescription("description"); // BG-31.BT-154
 		line.addClassificationIdentifier("4047247110051", "EN", null, null); // BG-31.BT-158
 		line.setCountryOfOrigin("FR"); // BG-31.BT-159
@@ -231,6 +282,56 @@ public class OrderTest {
 		assertThat(new BigDecimal(0.30),  Matchers.closeTo(line.getPackagingWidth().getValue(RoundingMode.HALF_UP), new BigDecimal(0.0001)));
 		assertNull(line.getPackagingLength().getUnitCode());
 		assertNull(line.getPackagingHeight());
+
+		/* Test Order-X-No: 79 + 141
+                    <ram:AdditionalReferenceReferencedDocument>
+                         <ram:IssuerAssignedID>ADD_REF_PROD_ID</ram:IssuerAssignedID>
+                         <ram:URIID>ADD_REF_PROD_URIID</ram:URIID>
+                         <ram:TypeCode>6</ram:TypeCode>       TODO DocumentNameCode.ProductSpecification report
+                         <ram:Name>ADD_REF_PROD_Desc</ram:Name>
+                    </ram:AdditionalReferenceReferencedDocument>
+               </ram:SpecifiedTradeProduct>
+                    <ram:AdditionalReferencedDocument>
+                         <ram:IssuerAssignedID>ADD_REF_DOC_ID</ram:IssuerAssignedID>
+                         <ram:URIID>ADD_REF_DOC_URIID</ram:URIID>
+                         <ram:LineID>5</ram:LineID>
+                         <ram:TypeCode>916</ram:TypeCode>
+                         <ram:Name>ADD_REF_DOC_Desc</ram:Name>
+                    </ram:AdditionalReferencedDocument>
+		 */
+		// 79:
+		line.addReferencedProductDocument("ADD_REF_PROD_ID", "6", "ADD_REF_PROD_Desc", "ADD_REF_PROD_URIID");
+		
+		// 98ff : SUBSTITUTED PRODUCT / OOR only
+		line.setSubstitutedProductID("SubstitutedProductID");
+		line.addSubstitutedIdentifier("global ID", "schemeID");
+		
+		// 141:
+		Reference lineID_5 = new ID("5");
+		byte[] content = getBytesFromTestFile(PDF);
+		LOG.info("content.length:"+content.length); // das result xml ist zu gross für's Loggen
+		line.addReferencedDocument("ADD_REF_DOC_ID", lineID_5, "ADD_REF_DOC_Desc"
+				, null // no date for the issuance
+//				, content, MIME, PDF);
+				, "ADD_REF_DOC_URIID");
+		
+		List<SupportingDocument> refProdDocs = line.getReferencedProductDocuments();
+		assertEquals(1, refProdDocs.size());
+		SupportingDocument refProdDoc = refProdDocs.get(0);
+		assertEquals("6", refProdDoc.getDocumentCode());
+		List<SupportingDocument> refDocs = line.getReferencedDocuments();
+		assertEquals(1, refDocs.size());
+		SupportingDocument refDoc = refDocs.get(0);
+		assertEquals(DocumentNameCode.RelatedDocument.getValueAsString(), refDoc.getDocumentCode());
+		assertEquals("5", refDoc.getLineReference().getName());
+		
+		// 162: TODO ? createAllowance auch als createDiscount:
+//		line.createDiscount(new Amount(new BigDecimal(6.00)), reasonCode, reason);
+		AllowancesAndCharges discount = line.createAllowance(new Amount(new BigDecimal(1.00)), null, null);
+		discount.setReasoncode("95");
+		discount.setReasonText("DISCOUNT");
+//		line.setPriceDiscount(line.createAllowance(new Amount(new BigDecimal(1.00)), null, null));
+		line.setPriceDiscount(discount);
 		
 		// 318: BG-27 0..n LINE ALLOWANCES:
 		//BigDecimal tenPerCent = new BigDecimal(10);
@@ -253,7 +354,9 @@ public class OrderTest {
 				, new Quantity("C62", new BigDecimal(10))
 				, new Amount(new BigDecimal(100.00))
 				, new UnitPriceAmount(new BigDecimal(10.00))
-				, "Product Name");
+				, "Product Name"
+				, TaxCategoryCode.StandardRate, new BigDecimal(16)
+				);
 
 		transformer = cioTransformer;
 		object = order;
@@ -265,6 +368,7 @@ public class OrderTest {
 		
 		byte[] xml = transformer.marshal(object);
 		LOG.info(new String(xml));
+//		writeBytesToFile(xml, "orderTestResult.xml");
 	}
 
 }

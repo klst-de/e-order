@@ -16,29 +16,20 @@ import java.util.List;
  * Cardinality: 	0..n
  * <br>EN16931-ID: 	BG-24
  * <br>Rule ID: 	
- * <br>Request ID: 	R36 / multiple attached or referenced documents at document level
- * 
- * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
+ * <br>Order-X-No: 	549
  */
 public interface BG24_AdditionalSupportingDocs extends SupportingDocumentFactory {
 
-	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
-	// BG-24.BT-122 ++ 1..1 Supporting document reference
-	// BG-24.BT-122-0  1..1 TypeCode
-	// BG-24.BT-123 ++ 0..1 Supporting document description
-	// BG-24.BT-124 ++ 0..1 External document location
-	// BG-24.BT-125 ++ 0..1 Attached document
-	
 	public void addSupportigDocument(SupportingDocument supportigDocument);
 	
 	/**
 	 * use this to add an attached document
 	 * 
-	 * @param docRefId    - BG-24.BT-122 Supporting document reference
-	 * @param description - BG-24.BT-123 Supporting document description
-	 * @param content     - BG-24.BT-125 Attached document content
-	 * @param mimeCode
-	 * @param filename
+	 * @param docRefId    - 550 document reference
+	 * @param description - 553 document description
+	 * @param content     - 554 Attached document content
+	 * @param mimeCode    - 555
+	 * @param filename    - 556
 	 */
 	default void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
 		addSupportigDocument(createSupportigDocument(docRefId, description, content, mimeCode, filename));
@@ -47,9 +38,9 @@ public interface BG24_AdditionalSupportingDocs extends SupportingDocumentFactory
 	/**
 	 * use this to add an External document
 	 * 
-	 * @param docRefId    - BG-24.BT-122 Supporting document reference
-	 * @param description - BG-24.BT-123 Supporting document description
-	 * @param uri locationUri
+	 * @param docRefId    - 550 document reference
+	 * @param description - 553 document description
+	 * @param uri         - 551 External document location URI
 	 */
 	default void addSupportigDocument(String docRefId, String description, String uri) {
 		addSupportigDocument(createSupportigDocument(docRefId, description, uri));

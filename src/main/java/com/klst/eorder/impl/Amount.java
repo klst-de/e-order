@@ -59,10 +59,7 @@ public class Amount extends AmountType implements IAmount {
 
 	// copy ctor
 	private Amount(AmountType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	public Amount(BigDecimal amount) {
@@ -81,11 +78,12 @@ public class Amount extends AmountType implements IAmount {
 	
 	@Override
 	public BigDecimal getValue(RoundingMode roundingMode) {
-		return super.getValue().setScale(scale, roundingMode);
+		return super.getValue()==null ? null : getValue().setScale(scale, roundingMode);
 	}
 	
 	@Override
 	public String toString() {
+		if(super.getValue()==null) return "null";
 		return getCurrencyID()==null ? ""+getValue(roundingMode) : getCurrencyID() + getValue(roundingMode);
 	}
 

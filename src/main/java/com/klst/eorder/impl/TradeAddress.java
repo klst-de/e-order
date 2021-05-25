@@ -2,7 +2,6 @@ package com.klst.eorder.impl;
 
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.PostalAddress;
 
@@ -39,10 +38,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 
 	// copy ctor
 	private TradeAddress(TradeAddressType address) {
-		super();
-		if(address!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, address);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, address);
 	}
 	
 	private TradeAddress(String countryCode, String postalCode, String city, String street) {
@@ -86,7 +82,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 //		if(addressLine==null) return;
 //		super.setLineOne(Text.create(addressLine));
 		// alternativ:
-		Mapper.set(this, "lineOne", addressLine);
+		SCopyCtor.getInstance().set(this, "lineOne", addressLine);
 	}
 
 	@Override
@@ -112,7 +108,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 //		postcode.setValue(postCode);
 //		this.setPostcodeCode(postcode);
 		// alternativ:
-		Mapper.set(this, "postcodeCode", postCode);
+		SCopyCtor.getInstance().set(this, "postcodeCode", postCode);
 	}
 
 	@Override
@@ -122,7 +118,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 //		region.setValue(countrySubdivision);
 //		this.setCountrySubDivisionName(region);
 		// alternativ:
-		Mapper.set(this, "countrySubDivisionName", countrySubdivision);
+		SCopyCtor.getInstance().set(this, "countrySubDivisionName", countrySubdivision);
 	}
 
 	private void setCountryCode(String countryCode) {
@@ -131,7 +127,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 //			countryID.setValue(ISOTwoletterCountryCodeContentType.fromValue(countryCode));
 //			super.setCountryID(countryID);
 			// alternativ:
-			Mapper.set(this, "countryID", ISOTwoletterCountryCodeContentType.fromValue(countryCode));
+			SCopyCtor.getInstance().set(this, "countryID", ISOTwoletterCountryCodeContentType.fromValue(countryCode));
 		} catch (Exception e) {
 			LOG.warning("Invalid countryCode "+countryCode);
 			throw new IllegalArgumentException("Invalid countryCode "+countryCode);

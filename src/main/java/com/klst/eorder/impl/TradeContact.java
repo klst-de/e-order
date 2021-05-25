@@ -1,6 +1,5 @@
 package com.klst.eorder.impl;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.eorder.api.ContactInfoExt;
@@ -36,10 +35,7 @@ public class TradeContact extends TradeContactType implements ContactInfoExt {
 
 	// copy ctor
 	private TradeContact(TradeContactType contact) {
-		super();
-		if(contact!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, contact);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, contact);
 	}
 
 	/**
@@ -117,7 +113,7 @@ public class TradeContact extends TradeContactType implements ContactInfoExt {
 	@Override
 	public void setContactType(String code) {
 		try {
-			Mapper.set(this, "typeCode", ContactFunctionCodeContentType.fromValue(code));
+			SCopyCtor.getInstance().set(this, "typeCode", ContactFunctionCodeContentType.fromValue(code));
 		} catch (Exception e) {
 //			LOG.warning("Invalid Function code "+code);
 			throw new IllegalArgumentException("Invalid ContactType code "+code);

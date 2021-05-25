@@ -31,10 +31,7 @@ public class TradeSettlementHeaderMonetarySummation extends TradeSettlementHeade
 
 	// copy ctor
 	private TradeSettlementHeaderMonetarySummation(TradeSettlementHeaderMonetarySummationType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 	
 	private TradeSettlementHeaderMonetarySummation(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {

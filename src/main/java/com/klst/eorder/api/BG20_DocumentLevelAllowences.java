@@ -13,6 +13,8 @@ import com.klst.edoc.api.IAmount;
  * 318: BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
  * <br>
  * 326: BG-28 0..n LINE CHARGES / ZUSCHLÄGE
+ * <br>
+ * 162: BG-29.BT-147 0..1 Item price discount aka ALLOWANCE
  * <p>
  * Cardinality: 	0..n
  * <br>EN16931-ID: 	BG-20 / BG-21 / BG-27 / BG-28
@@ -20,7 +22,7 @@ import com.klst.edoc.api.IAmount;
  * <br>Order-X-No: 	888, 903, 318, 326
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
- *
+ * @see AllowancesAndCharges
  */
 public interface BG20_DocumentLevelAllowences extends AllowancesOrChargesFactory {
 

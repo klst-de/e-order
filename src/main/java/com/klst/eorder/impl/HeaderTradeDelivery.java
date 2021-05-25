@@ -32,12 +32,10 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 
 	// copy ctor
 	private HeaderTradeDelivery(HeaderTradeDeliveryType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
+	// 643: ShipToParty @see ShipTo
 	@Override
 	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);
@@ -53,6 +51,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		return super.getShipToTradeParty()==null ? null : TradeParty.create(super.getShipToTradeParty());
 	}
 
+	// 725: ShipFromParty @see ShipFrom
 	@Override
 	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = TradeParty.create(name, null, address, contact);
@@ -69,9 +68,10 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 	}
 
 	// die nachfolgenden nicht public, methoden werden hierhin delegiert
+	// 767: Requested Delivery Date
+	// wie SupplyChainTradeLineItem#setLineDeliveryDate
 	void setDeliveryDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		// nur ein (?) element:
 		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
 		}
@@ -83,6 +83,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 	
+	// 770: Requested Delivery Period
 	void setDeliveryPeriod(IPeriod period) {
 		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) {
 			getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
@@ -93,5 +94,31 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements Ship
 		if(super.getRequestedDeliverySupplyChainEvent().isEmpty()) return null;
 		return Period.create(getRequestedDeliverySupplyChainEvent().get(0).getOccurrenceSpecifiedPeriod());
 	}
+
+	// 778: Requested Pick up Date
+	void setPickupDate(Timestamp ts) {
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
+		if(super.getRequestedDespatchSupplyChainEvent().isEmpty()) {
+			getRequestedDespatchSupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceDateTime(dateTime);
+	}
+	Timestamp getPickupDateAsTimestamp() {
+		if(super.getRequestedDespatchSupplyChainEvent().isEmpty()) return null;
+		DateTimeType dateTime = getRequestedDespatchSupplyChainEvent().get(0).getOccurrenceDateTime();
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
 	
+	// 781: Requested Pick up Period
+	void setPickupPeriod(IPeriod period) {
+		if(super.getRequestedDespatchSupplyChainEvent().isEmpty()) {
+			getRequestedDeliverySupplyChainEvent().add(new SupplyChainEventType());
+		}
+		getRequestedDespatchSupplyChainEvent().get(0).setOccurrenceSpecifiedPeriod((Period)period);
+	}
+	IPeriod getPickupPeriod() {
+		if(super.getRequestedDespatchSupplyChainEvent().isEmpty()) return null;
+		return Period.create(getRequestedDespatchSupplyChainEvent().get(0).getOccurrenceSpecifiedPeriod());
+	}
+
 }

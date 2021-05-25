@@ -3,7 +3,6 @@ package com.klst.eorder.impl;
 import java.math.BigDecimal;
 import java.util.logging.Logger;
 
-import com.klst.ebXml.reflection.Mapper;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.TaxCategoryCode;
@@ -101,7 +100,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	@Override
 	public void setChargeIndicator(boolean indicator) {
-		Mapper.set(this, "chargeIndicator", indicator);		
+		SCopyCtor.getInstance().set(this, "chargeIndicator", indicator);		
 	}
 	
 	@Override
@@ -156,8 +155,8 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		// the following throws IllegalArgumentException if tax type is invalid
 		DutyTaxFeeTypeCodeContentType.fromValue(type);
 		
-		Mapper.newFieldInstance(this, "categoryTradeTax", type);
-		Mapper.set(getCategoryTradeTax(), "typeCode", DutyTaxFeeTypeCodeContentType.fromValue(type));	
+		SCopyCtor.getInstance().newFieldInstance(this, "categoryTradeTax", type);
+		SCopyCtor.getInstance().set(getCategoryTradeTax(), "typeCode", DutyTaxFeeTypeCodeContentType.fromValue(type));	
 	}
 	@Override // liefert in CII immer "VAT", in CIO andere aus DutyTaxFeeTypeCodeContentType
 	public String getTaxType() {
@@ -166,18 +165,14 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return tradeTax.getTaxType();
 	}
 
-	// BT-95, BT-102 1..1 (mandatory) Document level allowance/charge VAT category code
-//	@Override
-//	public void setTaxCategoryCode(TaxCategoryCode code) {
-//		setTaxCategoryCode(code.getValue());
-//	}
+	// 916 : BT-95.BT-102 1..1 (mandatory) Document level allowance/charge VAT category code
 	@Override
 	public void setTaxCategoryCode(String code) {
 		// the following throws IllegalArgumentException if tax code is invalid
 		DutyorTaxorFeeCategoryCodeContentType.fromValue(code);
-		
-		Mapper.newFieldInstance(this, "categoryTradeTax", code);
-		Mapper.set(getCategoryTradeTax(), "typeCode", DutyorTaxorFeeCategoryCodeContentType.fromValue(code));		
+
+		SCopyCtor.getInstance().newFieldInstance(this, "categoryTradeTax", code);
+		SCopyCtor.getInstance().set(getCategoryTradeTax(), "categoryCode", DutyorTaxorFeeCategoryCodeContentType.fromValue(code));		
 	}
 
 	@Override
@@ -191,8 +186,8 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	@Override
 	public void setTaxPercentage(BigDecimal percentage) {
 		if(percentage==null) return;
-		Mapper.newFieldInstance(this, "categoryTradeTax", percentage);
-		Mapper.set(getCategoryTradeTax(), "rateApplicablePercent", percentage);		
+		SCopyCtor.getInstance().newFieldInstance(this, "categoryTradeTax", percentage);
+		SCopyCtor.getInstance().set(getCategoryTradeTax(), "rateApplicablePercent", percentage);		
 	}
 
 	@Override
@@ -206,7 +201,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	@Override
 	public void setReasonText(String text) {
 		if(text==null) return;		
-		Mapper.set(this, "reason", text);
+		SCopyCtor.getInstance().set(this, "reason", text);
 	}
 
 	@Override
@@ -218,7 +213,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	@Override
 	public void setReasoncode(String code) {
 		if(code==null) return; 
-		Mapper.set(this, "reasonCode", code);
+		SCopyCtor.getInstance().set(this, "reasonCode", code);
 	}
 
 	@Override

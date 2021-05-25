@@ -26,6 +26,7 @@ public interface ITaxType {
 	 * also used in EN16931-IDs BG-20.BT-95-0 , BG-21.BT-102-0 and BG-30.BT-151-0
 	 * 
 	 * @param type according to UNTDID 5153, typically VAT
+	 * @exception IllegalArgumentException if tax code is invalid
 	 * 
 	 * @see com.klst.edoc.untdid.TaxTypeCode
 	 */

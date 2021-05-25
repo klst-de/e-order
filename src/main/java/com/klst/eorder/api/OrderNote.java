@@ -18,7 +18,9 @@ public interface OrderNote extends OrderNoteFactory {
 //	void setNote(String content); // not public ==> use factory
 	
 // getter in BG1_OrderNote, OrderLine
-	
+//	public List<OrderNote> getOrderNotes();
+//	public List<OrderNote> getNotes();
+
 	/**
 	 * returns note
 	 * <p>
@@ -49,4 +51,9 @@ public interface OrderNote extends OrderNoteFactory {
 	 */
 	public String getCode();
 	
+	// 38: 0..1 EXTENDED Note Content Code, To be chosen from the entries in UNTDID xxx
+	public void setNoteContentCode(String code);
+	public String getNoteContentCode();
+
+
 }

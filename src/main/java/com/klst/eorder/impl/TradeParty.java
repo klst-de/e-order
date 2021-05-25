@@ -49,12 +49,8 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 	private static final Logger LOG = Logger.getLogger(TradeParty.class.getName());
 
 	// copy ctor
-	private TradeParty(TradePartyType doc) {
-		super();
-		if(doc!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, doc);
-			LOG.config("copy ctor:"+this);
-		}
+	private TradeParty(TradePartyType object) {
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	/**

@@ -1,9 +1,11 @@
 package com.klst.eorder.api;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.untdid.TaxCategoryCode;
 
 /**
  * BG-25 ORDER LINE
@@ -23,12 +25,16 @@ public interface BG25_OrderLine extends OrderLineFactory {
 	 */
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
-			IAmount priceAmount, String itemName);
+			IAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent);
+	default OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
+			IAmount priceAmount, String itemName) {
+		return createOrderLine(id, quantity, lineTotalAmount, priceAmount, itemName, null, null);
+	}
 
 	// setter
 	public void addLine(OrderLine line);
-	default void addLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount, String itemName) {
-		addLine(createOrderLine(id, quantity, lineTotalAmount, priceAmount, itemName));
+	default void addLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		addLine(createOrderLine(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent));
 	}
 	
 }

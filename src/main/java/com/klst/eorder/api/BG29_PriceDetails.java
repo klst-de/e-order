@@ -29,41 +29,33 @@ public interface BG29_PriceDetails {
 //	public void setUnitPriceAmount(IAmount priceAmount); // use OrderLineFactory
 
 	/**
-	 * Item price discount
+	 * Item price discount aka Allowance
 	 * <p>
-	 * The total discount subtracted from the Item gross price to calculate the Item net price. 
+	 * {@link AllowancesAndCharges#getAmountWithoutTax()} is the total discount subtracted from the Item gross price to calculate the Item net price. 
 	 * Only applies if the discount is provided per unit and if it is not included in the Item gross price.
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BG-29.BT-147
+	 * <br>Order-X-No: 	162
 	 * 
-	 * @return UnitPriceAmount
+	 * @return {@link AllowancesAndCharges}
 	 */
-	// ram:SpecifiedLineTradeAgreement/
-/*	ram:GrossPriceProductTradePrice/ram:AppliedTradeAllowanceCharge/ram:ActualAmount existiert nicht in BASIC
- * aber in COMFORT:
-                    <ram:GrossPriceProductTradePrice>
-                         <ram:ChargeAmount>11.00</ram:ChargeAmount>
-                         <ram:BasisQuantity unitCode="C62">1.00</ram:BasisQuantity>
-                         <ram:AppliedTradeAllowanceCharge>
-                              <ram:ChargeIndicator>
-                                   <udt:Indicator>false</udt:Indicator> <!-- false bei discount
-                              </ram:ChargeIndicator>
-                              <ram:ActualAmount>1.00</ram:ActualAmount>
-                         </ram:AppliedTradeAllowanceCharge>
-                    </ram:GrossPriceProductTradePrice>
+	public AllowancesAndCharges getPriceDiscount();
+	public void setPriceDiscount(AllowancesAndCharges allowance);
 
-    protected AmountType chargeAmount;
-    protected QuantityType basisQuantity;
-    protected QuantityType minimumQuantity;
-    protected QuantityType maximumQuantity;
-    protected TradeAllowanceChargeType appliedTradeAllowanceCharge;
-    protected List<TradeTaxType> includedTradeTax;
-
- */
-	public IAmount getPriceDiscount();
-	public void setPriceDiscount(IAmount grossPrice);
-
+	/**
+	 * Item price charge
+	 * <p>
+	 * Only applies if the charge is provided per unit and if it is not included in the Item gross price, for instance for WEEE tax.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	170
+	 * 
+	 * @return {@link AllowancesAndCharges}
+	 */
+	public AllowancesAndCharges getPriceCharge();
+	public void setPriceCharge(AllowancesAndCharges charge);
+	
 	/**
 	 * Item gross price
 	 * <p>
@@ -71,10 +63,10 @@ public interface BG29_PriceDetails {
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BG-29.BT-148
+	 * <br>Order-X-No: 	159
 	 * 
 	 * @return UnitPriceAmount
 	 */
-// ram:SpecifiedLineTradeAgreement/ram:GrossPriceProductTradePrice/ram:ChargeAmount existiert nicht nicht in BASIC
 	public IAmount getGrossPrice();
 	public void setGrossPrice(IAmount grossPrice);
 
@@ -87,6 +79,7 @@ public interface BG29_PriceDetails {
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BG-29.BT-150 + BG-29.BT-149
+	 * <br>Order-X-No:  180+181	
 	 * 
 	 * @return UnitPriceQuantity
 	 * @see #getQuantity

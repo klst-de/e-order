@@ -21,8 +21,10 @@ import com.klst.eorder.impl.TradeProductInstance;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
-public interface OrderLine extends OrderLineFactory, OrderNoteFactory, 
-	BG26_LineDeliveryPeriod, 
+public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
+	_79_AdditionalReferencedProductDocs, // 79 : ADDITIONAL REFERENCED PRODUCT DOCUMENT
+	_141_AdditionalReferencedDocs,       //	141: ADDITIONAL REFERENCED DOCUMENT
+	BG26_LineDeliveryOrPickup, 
 	BG27_LineLevelAllowences, 
 	BG28_LineLevelCharges,
 	BG29_PriceDetails, 
@@ -49,17 +51,18 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * Line status code
 	 * <p>
 	 * To be chosen from the entries in UNTDID 1229, Action code, in particular:
-1 : Order  line ADDED
-3 : Order  line CHANGED
-5 : Order line ACCEPTED WITHOUT AMENDMENT
-6 : Order line ACCEPTED WITH AMENDMENT
-7 : Order  line NOT ACCEPTED
-42 : Order  line ALREADY DELIVERED
-
-	 * TODO nur OOR OOC
+1 : Order line ADDED,
+3 : Order line CHANGED,
+5 : Order line ACCEPTED WITHOUT AMENDMENT,
+6 : Order line ACCEPTED WITH AMENDMENT,
+7 : Order line NOT ACCEPTED,
+42 : Order line ALREADY DELIVERED
 	 * <p>
 	 * Cardinality: 0..1 (optional)
 	 * <br>Order-X-No: 	36
+	 * <br>Rules:
+	 * An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code on each line, if it has lines.
+	 * An Order (Document Typecode BT-3 = 220) MUST NOT contain a Line Status Code.
 	 * 
 	 * @return status code
 	 */
@@ -128,7 +131,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
  	 * <p>
 	 * A unique identifier for this trade product.
 	 * <p>
-	 * Cardinality: 	0..n (optional)
+	 * Cardinality: 	0..1 (optional)
 	 * <br>Order-X-No: 	42
 	 * 
 	 * @param id
@@ -332,8 +335,41 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 //	public void setCountryOfOrigin(String code);
 //	public String getCountryOfOrigin();
 
+	// 79ff : ADDITIONAL REFERENCED PRODUCT DOCUMENT
+	// in interface _79_AdditionalReferencedProductDocs
 
-//	--------------------------------
+	// 98ff : SUBSTITUTED PRODUCT / OOR only
+	
+	// 99: Substituted Product ID
+	public void setSubstitutedProductID(String id);
+	public String getSubstitutedProductID();
+	
+	// 100: Substituted Product Global ID + Scheme ID
+	public void addSubstitutedIdentifier(Identifier id);
+	default Identifier createSubstitutedIdentifier(String globalID, String schemeID) {
+		return createStandardIdentifier(globalID, schemeID);
+	}
+	default void addSubstitutedIdentifier(String globalID, String schemeID) {
+		addSubstitutedIdentifier(createSubstitutedIdentifier(globalID, schemeID));
+	}
+	public List<Identifier> getSubstitutedIdentifier();
+	
+	// 102: Substituted Product Seller Assigned ID
+	public void setSubstitutedSellerAssignedID(String id);
+	public String getSubstitutedSellerAssignedID();
+	
+	// 103: Substituted Product Buyer Assigned ID
+	public void setSubstitutedBuyerAssignedID(String id);
+	public String getSubstitutedBuyerAssignedID();
+	
+	// 105: Substituted Product Name
+	public void setSubstitutedProductName(String text);
+	public String getSubstitutedProductName();
+	
+	// 106: Substituted Product Description
+	public void setSubstitutedProductDescription(String text);
+	public String getSubstitutedProductDescription();
+	
 	/**
 	 * line object identifier
 	 * <p>
@@ -371,6 +407,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 		setLineObjectID(id, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeCode);
 	}
 	default void setLineObjectIdentifier(Identifier id) {
+		if(id==null) return;
 		setLineObjectID(id.getContent(), DocumentNameCode.InvoicingDataSheet.getValueAsString(), id.getSchemeIdentifier());
 	}
 	public Identifier getLineObjectIdentifier(); // Identifier.Content == id , .SchemeIdentifier == schemeCode
@@ -384,12 +421,54 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * Cardinality: 	1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-129 (decimal quantity) + BT-130 (unitCode) 
 	 * <br>Rule ID: 	BR-22
-	 * <br>Order-X-No: 	207
+	 * <br>Order-X-No: 	210, 211
 	 * 
 	 * @return Quantity
 	 */
-//	public void setQuantity(Quantity quantity); // use factory
+//	public void setQuantity(IQuantity quantity); // use factory
 	public IQuantity getQuantity();
+
+	/**
+	 * LINE TRADE DELIVERY Agreed Quantity, only in CIOR
+	 * 
+	 * The quantity, at line level, agreed for this trade delivery.
+	 * Unit of measure Code for Agreed quantity.
+	 * <p>
+	 * Cardinality: 	0..1
+	 * <br>Order-X-No: 	212, 213
+	 * 
+	 * @return Quantity
+	 */
+	public void setAgreedQuantity(IQuantity quantity);
+	public IQuantity getAgreedQuantity();
+	
+	/**
+	 * LINE TRADE DELIVERY Package Quantity
+	 * 
+	 * The number of packages, at line level, in this trade delivery.
+	 * Unit of measure Code for Package quantity.
+	 * <p>
+	 * Cardinality: 	0..1
+	 * <br>Order-X-No: 	214, 215
+	 * 
+	 * @return Quantity
+	 */
+	public void setPackageQuantity(IQuantity quantity);
+	public IQuantity getPackageQuantity();
+
+	/**
+	 * LINE TRADE DELIVERY Per Package Quantity
+	 * 
+	 * The number of units per package, at line level, in this trade delivery.
+	 * Unit of measure Code for Per Package quantity.
+	 * <p>
+	 * Cardinality: 	0..1
+	 * <br>Order-X-No: 	214, 215
+	 * 
+	 * @return Quantity
+	 */
+	public void setPerPackageQuantity(IQuantity quantity);
+	public IQuantity getPerPackageQuantity();
 
 	/**
 	 * line net amount 
@@ -400,7 +479,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * Cardinality: 	1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-131
 	 * <br>Rule ID: 	BR-24
-	 * <br>Request ID: 	R39, R56, R14
+	 * <br>Order-X-No: 	335
 	 * 
 	 * @param Amount
 	 */
@@ -422,6 +501,31 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	public String getOrderLineID();
 	
 	/**
+	 * The quotation document referenced in this line trade agreement.	
+	 * In case an Order refers to different quotation.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	130
+	 * 
+	 * @param id - Issuer Assigned quotation ID
+	 */
+	public void setQuotationID(String id);
+	public String getQuotationID();
+	/**
+	 * The unique identifier of a line in this Quotation referenced document.
+	 * 
+	 * The quotation document referenced in this line trade agreement	
+	 * In case an Order refers to different quotation
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	131
+	 * 
+	 * @param id
+	 */
+	public void setQuotationLineID(String id);
+	public String getQuotationLineID();
+	
+	/**
 	 * line Buyer accounting reference
 	 * <p>
 	 * A textual value that specifies where to book the relevant data into the Buyer's financial accounts.
@@ -430,17 +534,16 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BT-133
 	 * <br>Rule ID: 	 
-	 * <br>Request ID: 	R3
+	 * <br>Order-X-No: 	340
 	 * 
 	 * @param Text
 	 */
-	// ram:ReceivableSpecifiedTradeAccountingAccount existiert nicht in BASIC
 	public void setBuyerAccountingReference(String text);
 	public String getBuyerAccountingReference();
 
-	// BG-26 0..1 INVOICE LINE PERIOD with 
-	//       BT-134 +++ 0..1 Invoice line period start date
-	//       BT-135 +++ 0..1 Invoice line period end date
+	// 297: BG-26 0..1 LINE REQUESTED DELIVERY DATE or PERIOD with 
+	//       BT-134 0..1 Invoice line period start date
+	//       BT-135 0..1 Invoice line period end date
 	
 	/**
 	 * 318: BG-27 0..n LINE ALLOWANCES
@@ -457,83 +560,23 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	@Override
 	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage);
 		
-	// BG-29 ++ 1..1 PRICE DETAILS // TODO move this Block to BG29_PriceDetails, order doc Zeile 170
-	/**
-	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
-	 * <p>
-	 * The unit net price has to be equal with the Item gross price less the Item price discount.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BG-29.BT-146 
-	 * <br>Rule ID: 	BR-27
-	 * <br>Request ID: 	R14
-	 * 
-	 * @return UnitPriceAmount
-	 */
-	public IAmount getUnitPriceAmount();
-//
-//	// 1..1 UnitPriceAmount BT-146 , UnitPriceQuantity BT-149-0 + BT-150-0 optional
-//	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity);
+	// 129: BG-29 1..1 PRICE DETAILS (LINE TRADE AGREEMENT)
+//	public IAmount getUnitPriceAmount();
+//	public AllowancesAndCharges getPriceDiscount();
+//	public void setPriceDiscount(AllowancesAndCharges allowance);
+//	public IAmount getGrossPrice();
+//	public void setGrossPrice(IAmount grossPrice);
+//	public IQuantity getUnitPriceQuantity();
+//	public void setUnitPriceQuantity(IQuantity quantity);
+	
+	// nicht in CII: 0..1 (BLANKET ORDER REFERENCED LINE ID), Doku Zeile 199ff
+/*
+The unique identifier of a line in the Blanket Order referenced document.
+Blanket Order, issued by the Buyer or the Buyer Requisitioner.
+ */
+	public void setBlanketOrderReference(String id);
+	public String getBlanketOrderReference();
 
-	/**
-	 * Item price discount
-	 * <p>
-	 * The total discount subtracted from the Item gross price to calculate the Item net price. 
-	 * Only applies if the discount is provided per unit and if it is not included in the Item gross price.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BG-29.BT-147
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R14
-	 * 
-	 * @return UnitPriceAmount
-	 */
-	// ram:SpecifiedLineTradeAgreement/
-//	ram:GrossPriceProductTradePrice/ram:AppliedTradeAllowanceCharge/ram:ActualAmount existiert nicht
-//	public UnitPriceAmount getPriceDiscount();
-
-	/**
-	 * Item gross price
-	 * <p>
-	 * The unit price, exclusive of VAT, before subtracting Item price discount.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BG-29.BT-148
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R14
-	 * 
-	 * @return UnitPriceAmount
-	 */
-	// ram:SpecifiedLineTradeAgreement/ram:GrossPriceProductTradePrice/ram:ChargeAmount existiert nicht
-//	public UnitPriceAmount getGrossPrice();
-	
-	/**
-	 * Sets price discount and gross price
-	 * 
-	 * @param priceDiscount, BT-147
-	 * @param grossPrice, BT-148
-	 */
-//	public void setUnitPriceAllowance(UnitPriceAmount priceDiscount, UnitPriceAmount grossPrice);
-	
-	// optional UnitPriceQuantity : BT-149-0 QuantityUnit 0..1 + BT-150-0 Quantity required
-	/**
-	 * Item price unit (BT-150) and base quantity (BT-149)
-	 * <p>
-	 * The number of item units to which the price applies.
-	 * <br>Item price base quantity unit of measure code The unit of measure that applies to the Item price base quantity.
-	 * The Item price base quantity unit of measure shall be the same as the Invoiced quantity unit of measure (BT-130).
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BG-29.BT-150 + BG-29.BT-149
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R14
-	 * 
-	 * @return UnitPriceQuantity
-	 * @see #getQuantity
-	 */
-	public IQuantity getUnitPriceQuantity();
-	public void setUnitPriceQuantity(IQuantity quantity);
-	
 	// BG-30 ++ 1..1 LINE VAT INFORMATION
 	/**
 	 * Invoiced item VAT category code
@@ -563,6 +606,7 @@ public interface OrderLine extends OrderLineFactory, OrderNoteFactory,
 	 * The indication, at line level, of whether or not this trade delivery can be partially delivered.
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
+	 * <br>Order-X-No: 	208, 209
 	 * 
 	 * @param indicator
 	 */

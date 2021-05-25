@@ -32,10 +32,7 @@ public class SupplyChainTradeTransaction extends SupplyChainTradeTransactionType
 
 	// copy ctor
 	private SupplyChainTradeTransaction(SupplyChainTradeTransactionType object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	public List<OrderLine> getLines() {

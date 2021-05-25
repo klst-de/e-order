@@ -5,12 +5,15 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.LogManager;
@@ -25,10 +28,12 @@ import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.api.SupportingDocument;
 import com.klst.marshaller.CioTransformer;
 
 public class OrderReadTest {
@@ -87,7 +92,7 @@ public class OrderReadTest {
 		if(transformer.isValid(testFile)) {
 			try {
 				InputStream is = new FileInputStream(testFile);
-				object = transformer.unmashal(is);
+				object = transformer.unmarshal(is);
 				LOG.info(">>>>"+object);
 				Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 				// dynamisch:
@@ -165,17 +170,21 @@ public class OrderReadTest {
 		assertEquals(0, new BigDecimal(360).compareTo(cio.getTotalTaxInclusive().getValue(RoundingMode.UNNECESSARY)));
 		assertEquals("BUYER_ACCOUNT_REF", cio.getBuyerAccountingReference().getName());
 		
+		// 874: BG-16 PAYMENT MEANS
+		assertEquals(PaymentMeansEnum.CreditTransfer, cio.getPaymentMeansEnum());
+		assertEquals("Credit Transfer", cio.getPaymentMeansText());
+		
 		List<OrderLine> lines = cio.getLines();
 		assertEquals(3, lines.size());
 		lines.forEach(line -> {
-			assertNull(line.getLineDeliveryPeriod());
+			assertNull(line.getDeliveryPeriod());
 		});
 	}
 	
 	public CoreOrder getCoreOrder(File testFile) {
 		try {
 			InputStream is = new FileInputStream(testFile);
-			object = transformer.unmashal(is);
+			object = transformer.unmarshal(is);
 			LOG.info(">>>>"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 			// dynamisch:
@@ -200,18 +209,57 @@ public class OrderReadTest {
 		assertEquals(BG2_ProcessControl.PROFILE_COMFORT, cio.getProfile());
 		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());	
 		assertEquals("202003311232", DateTimeFormats.tsToCCYYMMDDHHMM(cio.getIssueDateAsTimestamp()));
+		
+		List<SupportingDocument> docList = cio.getAdditionalSupportingDocuments();
+		LOG.info(">>>>>>>>>>> docList.size()="+docList.size());
+		SupportingDocument doc = docList.get(0);
+		LOG.info("AttachedDocumentFilename="+doc.getAttachedDocumentFilename());
+		LOG.info("AttachedDocumentMimeCode="+doc.getAttachedDocumentMimeCode());
+		if("application/pdf".equals(doc.getAttachedDocumentMimeCode())) {
+			LOG.info("TODO"); // TODO:
+//			try (FileOutputStream fos = new FileOutputStream(doc.getAttachedDocumentFilename())) {
+//				 fos.write(doc.getAttachedDocument());
+//				   //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
+//			} catch (FileNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+		}
+		
 
 		List<OrderLine> lines = cio.getLines();
 		assertEquals(3, lines.size());
 		OrderLine line = lines.get(0);
-		LOG.info("LineDeliveryPeriod:"+line.getLineDeliveryPeriod().getEndDateAsTimestamp());
-		assertEquals("202004150900", DateTimeFormats.tsToCCYYMMDDHHMM(line.getLineDeliveryPeriod().getStartDateAsTimestamp()));
-		assertEquals("202004301800", DateTimeFormats.tsToCCYYMMDDHHMM(line.getLineDeliveryPeriod().getEndDateAsTimestamp()));
-		line.setLineDeliveryDate("20210101");
+		LOG.info("LineDeliveryPeriod:"+line.getDeliveryPeriod().getEndDateAsTimestamp());
+		assertEquals("202004150900", DateTimeFormats.tsToCCYYMMDDHHMM(line.getDeliveryPeriod().getStartDateAsTimestamp()));
+		assertEquals("202004301800", DateTimeFormats.tsToCCYYMMDDHHMM(line.getDeliveryPeriod().getEndDateAsTimestamp()));
+		line.setDeliveryDate("20210101");
 		
 		line = lines.get(1); // the second! the first has index 0!
-		assertNull(line.getLineDeliveryPeriod());
-		line.setLineDeliveryPeriod("20200415", "20200430");
+/*
+               <ram:SpecifiedLineTradeDelivery>
+                    <ram:PartialDeliveryAllowedIndicator>
+                         <udt:Indicator>true</udt:Indicator>
+                    </ram:PartialDeliveryAllowedIndicator>
+                    <ram:RequestedQuantity unitCode="C62">10.00</ram:RequestedQuantity>
+                    <ram:PackageQuantity unitCode="C62">5</ram:PackageQuantity>
+                    <ram:PerPackageUnitQuantity unitCode="C62">2</ram:PerPackageUnitQuantity>
+                    <ram:RequestedDeliverySupplyChainEvent>
+                         <ram:OccurrenceDateTime>
+                                   <udt:DateTimeString format="102">20200415</udt:DateTimeString>
+                         </ram:OccurrenceDateTime>
+                    </ram:RequestedDeliverySupplyChainEvent>
+               </ram:SpecifiedLineTradeDelivery>
+ */
+		assertEquals("2", line.getId());
+		Timestamp deliveryDate = DateTimeFormats.ymdToTs("20200415");
+		assertEquals(deliveryDate, line.getDeliveryDateAsTimestamp());
+		line.setDeliveryPeriod("20200415", "20200430");
+		assertEquals(2, line.getDeliveryEvents().size()); // 1:Date, 2:Period
+		assertNull(line.getPickupDateAsTimestamp());
 		assertEquals("FR", line.getCountryOfOrigin());
 		Properties attributes = line.getItemAttributes();
 		assertEquals(1, attributes.size());

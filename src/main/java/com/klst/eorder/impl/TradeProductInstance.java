@@ -41,11 +41,8 @@ public class TradeProductInstance extends TradeProductInstanceType {
 		setSerialId(serialId);
 	}
 	// copy ctor
-	private TradeProductInstance(TradeProductInstanceType note) {
-		super();
-		if(note!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, note);
-		}
+	private TradeProductInstance(TradeProductInstanceType object) {
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	public String getBatchId() {

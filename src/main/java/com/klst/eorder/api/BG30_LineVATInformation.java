@@ -11,6 +11,7 @@ import com.klst.edoc.untdid.TaxCategoryCode;
  * <p>
  * Cardinality: 	1..1
  * <br>EN16931-ID: 	BG-30
+ * <br>Order-X-No: 	311
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
@@ -23,6 +24,7 @@ public interface BG30_LineVATInformation {
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
 	 * <br>EN16931-ID: 	BG-30.BT-151, BT-151-0
+	 * <br>Order-X-No: 	315
 	 * 
 	 * @param codeEnum
 	 */
@@ -45,6 +47,7 @@ public interface BG30_LineVATInformation {
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>EN16931-ID: 	BG-30.BT-152
+	 * <br>Order-X-No: 	317
 	 * 
 	 * @param taxRate
 	 */

@@ -24,9 +24,20 @@ public class DateTimeFormatStrings extends DateTimeFormats {
 	static DateTimeType toDateTime(Timestamp ts) {
 		if(ts==null) return null;
 		
+		String ymdhm = DateTimeFormats.tsToCCYYMMDDHHMM(ts);
+		if(ymdhm.endsWith("0000")) {
+			DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString();
+			dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
+			dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
+			
+			DateTimeType dateTime = new DateTimeType();
+			dateTime.setDateTimeString(dts);
+			return dateTime;
+		}
+		// else CCYYMMDDHHMM
 		DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString();
-		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
+		dts.setFormat(DateTimeFormats.CCYYMMDDHHMM_QUALIFIER);
+		dts.setValue(ymdhm);
 		
 		DateTimeType dateTime = new DateTimeType();
 		dateTime.setDateTimeString(dts);
