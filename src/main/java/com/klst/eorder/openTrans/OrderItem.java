@@ -16,12 +16,18 @@ import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
+import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
+import com.klst.eorder.api.ISupplyChainEvent;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
+import com.klst.eorder.api.SupportingDocument;
+import com.klst.eorder.impl.TradeProductInstance;
+import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.eorder.openTrans.reflection.Mapper;
 
 /*                         BG-25 + 1..n INVOICE LINE
@@ -99,12 +105,12 @@ BG-32 +++ 0..n ITEM ATTRIBUTES
 public class OrderItem extends ORDERITEM implements OrderLine {
 
 	@Override
-	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount, String itemName) {
-		return create(this.order, id, (Quantity)quantity, (Amount)lineTotalAmount, (UnitPriceAmount)priceAmount, itemName);
+	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		return create(this.order, id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
 	}
 
-	static OrderItem create(CoreOrder order, String id, Quantity quantity, Amount lineTotalAmount,UnitPriceAmount priceAmount, String itemName) {
-		OrderItem orderLine =  new OrderItem(id, quantity, lineTotalAmount, priceAmount, itemName);
+	static OrderItem create(CoreOrder order, String id, IQuantity quantity, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		OrderItem orderLine =  new OrderItem(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent);
 		orderLine.order = order;
 		return orderLine;
 	}
@@ -142,13 +148,9 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	}
 
 	private OrderItem(String id
-			, Quantity quantity
-			, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName) {
-//		super.setAssociatedDocumentLineDocument(new DocumentLineDocumentType()); // mit id
-//		super.setSpecifiedLineTradeAgreement(new LineTradeAgreementType()); // mit setUnitPriceAmount
-//		super.setSpecifiedLineTradeDelivery(new LineTradeDeliveryType()); // mit quantity
-//		super.setSpecifiedLineTradeSettlement(new LineTradeSettlementType());
-// optional		super.setSpecifiedTradeProduct(new TradeProductType()); // mit ItemName
+			, IQuantity quantity
+			, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+			, TaxCategoryCode taxCat, BigDecimal percent) {
 		productid = Productid.create();
 		super.setPRODUCTID(productid);
 		
@@ -160,6 +162,7 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 		super.setPRODUCTPRICEFIX(productpricefix);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
+		if(taxCat!=null) setTaxCategoryAndRate(taxCat, percent);
 	}
 	
 	public String toString() {
@@ -176,68 +179,61 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 		return stringBuilder.toString();
 	}
 
-/*
-		<ram:IncludedSupplyChainTradeLineItem>
-			<ram:AssociatedDocumentLineDocument>
-				<ram:LineID>1</ram:LineID>                                    <!-- BG.25.BT-126 1..1
-				<ram:IncludedNote>
-					<ram:Content>Content of Note</ram:Content>
-					<ram:SubjectCode>AAI</ram:SubjectCode>
-				</ram:IncludedNote>
-			</ram:AssociatedDocumentLineDocument>
-			<ram:SpecifiedTradeProduct>
-				<ram:GlobalID schemeID="0160">1234567890123</ram:GlobalID>
-				<ram:SellerAssignedID>987654321</ram:SellerAssignedID>
-				<ram:BuyerAssignedID>654987321</ram:BuyerAssignedID>
-				<ram:Name>Product Name</ram:Name>                             <!-- BG-31.BT-153 0..1
-			</ram:SpecifiedTradeProduct>
-			<ram:SpecifiedLineTradeAgreement>
-				<ram:BuyerOrderReferencedDocument>
-					<ram:LineID>1</ram:LineID>
-				</ram:BuyerOrderReferencedDocument>
-				<ram:NetPriceProductTradePrice>
-					<ram:ChargeAmount>10.00</ram:ChargeAmount>
-					<ram:BasisQuantity unitCode="C62">1.00</ram:BasisQuantity>
-				</ram:NetPriceProductTradePrice>
-				<ram:BlanketOrderReferencedDocument>
-					<ram:LineID>2</ram:LineID>
-				</ram:BlanketOrderReferencedDocument>
-			</ram:SpecifiedLineTradeAgreement>
-			<ram:SpecifiedLineTradeDelivery>
-				<ram:PartialDeliveryAllowedIndicator>
-					<udt:Indicator>true</udt:Indicator>
-				</ram:PartialDeliveryAllowedIndicator>
-				<ram:RequestedQuantity unitCode="C62">6</ram:RequestedQuantity> <!-- BT-129+BT-130 1..1
-			</ram:SpecifiedLineTradeDelivery>
-			<ram:SpecifiedLineTradeSettlement>
-				<ram:SpecifiedTradeSettlementLineMonetarySummation>
-					<ram:LineTotalAmount>60.00</ram:LineTotalAmount>            <!-- BT-131 1..1
-				</ram:SpecifiedTradeSettlementLineMonetarySummation>
-			</ram:SpecifiedLineTradeSettlement>
-		</ram:IncludedSupplyChainTradeLineItem>
- */
-	// BG.25.BT-126 1..1
+	// 35: BG-25.BT-126 1..1
+	void setId(String id) {
+		super.setLINEITEMID(id);
+	}
 	@Override
 	public String getId() {
 		return super.getLINEITEMID();
 	}
-	void setId(String id) {
-		super.setLINEITEMID(id);
+
+	// 210: BT-129 1..1 bestellte Menge / The quantity, at line level, requested for this trade delivery.
+	// 211: Unit of measure Code for Requested quantity BT-129+BT-130
+	void setQuantity(IQuantity quantity) { 
+		super.setORDERUNIT(quantity.getUnitCode()); // required
+		super.setQUANTITY(quantity.getValue()); // required		
+	}
+	@Override
+	public IQuantity getQuantity() {
+		return Quantity.create(super.getORDERUNIT(), super.getQUANTITY());
 	}
 
-/* TODO
+	/* 335: BT-131 1..1 Nettobetrag der Rechnungsposition / PRICE_LINE_AMOUNT
+	 * Höhe des Preises für die Positionszeile. 
+	 * Der Wert ergibt sich im Regelfall aus der Multiplikation von PRICE_AMOUNT und QUANTITY, 
+	 * muss aber explizit aufgeführt werden. 
+	 * Der PRICE_LINE_AMOUNT kann sich auch aus PRICE_AMOUNT und PRICE_UNIT_VALUE ergeben, 
+	 * wenn der Preis nicht an die Bestelleinheit gekoppelt ist. Siehe auch PRICE_BASE_FIX.
+	 */
+	void setLineTotalAmount(IAmount amount) {
+		super.setPRICELINEAMOUNT(amount.getValue());
+	}
+	@Override
+	public IAmount getLineTotalAmount() {
+		return super.getPRICELINEAMOUNT()==null ? null : Amount.create(getPRICELINEAMOUNT());
+	}
 
-Line status code : not in CIO
-An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
-
- */
+	@Override
+	public String getStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setStatus(String status) {
+		// TODO order.getDocumentCode() nicht implementiert
+		if(this.order.getDocumentCode()==DocumentNameCode.Order) {
+			LOG.warning(WARN_ORDERLINEID + "ignore status:'"+status+"'.");
+			return;
+		}
+		// TODO Auto-generated method stub		
+	}
 	
-	// BT-127 0..1/n Freitext zur Rechnungsposition : ram:IncludedNote
+	// 37: BT-127 0..1/n Freitext zur Rechnungsposition : ram:IncludedNote
 	@Override // getter
 	public List<OrderNote> getNotes() {
 		return Remarks.getNotes(super.getREMARKS());
 	}
-
 	@Override
 	public OrderNote createNote(String subjectCode, String content) {
 		return Remarks.create(subjectCode, content);
@@ -246,6 +242,290 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	public void addNote(OrderNote note) {
 		super.getREMARKS().add((Remarks)note);
 	}
+	
+	// 42: 0..1 PRODUCT_ID.SUPPLIER_PID ??????
+	@Override
+	public void setProductID(String id) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public String getProductID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// 43: BG-31.BT-157 0..n Item (Trade Product) Global ID
+	// 44:                   Item (Trade Product) Global ID Scheme ID
+	@Override
+	public Identifier createStandardIdentifier(String globalID, String schemeID) {
+		return productid.createStandardIdentifier(globalID, schemeID);
+	}
+	@Override
+	public void addStandardIdentifier(Identifier id) {
+		productid.addStandardIdentifier(id);
+	}
+	@Override
+	public List<Identifier> getStandardIdentifier() {
+		return productid.getStandardIdentifier();
+	}
+
+	// 45: BG-31.BT-155 0..1 Item Seller's identifier, productid.supplierpid
+	@Override
+	public void setSellerAssignedID(String id) {
+		productid.setSellerAssignedID(id);
+	}
+	@Override
+	public String getSellerAssignedID() {
+		return productid.getSellerAssignedID();
+	}
+
+	// 46: BG-31.BT-156 0..1 Item Buyer's identifier, productid.buyerpid (1..n)
+	@Override
+	public void setBuyerAssignedID(String id) {
+		productid.setBuyerAssignedID(id);
+	}
+	@Override
+	public String getBuyerAssignedID() {
+		return productid.getBuyerAssignedID();
+	}
+
+	// 47: 0..1 SpecifiedTradeProduct.industryAssignedID
+	// 48: 0..1 SpecifiedTradeProduct.modelID
+	
+	// 49: BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
+	void setItemName(String text) {
+		productid.setItemName(text);
+	}
+	@Override
+	public String getItemName() {
+		return productid.getItemName();
+	}
+
+	// 50: BG-31.BT-154 0..1 Item description
+	@Override
+	public void setDescription(String text) {
+		productid.setDescription(text);
+	}
+	@Override
+	public String getDescription() {
+		return productid.getDescription();
+	}
+	
+	// 51: 0..1 Item (Trade Product) Batch ID (lot ID)
+	// TODO Unterschied zu 66: Item (Trade Product) Instances Batch ID
+	@Override
+	public void setBatchID(String id) {
+		productid.getLOTNUMBER().add(id);
+	}
+	@Override
+	public String getBatchID() {
+		return productid.getLOTNUMBER().isEmpty() ? null 
+			: productid.getLOTNUMBER().get(0);
+	}
+
+	// 52: 0..1 SpecifiedTradeProduct.brandName
+	// 53: 0..1 SpecifiedTradeProduct.modelName
+
+	// 54: BG-32 0..n ITEM ATTRIBUTES
+	@Override
+	public void addItemAttribute(String name, String value) {
+		// TODO 
+//		PRODUCTFEATURES pf = super.getPRODUCTFEATURES()
+//			    "referencefeaturesystemname",
+//			    "referencefeaturegroupid",
+//			    "referencefeaturegroupname",
+//			    "referencefeaturegroupid2",
+//			    "groupproductorder",
+//			    List<FEATURE> feature:
+//	    protected List<FNAME> fname;
+//	    protected String ftidref;
+//	    protected TypeFTEMPLATE ftemplate;
+//	    protected List<FVALUE> fvalue;
+//	    protected List<String> valueidref;
+//	    protected String funit;
+//	    protected BigInteger forder;
+//	    protected List<FDESCR> fdescr;
+//	    protected List<FVALUEDETAILS> fvaluedetails;
+//	    protected String fvaluetype;
+/*
+				<FEATURE>
+					<bmecat:FNAME>a</bmecat:FNAME>
+					<bmecat:FVALUE>a</bmecat:FVALUE>
+					<bmecat:FUNIT>a</bmecat:FUNIT>
+					<bmecat:FORDER>0</bmecat:FORDER>
+					<bmecat:FDESCR lang="aar">a</bmecat:FDESCR>
+					<bmecat:FVALUE_DETAILS lang="aar">a</bmecat:FVALUE_DETAILS>
+					<bmecat:FVALUE_TYPE>choice</bmecat:FVALUE_TYPE>
+				</FEATURE>
+
+ */
+	}
+	/* PRODUCTFEATURES enthält List<FEATURE> feature:
+	 * Produktmerkmal FEATURE Informationen über ein Produktmerkmal 
+	 */
+	@Override
+	public Properties getItemAttributes() {
+		List<FEATURE> feature = super.getPRODUCTFEATURES()==null ? null : super.getPRODUCTFEATURES().getFEATURE();
+//		List<ProductCharacteristicType> productCharacteristics = specifiedTradeProduct.getApplicableProductCharacteristic();
+		Properties result = new Properties();
+		feature.forEach(f -> {
+			if(f.getFNAME().isEmpty()) { // eindeutiger Name des Merkmals
+				// nix tun
+			} else {
+				// FVALUE : Ausprägung(en) des referenzierten Merkmals
+				if(f.getFVALUE().isEmpty()) {
+					// in OT steht was von VARIANTS, dann aber doch nicht
+				} else {
+					result.put(f.getFNAME().get(0).getValue(), f.getFVALUE().get(0).getValue());
+				}
+			}
+//			result.put(pc.getDescription().get(0).getValue(), pc.getValue().get(0).getValue());			
+		});
+		return result;
+	}
+
+	// 60: BG-31.BT-158 0..n Item classification identifier designatedProductClassification
+	/* ProductClassificationType CodeType classCode (value, listID, listVersionID)
+	                             TextType className
+
+ Bsp. 
+        <ram:DesignatedProductClassification>
+        <ram:ClassCode listID="EN">4047247110051</ram:ClassCode>
+             <ram:ClassName>EN==EAN==European Article Number</ram:ClassName>
+        </ram:DesignatedProductClassification>
+
+			<PRODUCT_FEATURES>
+				<bmecat:REFERENCE_FEATURE_GROUP_ID type="flat">a</bmecat:REFERENCE_FEATURE_GROUP_ID>
+				<bmecat:REFERENCE_FEATURE_GROUP_NAME>a</bmecat:REFERENCE_FEATURE_GROUP_NAME>
+				<bmecat:REFERENCE_FEATURE_GROUP_ID2 type="flat">a</bmecat:REFERENCE_FEATURE_GROUP_ID2>
+				<bmecat:GROUP_PRODUCT_ORDER>0</bmecat:GROUP_PRODUCT_ORDER>
+				<FEATURE>
+					<bmecat:FNAME>a</bmecat:FNAME>
+					<bmecat:FVALUE>a</bmecat:FVALUE>
+					<bmecat:FUNIT>a</bmecat:FUNIT>
+					<bmecat:FORDER>0</bmecat:FORDER>
+					<bmecat:FDESCR lang="aar">a</bmecat:FDESCR>
+					<bmecat:FVALUE_DETAILS lang="aar">a</bmecat:FVALUE_DETAILS>
+					<bmecat:FVALUE_TYPE>choice</bmecat:FVALUE_TYPE>
+				</FEATURE>
+			</PRODUCT_FEATURES>
+
+	 */
+	@Override
+	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText) {
+		return null;
+//		// TODO
+	}
+	@Override
+	public void addClassificationIdentifier(IdentifierExt id) {
+	}
+	@Override
+	public List<IdentifierExt> getClassifications() {
+		return null;
+	}
+
+	// 65: SCT_LINE	COMFORT	  Item (Trade Product) Instances
+//	66  SCT_LINE	COMFORT	  Item (Trade Product) Instances Batch ID
+//	67  SCT_LINE	COMFORT	  Item (Trade Product) Instances Supplier Serial ID
+	@Override
+	public void addTradeProductInstance(String batchId, String serialId) {
+		// TODO Auto-generated method stub	
+	}
+	// TradeProductInstanceType ist uncefact, nicht OT
+	@Override
+	public List<TradeProductInstance> getTradeProductInstances() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// TODO 68: SCT_LINE	COMFORT	  Packaging
+	@Override
+	public void setPackaging(String code, IQuantity width, IQuantity length, IQuantity height) {
+		// TODO Auto-generated method stub		
+	}
+	@Override
+	public String getPackagingCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public IQuantity getPackagingWidth() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public IQuantity getPackagingLength() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public IQuantity getPackagingHeight() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// 77,78: BG-31.BT-159 0..1 Item country of origin / nicht in opentrans, ===> "countryoforigin" als ARTIKELATTRIBUTE
+	private static final String COUNTRY_OF_ORIGIN = "countryoforigin";
+	@Override
+	public void setCountryOfOrigin(String code) {
+		addItemAttribute(COUNTRY_OF_ORIGIN, code);
+	}
+	@Override
+	public String getCountryOfOrigin() {
+		Properties attributes = getItemAttributes();
+		return (String) attributes.get(COUNTRY_OF_ORIGIN);
+	}
+
+	// 107: LINE TRADE AGREEMENT
+	// 178: (Net Price)
+	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount / PRODUCTPRICEFIX.priceamount
+	@Override
+	public IAmount getUnitPriceAmount() {
+		// delegieren:
+		return productpricefix.getUnitPriceAmount();
+	}
+	private void setUnitPriceAmount(IAmount unitPriceAmount) {
+		productpricefix.setUnitPriceAmount(unitPriceAmount);
+	}
+
+	// 180+181: BG-29.BT-150 + BG-29.BT-149 0..1 / PRODUCTPRICEFIX.pricequantity
+	@Override
+	public IQuantity getUnitPriceQuantity() {
+		if(super.getPRODUCTPRICEFIX()==null) return null;
+		// delegieren:
+		return productpricefix.getUnitPriceQuantity();
+	}
+	@Override
+	public void setUnitPriceQuantity(IQuantity basisQuantity) {
+		Mapper.set(getPRODUCTPRICEFIX(), "pricequantity", basisQuantity);
+	}
+	
+//	158 SCT_LINE_TA COMFORT	  (Gross Price)
+//	159 SCT_LINE_TA COMFORT	  Gross Price
+//	160 SCT_LINE_TA COMFORT	  Gross Price Base quantity
+//	161 SCT_LINE_TA COMFORT	  Gross Price Unit Code for base quantity
+	// 158: BG-29.BT-148 0..1 Item gross price
+	@Override
+	public IAmount getGrossPrice() {
+		// delegieren:
+		return productpricefix.getGrossPrice();
+	}
+	@Override
+	public void setGrossPrice(IAmount grossPrice) {
+		productpricefix.setGrossPrice(grossPrice);
+	}
+
+	// 162: BG-29.BT-147 0..1 PriceDiscount
+	@Override
+	public AllowancesAndCharges getPriceDiscount() {
+		// delegieren:
+		return productpricefix.getPriceDiscount();
+	}
+	@Override
+	public void setPriceDiscount(AllowancesAndCharges discount) {
+		productpricefix.setPriceDiscount(discount);
+	}
+
 	
 	// BG.25.BT-128 0..1 Objektkennung // (OBJECT IDENTIFIER FOR INVOICE LINE) Zeile 154
 /*
@@ -279,32 +559,6 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 //		return new ID(rd.getIssuerAssignedID().getValue(), rd.getReferenceCode());
 	}
 	
-	// BT-129 ++ 1..1 bestellte Menge
-	// BT-129+BT-130
-	void setQuantity(Quantity quantity) { 
-		super.setORDERUNIT(quantity.getUnitCode()); // required
-		super.setQUANTITY(quantity.getValue()); // required		
-	}
-	@Override
-	public IQuantity getQuantity() {
-		return Quantity.create(super.getORDERUNIT(), super.getQUANTITY());
-	}
-
-	/* BT-131 ++ 1..1 Nettobetrag der Rechnungsposition / PRICE_LINE_AMOUNT
-	 * Höhe des Preises für die Positionszeile. 
-	 * Der Wert ergibt sich im Regelfall aus der Multiplikation von PRICE_AMOUNT und QUANTITY, 
-	 * muss aber explizit aufgeführt werden. 
-	 * Der PRICE_LINE_AMOUNT kann sich auch aus PRICE_AMOUNT und PRICE_UNIT_VALUE ergeben, 
-	 * wenn der Preis nicht an die Bestelleinheit gekoppelt ist. Siehe auch PRICE_BASE_FIX.
-	 */
-	void setLineTotalAmount(Amount amount) {
-		super.setPRICELINEAMOUNT(amount.getValue());
-	}
-
-	@Override
-	public IAmount getLineTotalAmount() {
-		return super.getPRICELINEAMOUNT()==null ? null : Amount.create(getPRICELINEAMOUNT());
-	}
 
 	private static final String WARN_ORDERLINEID = "An Order (Document Type Code BT-3 = 220) MUST NOT contain a purchase order line reference.";
 	// BT-132 0..1 Referenced purchase order line reference
@@ -344,20 +598,22 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 	}
 
 //---------------- BG-26 0..1 BG-26.BT-134 + BG-26.BT-135
+	// 291..393 + 294..296
+	// 304..306 + 305..307
 	@Override // factory
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
 		return DeliveryDate.create(start, end);
 	}	
 	@Override
-	public void setLineDeliveryPeriod(IPeriod period) {
+	public void setDeliveryPeriod(IPeriod period) {
 		super.setDELIVERYDATE((DeliveryDate)period);
 	}
 	@Override
-	public void setLineDeliveryDate(Timestamp timestamp) {
-		setLineDeliveryPeriod(DeliveryDate.create(timestamp, timestamp));
+	public void setDeliveryDate(Timestamp timestamp) {
+		setDeliveryPeriod(DeliveryDate.create(timestamp, timestamp));
 	}
 	@Override
-	public Timestamp getLineDeliveryDateAsTimestamp() {
+	public Timestamp getDeliveryDateAsTimestamp() {
 		if(super.getDELIVERYDATE()==null) return null;
 		if(getDELIVERYDATE().getDELIVERYSTARTDATE().equals(getDELIVERYDATE().getDELIVERYENDDATE())) {
 			// DELIVERYDATE ist Zeitpunkt
@@ -366,7 +622,7 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		return null;
 	}
 	@Override
-	public IPeriod getLineDeliveryPeriod() {
+	public IPeriod getDeliveryPeriod() {
 		if(super.getDELIVERYDATE()==null) return null;
 		if(getDELIVERYDATE().getDELIVERYSTARTDATE().equals(getDELIVERYDATE().getDELIVERYENDDATE())) {
 			// DELIVERYDATE ist Zeitpunkt
@@ -440,71 +696,7 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 //		return res;
 	}
 
-	/*
-	 * BG-29 1..1 PRICE DETAILS
-	 * 
-	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
-	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
-	 */
-	// BG-29.BT-146 1..1 Item net price aka UnitPriceAmount / PRODUCTPRICEFIX.priceamount
-	@Override
-	public IAmount getUnitPriceAmount() {
-//		return super.getPRODUCTPRICEFIX()==null ? null : Amount.create(getPRODUCTPRICEFIX().getPRICEAMOUNT());
-		// delegieren:
-		return productpricefix.getUnitPriceAmount();
-	}
-	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-//		Mapper.set(getPRODUCTPRICEFIX(), "priceamount", unitPriceAmount);
-		productpricefix.setUnitPriceAmount(unitPriceAmount);
-	}
-
-	// BT-146 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional
-//	@Override
-//	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
-//		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
-//		if(quantity!=null) {
-//			QuantityType qt = new QuantityType();
-//			quantity.copyTo(qt);
-//			tradePrice.setBasisQuantity(qt); 
-//		}
-//		super.getSpecifiedLineTradeAgreement().setNetPriceProductTradePrice(tradePrice);;
-//	}
 	
-	// BG-29.BT-147 0..1 PriceDiscount
-	@Override
-	public IAmount getPriceDiscount() {
-		// delegieren:
-		return productpricefix.getPriceDiscount();
-	}
-	@Override
-	public void setPriceDiscount(IAmount discount) {
-		productpricefix.setPriceDiscount(discount);
-	}
-
-	// BG-29.BT-148 0..1 
-	@Override
-	public IAmount getGrossPrice() {
-		// delegieren:
-		return productpricefix.getGrossPrice();
-	}
-	@Override
-	public void setGrossPrice(IAmount grossPrice) {
-		productpricefix.setGrossPrice(grossPrice);
-	}
-
-	// BG-29.BT-150 + BG-29.BT-149 0..1 / PRODUCTPRICEFIX.pricequantity
-	@Override
-	public IQuantity getUnitPriceQuantity() {
-		if(super.getPRODUCTPRICEFIX()==null) return null;
-//		return getPRODUCTPRICEFIX().getPRICEQUANTITY()==null ? null : Quantity.create(getPRODUCTPRICEFIX().getPRICEQUANTITY());
-		// delegieren:
-		return productpricefix.getUnitPriceQuantity();
-	}
-	@Override
-	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-		Mapper.set(getPRODUCTPRICEFIX(), "pricequantity", basisQuantity);
-	}
-
 	// BG-30.BT-151 1..1 item VAT category code
 	@Override
 	public void setTaxCategory(TaxCategoryCode codeEnum) {
@@ -527,190 +719,6 @@ An Order Response (Document Typecode BT-3 = 231) MUST contain a Line Status Code
 		return productpricefix.getTaxRate();
 	}
 
-	// BG-31 ITEM INFORMATION : SpecifiedTradeProduct ==============> OT: productid
-	// BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
-	void setItemName(String text) {
-		productid.setItemName(text);
-	}
-	@Override
-	public String getItemName() {
-		return productid.getItemName();
-	}
-
-	// BG-31.BT-154 0..1 Item description
-	@Override
-	public void setDescription(String text) {
-		productid.setDescription(text);
-	}
-	@Override
-	public String getDescription() {
-		return productid.getDescription();
-	}
-	
-	// BG-31.BT-155 0..1 Item Seller's identifier, productid.supplierpid
-	@Override
-	public void setSellerAssignedID(String id) {
-		productid.setSellerAssignedID(id);
-	}
-	@Override
-	public String getSellerAssignedID() {
-		return productid.getSellerAssignedID();
-	}
-
-	// BG-31.BT-156 0..1 Item Buyer's identifier, productid.buyerpid (1..n)
-	@Override
-	public void setBuyerAssignedID(String id) {
-		productid.setBuyerAssignedID(id);
-	}
-	@Override
-	public String getBuyerAssignedID() {
-		return productid.getBuyerAssignedID();
-	}
-
-	// BG-31.BT-157 0..n SpecifiedTradeProduct.GlobalID
-	@Override
-	public Identifier createStandardIdentifier(String globalID, String schemeID) {
-		return productid.createStandardIdentifier(globalID, schemeID);
-	}
-	@Override
-	public void addStandardIdentifier(Identifier id) {
-		productid.addStandardIdentifier(id);
-	}
-	@Override
-	public List<Identifier> getStandardIdentifier() {
-		return productid.getStandardIdentifier();
-	}
-
-	// BG-31.BT-158 0..n Item classification identifier designatedProductClassification
-	/* ProductClassificationType CodeType classCode (value, listID, listVersionID)
-	                             TextType className
-
- Bsp. ORDER-X_EX01_ORDER_FULL_DATA-COMFORT.xml :
-         ...
-        <ram:DesignatedProductClassification>
-        <ram:ClassCode listID="TST">Class_code</ram:ClassCode>
-             <ram:ClassName>Name Class Codification</ram:ClassName> <!-- text zu "TST", TST nicht in UNTDID 7143
-        </ram:DesignatedProductClassification>
-
-realistisches Beispiel:
-        <ram:DesignatedProductClassification>
-        <ram:ClassCode listID="EN">4047247110051</ram:ClassCode>
-             <ram:ClassName>EN==EAN==European Article Number</ram:ClassName>
-        </ram:DesignatedProductClassification>
-
-			<PRODUCT_FEATURES>
-				<bmecat:REFERENCE_FEATURE_GROUP_ID type="flat">a</bmecat:REFERENCE_FEATURE_GROUP_ID>
-				<bmecat:REFERENCE_FEATURE_GROUP_NAME>a</bmecat:REFERENCE_FEATURE_GROUP_NAME>
-				<bmecat:REFERENCE_FEATURE_GROUP_ID2 type="flat">a</bmecat:REFERENCE_FEATURE_GROUP_ID2>
-				<bmecat:GROUP_PRODUCT_ORDER>0</bmecat:GROUP_PRODUCT_ORDER>
-				<FEATURE>
-					<bmecat:FNAME>a</bmecat:FNAME>
-					<bmecat:FVALUE>a</bmecat:FVALUE>
-					<bmecat:FUNIT>a</bmecat:FUNIT>
-					<bmecat:FORDER>0</bmecat:FORDER>
-					<bmecat:FDESCR lang="aar">a</bmecat:FDESCR>
-					<bmecat:FVALUE_DETAILS lang="aar">a</bmecat:FVALUE_DETAILS>
-					<bmecat:FVALUE_TYPE>choice</bmecat:FVALUE_TYPE>
-				</FEATURE>
-			</PRODUCT_FEATURES>
-
-	 */
-	@Override
-	public IdentifierExt createClassificationIdentifier(String classCode, String listID, String listVersionID, String idText) {
-		return null;
-//		// ignore idText TODO
-//		return new Code(classCode, listID, listVersionID);
-	}
-	@Override
-	public void addClassificationIdentifier(IdentifierExt id) {
-//		Mapper.newFieldInstance(this, FIELD_specifiedTradeProduct, id);
-//		ProductClassificationType productClassificationType = new ProductClassificationType();
-//		productClassificationType.setClassCode((Code)id);
-//		super.getSpecifiedTradeProduct().getDesignatedProductClassification().add(productClassificationType);		
-	}
-	@Override
-	public List<IdentifierExt> getClassifications() {
-		return null;
-//		if(super.getSpecifiedTradeProduct()==null) return null;
-//		List<ProductClassificationType> list = getSpecifiedTradeProduct().getDesignatedProductClassification();
-//		List<IdentifierExt> result = new ArrayList<IdentifierExt>(list.size());
-//		list.forEach(producClass -> {
-//			IdentifierExt idExt= new Code(producClass.getClassCode());
-//			//idExt.setIdText(producClass.getClassName().getValue());
-//			result.add(idExt);
-//		});
-//		return result;
-	}
-
-	// BG-31.BT-159 0..1 Item country of origin / nicht in opentrans, ===> "countryoforigin" als ARTIKELATTRIBUTE
-	private static final String COUNTRY_OF_ORIGIN = "countryoforigin";
-	@Override
-	public void setCountryOfOrigin(String code) {
-		addItemAttribute(COUNTRY_OF_ORIGIN, code);
-	}
-	@Override
-	public String getCountryOfOrigin() {
-		Properties attributes = getItemAttributes();
-		return (String) attributes.get(COUNTRY_OF_ORIGIN);
-	}
-
-	// BG-32 0..n ITEM ATTRIBUTES with BT-160 name and BT-161 value
-	@Override
-	public void addItemAttribute(String name, String value) {
-		// TODO Auto-generated method stub
-//		PRODUCTFEATURES pf = super.getPRODUCTFEATURES()
-//			    "referencefeaturesystemname",
-//			    "referencefeaturegroupid",
-//			    "referencefeaturegroupname",
-//			    "referencefeaturegroupid2",
-//			    "groupproductorder",
-//			    List<FEATURE> feature:
-//	    protected List<FNAME> fname;
-//	    protected String ftidref;
-//	    protected TypeFTEMPLATE ftemplate;
-//	    protected List<FVALUE> fvalue;
-//	    protected List<String> valueidref;
-//	    protected String funit;
-//	    protected BigInteger forder;
-//	    protected List<FDESCR> fdescr;
-//	    protected List<FVALUEDETAILS> fvaluedetails;
-//	    protected String fvaluetype;
-/*
-				<FEATURE>
-					<bmecat:FNAME>a</bmecat:FNAME>
-					<bmecat:FVALUE>a</bmecat:FVALUE>
-					<bmecat:FUNIT>a</bmecat:FUNIT>
-					<bmecat:FORDER>0</bmecat:FORDER>
-					<bmecat:FDESCR lang="aar">a</bmecat:FDESCR>
-					<bmecat:FVALUE_DETAILS lang="aar">a</bmecat:FVALUE_DETAILS>
-					<bmecat:FVALUE_TYPE>choice</bmecat:FVALUE_TYPE>
-				</FEATURE>
-
- */
-	}
-	/* PRODUCTFEATURES enthält List<FEATURE> feature:
-	 * Produktmerkmal FEATURE Informationen über ein Produktmerkmal 
-	 */
-	@Override
-	public Properties getItemAttributes() {
-		List<FEATURE> feature = super.getPRODUCTFEATURES()==null ? null : super.getPRODUCTFEATURES().getFEATURE();
-//		List<ProductCharacteristicType> productCharacteristics = specifiedTradeProduct.getApplicableProductCharacteristic();
-		Properties result = new Properties();
-		feature.forEach(f -> {
-			if(f.getFNAME().isEmpty()) { // eindeutiger Name des Merkmals
-				// nix tun
-			} else {
-				// FVALUE : Ausprägung(en) des referenzierten Merkmals
-				if(f.getFVALUE().isEmpty()) {
-					// in OT steht was von VARIANTS, dann aber doch nicht
-				} else {
-					result.put(f.getFNAME().get(0).getValue(), f.getFVALUE().get(0).getValue());
-				}
-			}
-//			result.put(pc.getDescription().get(0).getValue(), pc.getValue().get(0).getValue());			
-		});
-		return result;
-	}
 
 	// --------------------------- CIO only:
 	@Override
@@ -723,5 +731,260 @@ realistisches Beispiel:
 		String indicator = super.getPARTIALSHIPMENTALLOWED();
 		return indicator!=null && indicator.equals("TRUE");
 	}
+
+	@Override
+	public void addReferencedProductDocument(String code, SupportingDocument supportigDocument) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<SupportingDocument> getReferencedProductDocuments() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
+			Timestamp ts, String uri) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
+			Timestamp ts, byte[] content, String mimeCode, String filename) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addReferencedDocument(SupportingDocument supportigDocument) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<SupportingDocument> getReferencedDocuments() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPickupDate(Timestamp timestamp) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getPickupDateAsTimestamp() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ISupplyChainEvent> getPickupEvents() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addPickupEvent(ISupplyChainEvent supplyChainEvent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<ISupplyChainEvent> getDeliveryEvents() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addDeliveryEvent(ISupplyChainEvent supplyChainEvent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setPickupPeriod(IPeriod period) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IPeriod getPickupPeriod() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ISupplyChainEvent createSupplyChainEvent(IQuantity quantity, Timestamp timestamp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ISupplyChainEvent createSupplyChainEvent(IQuantity quantity, IPeriod period) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AllowancesAndCharges getPriceCharge() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPriceCharge(AllowancesAndCharges charge) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setSubstitutedProductID(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getSubstitutedProductID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addSubstitutedIdentifier(Identifier id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<Identifier> getSubstitutedIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setSubstitutedSellerAssignedID(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getSubstitutedSellerAssignedID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setSubstitutedBuyerAssignedID(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getSubstitutedBuyerAssignedID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setSubstitutedProductName(String text) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getSubstitutedProductName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setSubstitutedProductDescription(String text) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getSubstitutedProductDescription() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setAgreedQuantity(IQuantity quantity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IQuantity getAgreedQuantity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPackageQuantity(IQuantity quantity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IQuantity getPackageQuantity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPerPackageQuantity(IQuantity quantity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IQuantity getPerPackageQuantity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setQuotationID(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getQuotationID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setQuotationLineID(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getQuotationLineID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setBlanketOrderReference(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getBlanketOrderReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

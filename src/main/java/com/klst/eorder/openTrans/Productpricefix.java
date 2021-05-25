@@ -182,20 +182,8 @@ public class ALLOWORCHARGESFIX {
 	public IAmount getUnitPriceAmount() {
 		return Amount.create(super.getPRICEAMOUNT());
 	}
-	void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
+	void setUnitPriceAmount(IAmount unitPriceAmount) {
 		Mapper.set(this, "priceamount", unitPriceAmount);
-	}
-	
-	// BG-29.BT-147 0..1 PriceDiscount
-	@Override
-	public IAmount getPriceDiscount() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void setPriceDiscount(IAmount grossPrice) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	// BG-29.BT-148 0..1 GrossPrice
@@ -319,6 +307,26 @@ mindestens 1 Zeichen und darf höchstens 80 Zeichen betragen.
 	public BigDecimal getTaxRate() {
 		TAXDETAILSFIX vatDatails = getVatDatails();
 		return vatDatails.getTAX();
+	}
+	@Override
+	public AllowancesAndCharges getPriceDiscount() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setPriceDiscount(AllowancesAndCharges allowance) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public AllowancesAndCharges getPriceCharge() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setPriceCharge(AllowancesAndCharges charge) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

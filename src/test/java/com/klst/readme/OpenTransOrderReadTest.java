@@ -104,7 +104,7 @@ public class OpenTransOrderReadTest {
 		if(transformer.isValid(testFile)) {
 			try {
 				InputStream is = new FileInputStream(testFile);
-				object = transformer.unmashal(is);
+				object = transformer.unmarshal(is);
 				LOG.info(">>>>"+object);
 				Class<?> type = Class.forName(com.klst.marshaller.CioTransformer.CONTENT_TYPE_NAME); // CrossIndustryOrder aus jar laden
 				// dynamisch:
@@ -124,7 +124,7 @@ public class OpenTransOrderReadTest {
 	private CoreOrder getCoreOrder(File testFile) {
 		try {
 			InputStream is = new FileInputStream(testFile);
-			object = transformer.unmashal(is);
+			object = transformer.unmarshal(is);
 			LOG.info(">>>>"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // openTrans.Order aus jar laden
 			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
@@ -143,6 +143,10 @@ public class OpenTransOrderReadTest {
 		CoreOrder co = null;	
 		if(!transformer.isValid(testFile)) return; // not valid
 		co = getCoreOrder(testFile);
+		
+		// keine Methode für <GENERATION_DATE>2020-01-22T07:35:18.6258</GENERATION_DATE>
+		// <ORDER_INFO> ... <ORDER_DATE>2020-01-22</ORDER_DATE>
+		LOG.info("IssueDateAsTimestamp:"+co.getIssueDateAsTimestamp());
 		
 		BusinessParty seller = co.getSeller();
 		LOG.info("seller:"+seller);
@@ -233,7 +237,7 @@ public class OpenTransOrderReadTest {
 		assertEquals(a, line.getBuyerAccountingReference());
 		
 		// BG.26 0..1 POSITIONSZEITRAUM : BT-134 0..1 Anfangsdatum + BT-135
-		IPeriod lineDeliveryPeriod = line.getLineDeliveryPeriod();
+		IPeriod lineDeliveryPeriod = line.getDeliveryPeriod();
 		assertEquals("20200130", DateTimeFormats.tsToCCYYMMDD(lineDeliveryPeriod.getStartDateAsTimestamp()));
 		assertEquals(DateTimeFormats.ymdToTs("2020-02-15"), lineDeliveryPeriod.getEndDateAsTimestamp());
 		

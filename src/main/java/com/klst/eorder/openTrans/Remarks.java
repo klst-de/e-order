@@ -9,9 +9,12 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.OrderNoteFactory;
 
-/* implements BG-1 NOTE
+/* implements 21: BG-1 NOTE
  * 
- * also implements BG-25.BT-127 0..n IncludedNote.Content
+ * Alternative is to use delivery instructions, 
+ * but that's more applicable in a despatch message.
+ * 
+ * Also implements 37: BG-25.BT-127 0..n LINE NOTE
  * 
  * super class REMARKS extends TypeMLSTRING64000 extends DtMLSTRING
  */
@@ -53,10 +56,7 @@ public class Remarks extends REMARKS implements OrderNote, OrderNoteFactory {
 	}
 	// copy ctor
 	private Remarks(REMARKS note) {
-		super();
-		if(note!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, note);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, note);
 	}
 
 	public String toString() {
@@ -64,7 +64,16 @@ public class Remarks extends REMARKS implements OrderNote, OrderNoteFactory {
 			+" \""+getNote()+"\"]";
 	}
 
-	// BT-21 ++ 0..1 note subject code
+	// 22, 38: 0..1 EXTENDED Note Content Code, not in OT
+	@Override
+	public void setNoteContentCode(String code) {
+	}
+	@Override
+	public String getNoteContentCode() {
+		return null;
+	}
+	
+	// 24: BG-1.BT-21 0..1 note subject code
 	@Override
 	public String getCode() {
 		return super.getType();
@@ -74,8 +83,8 @@ public class Remarks extends REMARKS implements OrderNote, OrderNoteFactory {
 		super.setType(code);
 	}
 
-	// BG-1 .BT-22  1..1 Invoice note
-	// BG-25.BT-127 0..n IncludedNote.Content
+	// 23: BG-1.BT-22  1..1 note
+	// 39: BG-25.BT-127 0..n IncludedNote.Content
 	/*
 	 * in in Order-X_Extended content is mapped to List
 	 * @see https://github.com/klst-de/e-order/issues/3

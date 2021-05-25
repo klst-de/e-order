@@ -15,15 +15,20 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.MessageFunctionEnum;
+import com.klst.edoc.untdid.PaymentMeansEnum;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG22_DocumentTotals;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
+import com.klst.eorder.impl.UnitPriceAmount;
 
 /* alle drei elemente sind required:
     "orderheader",
@@ -35,8 +40,9 @@ public class Order extends ORDER implements CoreOrder {
 	private static final Logger LOG = Logger.getLogger(Order.class.getName());
 
 	OrderHeader orderHeader;
-//    protected CONTROLINFO controlinfo;
-//    protected SOURCINGINFO sourcinginfo;
+	// elemente:
+//    protected CONTROLINFO controlinfo; hat nur 3 String elemente: stopautomaticprocessing, generatorinfo, generationdate
+//    protected SOURCINGINFO sourcinginfo; Informationen über Beschaffungsaktivitäten zusammengefasst, die diesem Auftrag vorausgegangen sind.
 //    protected ORDERINFO orderinfo; mit parties usw
 	OrderInfo orderInfo;
 	
@@ -54,7 +60,21 @@ public class Order extends ORDER implements CoreOrder {
 		//orderHeader.createtControlInfo(); // hat nur 3 elemente
 //	    "sourcinginfo" SOURCING_INFO (Beschaffungsinformationen) : optional
 //		Im Element SOURCING_INFO werden Informationen über Beschaffungsaktivitäten zusammengefasst, 
-//		die diesem Auftrag voraus gegangen sind. 
+//		die diesem Auftrag vorausgegangen sind:
+//	protected String quotationid;   ===> // 534: 0..1 QUOTATION REFERENCE
+//	protected List<AGREEMENT> agreement;  ?? ==> wie applicableHeaderTradeAgreement ??? (Referenz auf Rahmenvertrag)
+//	    protected String agreementid;
+//	    protected String agreementlineid;
+//	    protected String agreementstartdate;
+//	    protected String agreementenddate;
+//	    protected TypePARTYID supplieridref;
+//	    protected List<AGREEMENTDESCR> agreementdescr;
+//	    protected MIMEINFO mimeinfo;
+//	    protected String type;
+//	    protected String _default;
+
+//	protected CATALOGREFERENCE catalogreference;
+
 		
 //	    "orderinfo" : required
 		
@@ -229,31 +249,6 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
-	@Override
-	public void addSupportigDocument(SupportingDocument supportigDocument) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<SupportingDocument> getAdditionalSupportingDocuments() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public SupportingDocument createSupportigDocument(String docRefId, String description, String uri) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public SupportingDocument createSupportigDocument(String docRefId, String description, byte[] content,
-			String mimeCode, String filename) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	// BG-25 1..n ORDER LINE
 	@Override
 	public List<OrderLine> getLines() {
@@ -266,9 +261,8 @@ public class Order extends ORDER implements CoreOrder {
 	}
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount,
-			String itemName) {
-		// TODO Auto-generated method stub
-		return null;
+			String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		return OrderItem.create(this, id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
 	}
 
 	@Override
@@ -419,30 +413,6 @@ public class Order extends ORDER implements CoreOrder {
 	}
 
 	@Override
-	public void setContractReference(String id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getContractReference() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setPurchaseOrderReference(String id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getPurchaseOrderReference() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void setTenderOrLotReference(String docRefId) {
 		// TODO Auto-generated method stub
 		
@@ -480,18 +450,6 @@ public class Order extends ORDER implements CoreOrder {
 
 	@Override
 	public String getDeliveryFunctionCode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setQuotationReference(String id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getQuotationReference() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -540,6 +498,255 @@ public class Order extends ORDER implements CoreOrder {
 
 	@Override
 	public String getPreviousOrderResponseReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPickupDate(Timestamp timestamp) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getPickupDateAsTimestamp() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPickupPeriod(IPeriod period) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IPeriod getPickupPeriod() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
+			Timestamp ts, String uri) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
+			Timestamp ts, byte[] content, String mimeCode, String filename) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setTestIndicator(boolean indicator) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isTest() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setCopyIndicator(boolean indicator) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isCopy() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void addLanguage(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<String> getLanguage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPurpose(MessageFunctionEnum code) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public MessageFunctionEnum getPurposeCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setRequestedResponse(String code) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getRequestedResponse() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setTaxCurrency(String isoCurrencyCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getTaxCurrency() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setTaxPointDateCode(String code) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getTaxPointDateCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// 524: BT-14 0..1 SALES ORDER REFERENCED DOCUMENT
+	// eine vom Verkäufer ausgegebene Kennung für einen referenzierten Verkaufsauftrag
+	@Override
+	public void setOrderReference(String docRefId) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public String getOrderReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// 529: BT-13 0..1 Purchase order reference
+	// eine vom Käufer ausgegebene Kennung für eine referenzierte Bestellung
+	@Override
+	public void setPurchaseOrderReference(String id) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public String getPurchaseOrderReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// 534: 0..1 QUOTATION REFERENCE, not in CII
+	@Override
+	public void setQuotationReference(String id) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public String getQuotationReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// 539: BT-12 0..1 Contract reference / (Referenz auf Rahmenvertrag)
+	// Die Vertragsreferenz sollte im Kontext der spezifischen Handelsbeziehung 
+	// und für einen definierten Zeitraum einmalig vergeben sein
+	@Override
+	public void setContractReference(String id) {
+		orderHeader.setContractReference(id);
+	}
+	@Override
+	public String getContractReference() {
+		return orderHeader.getContractReference();
+	}
+
+	// 549: BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, String description, String uri) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, String description, byte[] content,
+			String mimeCode, String filename) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void addSupportigDocument(SupportingDocument supportigDocument) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public List<SupportingDocument> getAdditionalSupportingDocuments() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setInvoicedObject(String name, String schemeID) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public String getInvoicedObject() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public Identifier getInvoicedObjectIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PaymentMeansEnum getPaymentMeansEnum() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPaymentMeansEnum(PaymentMeansEnum code) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getPaymentMeansText() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPaymentMeansText(String text) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addPaymentTerm(String description) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setPaymentTerms(List<String> paymentTerms) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<String> getPaymentTerms() {
 		// TODO Auto-generated method stub
 		return null;
 	}
