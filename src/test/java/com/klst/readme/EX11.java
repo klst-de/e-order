@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,20 +123,25 @@ public class EX11 {
 		
 		byte[] xml = transformer.marshal(object);
 		LOG.info(new String(xml));
-//		writeBytesToFile(xml, "EX11-TestResult.xml");
+		try {
+			Path temp = Files.createTempFile("EX11-TestResult", ".xml");
+			Files.write(temp, xml);
+			LOG.info("written to "+temp);
+			File testFile = getTestFile(temp.toString());
+			CoreOrder cio = null;
+			// unmarshal toModel:
+			if(transformer.isValid(testFile)) {
+				cio = unmarshal(testFile);
+				doAssert(cio);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	static final Timestamp issueDate = DateTimeFormats.ymdToTs("2020-01-09");
-
-	@Test
-    public void readFile() {
-		File testFile = getTestFile(TESTDIR+"ORDER-X_EX11_ORDER_PICK-UP-BASIC.xml");
-		transformer = cioTransformer;
-		CoreOrder cio = null;
-		// unmarshal toModel:
-		if(transformer.isValid(testFile)) {
-			cio = unmarshal(testFile);
-		}
+	private void doAssert(CoreOrder cio) {
 		assertFalse(cio.isTest());                                        // 2
 		assertEquals(BG2_ProcessControl.PROFILE_BASIC, cio.getProfile()); // 7
 		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());      // 11
@@ -170,25 +177,38 @@ public class EX11 {
 			assertEquals(e.bai, l.getBuyerAssignedID());
 		}
 	}
+	
+	@Test
+    public void readFile() {
+		File testFile = getTestFile(TESTDIR+"ORDER-X_EX11_ORDER_PICK-UP-BASIC.xml");
+		transformer = cioTransformer;
+		CoreOrder cio = null;
+		// unmarshal toModel:
+		if(transformer.isValid(testFile)) {
+			cio = unmarshal(testFile);
+			doAssert(cio);
+		}	
+	}
 
 	public class ExpectedLine {
 		String id;
 		OrderNote note = null;
 		IQuantity qty;
-		IAmount lna; // line net amount
+		IAmount lna;         // line net amount
 		UnitPriceAmount upa;
-		IQuantity upq; // UnitPriceQuantity
+		IQuantity upq;       // UnitPriceQuantity
 		String name;
-		boolean pdi; // PartialDeliveryIndicator
-		Identifier sid; // StandardIdentifier
-		String sai; // SellerAssignedID
-		String bai; // BuyerAssignedID
+		boolean pdi;         // PartialDeliveryIndicator
+		Identifier sid;      // StandardIdentifier
+		String sai;          // SellerAssignedID
+		String bai;          // BuyerAssignedID
 	}
+	static final String NODE_CONTENT = "certifiés  PEFC mini 90% PEFC/10-34-97 ";
 	ArrayList<ExpectedLine> expected() {
 		ArrayList<ExpectedLine> lines = new ArrayList<ExpectedLine>(3);
 		ExpectedLine line = new ExpectedLine();
 		line.id = "1";
-		line.note = CrossIndustryOrder.getFactory().createNote(PRD, "certifiés  PEFC mini 90% PEFC/10-34-97 ");
+		line.note = CrossIndustryOrder.getFactory().createNote(PRD, NODE_CONTENT);
 		line.qty = new Quantity(MTK, new BigDecimal(4.052));
 		line.upa = new UnitPriceAmount(new BigDecimal(18.74));
 		line.upq = new Quantity(MTK, new BigDecimal(1));
@@ -252,7 +272,7 @@ public class EX11 {
 		  , new UnitPriceAmount(new BigDecimal(18.74)) // price
 		  , "HPL 0.8 mm  3070x1320"                    // itemName
 		  );
-		line1.addNote(PRD, "certifiés  PEFC mini 90% PEFC/10-34-97");     // 37
+		line1.addNote(PRD, NODE_CONTENT);                                 // 37
 		line1.addStandardIdentifier("3607765426686", GTIN);               // 43+44
 		line1.setSellerAssignedID("542668");                              // 45
 		line1.setBuyerAssignedID("198765");                               // 46
