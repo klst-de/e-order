@@ -318,44 +318,74 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeAgreement.getBuyer();
 	}
 
-	// 539: BT-12 0..1 Contract reference
-	@Override
-	public void setContractReference(String id) {
-		applicableHeaderTradeAgreement.setContractReference(id);	
-	}
-	@Override
-	public String getContractReference() {
-		return applicableHeaderTradeAgreement.getContractReference();	
-	}
-
 	// 524: BT-14 0..1 SALES ORDER REFERENCED DOCUMENT
 	@Override
-	public void setOrderReference(String docRefId) {
-		applicableHeaderTradeAgreement.setOrderReference(docRefId);	
+	public void setOrderReference(String docRefId, Timestamp timestamp) {
+		applicableHeaderTradeAgreement.setOrderReference(docRefId, timestamp);	
 	}
 	@Override
 	public String getOrderReference() {
 		return applicableHeaderTradeAgreement.getOrderReference();	
 	}
+	@Override
+	public Timestamp getOrderDate() {
+		return applicableHeaderTradeAgreement.getOrderDate();	
+	}
 	
 	// 529: BT-13 0..1 Purchase order reference
 	@Override
-	public void setPurchaseOrderReference(String id) {
-		applicableHeaderTradeAgreement.setPurchaseOrderReference(id);	
+	public void setPurchaseOrderReference(String docRefId, Timestamp timestamp) {
+		applicableHeaderTradeAgreement.setPurchaseOrderReference(docRefId, timestamp);	
 	}
 	@Override
 	public String getPurchaseOrderReference() {
 		return applicableHeaderTradeAgreement.getPurchaseOrderReference();	
 	}
+	@Override
+	public Timestamp getPurchaseOrderDate() {
+		return applicableHeaderTradeAgreement.getPurchaseOrderDate();	
+	}
 
 	// 534: 0..1 QUOTATION REFERENCE, not in CII
 	@Override
-	public void setQuotationReference(String id) {
-		applicableHeaderTradeAgreement.setQuotationReference(id);
+	public void setQuotationReference(String id, Timestamp timestamp) {
+		applicableHeaderTradeAgreement.setQuotationReference(id, timestamp);
 	}
 	@Override
 	public String getQuotationReference() {
 		return applicableHeaderTradeAgreement.getQuotationReference();
+	}
+	@Override
+	public Timestamp getQuotationDate() {
+		return applicableHeaderTradeAgreement.getQuotationDate();	
+	}
+
+	// 539: BT-12 0..1 Contract reference
+	@Override
+	public void setContractReference(String id, Timestamp timestamp) {
+		applicableHeaderTradeAgreement.setContractReference(id, timestamp);	
+	}
+	@Override
+	public String getContractReference() {
+		return applicableHeaderTradeAgreement.getContractReference();	
+	}
+	@Override
+	public Timestamp getContractDate() {
+		return applicableHeaderTradeAgreement.getContractDate();	
+	}
+
+	// 544: 0..1 REQUISITION REFERENCE, not in CII
+	@Override
+	public void setRequisitionReference(String id, Timestamp timestamp) {
+		applicableHeaderTradeAgreement.setRequisitionReference(id, timestamp);
+	}
+	@Override
+	public String getRequisitionReference() {
+		return applicableHeaderTradeAgreement.getRequisitionReference();
+	}
+	@Override
+	public Timestamp getRequisitionDate() {
+		return applicableHeaderTradeAgreement.getRequisitionDate();	
 	}
 
 	// 549: BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS

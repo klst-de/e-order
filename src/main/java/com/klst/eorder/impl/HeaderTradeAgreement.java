@@ -1,5 +1,6 @@
 package com.klst.eorder.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
 import com.klst.eorder.api.SupportingDocument;
 
+import un.unece.uncefact.data.standard.qualifieddatatype._128.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._128.ReferencedDocumentType;
 
@@ -70,37 +72,114 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 						);
 	}
 
-	// 539: BT-12 0..1 Contract reference
-	public void setContractReference(String id) {
-		SCopyCtor.getInstance().newFieldInstance(this, "contractReferencedDocument", id);
-		SCopyCtor.getInstance().set(getContractReferencedDocument(), FIELD_issuerAssignedID, id);
-	}
-	public String getContractReference() {
-		if(getContractReferencedDocument()==null) return null;
-		return getContractReferencedDocument().getIssuerAssignedID()==null ? null : getContractReferencedDocument().getIssuerAssignedID().getValue();
-	}
-	
 	// 524: BT-14 0..1 SALES ORDER REFERENCED DOCUMENT
-	public void setOrderReference(String id) {
+	void setOrderReference(String id, Timestamp ts) {
 		SCopyCtor.getInstance().newFieldInstance(this, "sellerOrderReferencedDocument", id);
 		SCopyCtor.getInstance().set(getSellerOrderReferencedDocument(), FIELD_issuerAssignedID, id);
+		if(ts==null) return;
+		FormattedDateTimeType dateTime = DateTimeFormatStrings.toFormattedDateTime(ts);
+		getSellerOrderReferencedDocument().setFormattedIssueDateTime(dateTime);
 	}
-	public String getOrderReference() {
+	String getOrderReference() {
 		if(getSellerOrderReferencedDocument()==null) return null;
 		return getSellerOrderReferencedDocument().getIssuerAssignedID()==null ? null : getBuyerOrderReferencedDocument().getIssuerAssignedID().getValue();
 	}
+	Timestamp getOrderDate() {
+		if(getSellerOrderReferencedDocument()==null) return null;
+		return getSellerOrderReferencedDocument().getFormattedIssueDateTime()==null ? null 
+			: DateTimeFormatStrings.getDateAsTimestamp(getSellerOrderReferencedDocument().getFormattedIssueDateTime());
+	}
 	
 	// 529: BT-13 0..1 Purchase order reference
-	public void setPurchaseOrderReference(String id) {
+	// TODO Rule:
+//	 * <br>Rule ID: 	In an Order type message (BT-3 = 220), 
+//	 *     if the Buyer Order Referenced Document ID (BT-13) is present, 
+//	 *     it MUST be equal to Document ID (BT-1)
+	public void setPurchaseOrderReference(String id, Timestamp ts) {
 		SCopyCtor.getInstance().newFieldInstance(this, "buyerOrderReferencedDocument", id);
 		SCopyCtor.getInstance().set(getBuyerOrderReferencedDocument(), FIELD_issuerAssignedID, id);
+		if(ts==null) return;
+		FormattedDateTimeType dateTime = DateTimeFormatStrings.toFormattedDateTime(ts);
+		getSellerOrderReferencedDocument().setFormattedIssueDateTime(dateTime);
 	}
 	public String getPurchaseOrderReference() {
 		if(getBuyerOrderReferencedDocument()==null) return null;
 		return getBuyerOrderReferencedDocument().getIssuerAssignedID()==null ? null : getBuyerOrderReferencedDocument().getIssuerAssignedID().getValue();
 	}
+	Timestamp getPurchaseOrderDate() {
+		if(getBuyerOrderReferencedDocument()==null) return null;
+		return getBuyerOrderReferencedDocument().getFormattedIssueDateTime()==null ? null 
+			: DateTimeFormatStrings.getDateAsTimestamp(getBuyerOrderReferencedDocument().getFormattedIssueDateTime());
+	}
 	
-	
+	// 534: 0..1 QUOTATION REFERENCE
+	void setQuotationReference(String id, Timestamp ts) {
+		SCopyCtor.getInstance().newFieldInstance(this, "quotationReferencedDocument", id);
+		SCopyCtor.getInstance().set(getQuotationReferencedDocument(), FIELD_issuerAssignedID, id);
+		if(ts==null) return;
+		FormattedDateTimeType dateTime = DateTimeFormatStrings.toFormattedDateTime(ts);
+		getQuotationReferencedDocument().setFormattedIssueDateTime(dateTime);
+	}
+	String getQuotationReference() {
+		if(getQuotationReferencedDocument()==null) return null;
+		return getQuotationReferencedDocument().getIssuerAssignedID()==null ? null : getQuotationReferencedDocument().getIssuerAssignedID().getValue();
+	}
+	Timestamp getQuotationDate() {
+		if(getQuotationReferencedDocument()==null) return null;
+		return getQuotationReferencedDocument().getFormattedIssueDateTime()==null ? null 
+			: DateTimeFormatStrings.getDateAsTimestamp(getQuotationReferencedDocument().getFormattedIssueDateTime());
+	}
+
+	// 539: BT-12 0..1 Contract reference
+	public void setContractReference(String id, Timestamp ts) {
+		SCopyCtor.getInstance().newFieldInstance(this, "contractReferencedDocument", id);
+		SCopyCtor.getInstance().set(getContractReferencedDocument(), FIELD_issuerAssignedID, id);
+		if(ts==null) return;
+		FormattedDateTimeType dateTime = DateTimeFormatStrings.toFormattedDateTime(ts);
+		getContractReferencedDocument().setFormattedIssueDateTime(dateTime);
+	}
+	public String getContractReference() {
+		if(getContractReferencedDocument()==null) return null;
+		return getContractReferencedDocument().getIssuerAssignedID()==null ? null : getContractReferencedDocument().getIssuerAssignedID().getValue();
+	}
+	Timestamp getContractDate() {
+		if(getContractReferencedDocument()==null) return null;
+		return getContractReferencedDocument().getFormattedIssueDateTime()==null ? null 
+			: DateTimeFormatStrings.getDateAsTimestamp(getContractReferencedDocument().getFormattedIssueDateTime());
+	}
+		
+	// 544: 0..1 REQUISITION REFERENCE, not in CII
+	public void setRequisitionReference(String id, Timestamp ts) {
+		SCopyCtor.getInstance().newFieldInstance(this, "requisitionReferencedDocument", id);
+		SCopyCtor.getInstance().set(getRequisitionReferencedDocument(), FIELD_issuerAssignedID, id);
+		if(ts==null) return;
+		FormattedDateTimeType dateTime = DateTimeFormatStrings.toFormattedDateTime(ts);
+		getRequisitionReferencedDocument().setFormattedIssueDateTime(dateTime);
+	}
+	public String getRequisitionReference() {
+		if(getRequisitionReferencedDocument()==null) return null;
+		return getRequisitionReferencedDocument().getIssuerAssignedID()==null ? null : getRequisitionReferencedDocument().getIssuerAssignedID().getValue();
+	}
+	Timestamp getRequisitionDate() {
+		if(getRequisitionReferencedDocument()==null) return null;
+		return getRequisitionReferencedDocument().getFormattedIssueDateTime()==null ? null 
+			: DateTimeFormatStrings.getDateAsTimestamp(getRequisitionReferencedDocument().getFormattedIssueDateTime());
+	}
+
+	// 549: BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	public void addSupportigDocument(SupportingDocument supportigDocument) {
+		super.getAdditionalReferencedDocument().add((ReferencedDocument)supportigDocument);
+	}
+	public List<SupportingDocument> getAdditionalSupportingDocuments() {
+		List<ReferencedDocumentType> list = super.getAdditionalReferencedDocument();
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isRelatedDocument()) res.add(referencedDocument);
+		});
+		return res;
+	}
+
 	// 561: BT-17 0..1 Tender or lot reference
 /* Beispiel:
                <ram:AdditionalReferencedDocument>
@@ -205,16 +284,6 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 		return getApplicableTradeDeliveryTerms().getFunctionCode()==null ? null : getApplicableTradeDeliveryTerms().getFunctionCode().getValue();
 	}
 
-	// 534: 0..1 QUOTATION REFERENCE
-	void setQuotationReference(String id) {
-		SCopyCtor.getInstance().newFieldInstance(this, "quotationReferencedDocument", id);
-		SCopyCtor.getInstance().set(getQuotationReferencedDocument(), FIELD_issuerAssignedID, id);
-	}
-	String getQuotationReference() {
-		if(getQuotationReferencedDocument()==null) return null;
-		return getQuotationReferencedDocument().getIssuerAssignedID()==null ? null : getQuotationReferencedDocument().getIssuerAssignedID().getValue();
-	}
-
 	// 614: 0..1 BLANKET ORDER REFERENCE, not in CII
 	void setBlanketOrderReference(String id) {
 		SCopyCtor.getInstance().newFieldInstance(this, "blanketOrderReferencedDocument", id);
@@ -253,20 +322,6 @@ public class HeaderTradeAgreement extends HeaderTradeAgreementType implements BG
 	String getPreviousOrderResponseReference() {
 		if(getPreviousOrderResponseReferencedDocument()==null) return null;
 		return getPreviousOrderResponseReferencedDocument().getIssuerAssignedID()==null ? null : getPreviousOrderResponseReferencedDocument().getIssuerAssignedID().getValue();
-	}
-
-	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
-	public void addSupportigDocument(SupportingDocument supportigDocument) {
-		super.getAdditionalReferencedDocument().add((ReferencedDocument)supportigDocument);
-	}
-	public List<SupportingDocument> getAdditionalSupportingDocuments() {
-		List<ReferencedDocumentType> list = super.getAdditionalReferencedDocument();
-		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
-		list.forEach(rd -> {
-			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
-			if(referencedDocument.isRelatedDocument()) res.add(referencedDocument);
-		});
-		return res;
 	}
 
 }
