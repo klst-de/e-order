@@ -275,11 +275,16 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * <br>Rule ID: 	
 	 * <br>Order-X-No: 	539
 	 * 
-	 * @param Document reference
+	 * @param docRefId  - 540 Contract reference
+	 * @param timestamp - 541 Contract Reference Date (EXTENDED)
 	 */
 	// Eine eindeutige Bezeichnung des Vertrages (z. B. Vertragsnummer).
-	public void setContractReference(String id);
+	public void setContractReference(String docRefId, Timestamp timestamp);
+	default void setContractReference(String docRefId) {
+		setContractReference(docRefId, null);
+	}
 	public String getContractReference();
+	public Timestamp getContractDate();
 
 	/**
 	 * Purchase order reference
@@ -288,14 +293,21 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * <p>
 	 * Cardinality: 0..1 (optional)
 	 * <br>EN16931-ID: 	BT-13
-	 * <br>Rule ID: 	
+	 * <br>Rule ID: 	In an Order type message (BT-3 = 220), 
+	 *     if the Buyer Order Referenced Document ID (BT-13) is present, 
+	 *     it MUST be equal to Document ID (BT-1)
 	 * <br>Order-X-No: 	529
 	 * 
-	 * @param Document reference
+	 * @param docRefId  - 530 Document reference
+	 * @param timestamp - 531 Buyer Order Reference Date (EXTENDED)
 	 */
 	// Eine vom Erwerber ausgegebene Kennung für eine referenzierte Bestellung.
-	public void setPurchaseOrderReference(String id);
+	public void setPurchaseOrderReference(String docRefId, Timestamp timestamp);
+	default void setPurchaseOrderReference(String docRefId) {
+		setPurchaseOrderReference(docRefId, null);
+	}
 	public String getPurchaseOrderReference();
+	public Timestamp getPurchaseOrderDate();
 
 	/**
 	 * Sales order reference
@@ -304,13 +316,55 @@ public interface CoreOrder extends CoreOrderFactory, BG1_OrderNote, BG2_ProcessC
 	 * <p>
 	 * Cardinality: 0..1 (optional)
 	 * <br>EN16931-ID: 	BT-14
-	 * <br>Rule ID: 	 
 	 * <br>Order-X-No: 	524
 	 * 
-	 * @param Document reference
+	 * @param docRefId  - 525 Document reference
+	 * @param timestamp - 526 Sales Order Reference Date (EXTENDED)
 	 */
-	public void setOrderReference(String docRefId);
+	public void setOrderReference(String docRefId, Timestamp timestamp);
+	default void setOrderReference(String docRefId) {
+		setOrderReference(docRefId, null);
+	}
 	public String getOrderReference();
+	public Timestamp getOrderDate();
+
+	/**
+	 * QUOTATION REFERENCE
+	 * <p>
+	 * An Identifier of a Quotation, issued by the Seller.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>Order-X-No: 	534
+	 * 
+	 * @param docRefId  - 535 Quotation Reference
+	 * @param timestamp - 536 Quotation Reference Date (EXTENDED)
+	 */
+	// 534: 0..1 QUOTATION REFERENCE, nicht in CII: Angebot ref
+	public void setQuotationReference(String docRefId, Timestamp timestamp);
+	default void setQuotationReference(String docRefId) {
+		setQuotationReference(docRefId, null);
+	}
+	public String getQuotationReference();
+	public Timestamp getQuotationDate();
+
+	/**
+	 * REQUISITION REFERENCE
+	 * <p>
+	 * The identification of a Requisition Document, issued by the Buyer or the Buyer Requisitioner.
+	 * Originator Document. To be able to give a reference to the internal requisition on the buyer site on which the order is based.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>Order-X-No: 	544 (not in CII)
+	 * 
+	 * @param docRefId  - 545 Requisition Reference
+	 * @param timestamp - 546 Requisition Reference Date (EXTENDED)
+	 */
+	public void setRequisitionReference(String docRefId, Timestamp timestamp);
+	default void setRequisitionReference(String docRefId) {
+		setRequisitionReference(docRefId, null);
+	}
+	public String getRequisitionReference();
+	public Timestamp getRequisitionDate();
 
 	// BT-15 (Receiving advice / Receipt document reference) : nicht in CIO
 	// BT-16 (Despatch advice reference) : nicht in CIO
@@ -504,14 +558,6 @@ example:
 	public void setDeliveryTerms(String deliveryType, String functionCode);
 	public String getDeliveryType();
 	public String getDeliveryFunctionCode();
-
-	// 534: 0..1 QUOTATION REFERENCE, nicht in CII: Angebot ref: ram:QuotationReferencedDocument
-/*
-Quotation Reference ID
-An Identifier of a Quotation, issued by the Seller.
- */
-	public void setQuotationReference(String id);
-	public String getQuotationReference();
 
 	// 614: 0..1 BLANKET ORDER REFERENCE, nicht in CII: Rahmenauftrag ref: ram:BlanketOrderReferencedDocument
 /*

@@ -21,6 +21,14 @@ public class DateTimeFormatStrings extends DateTimeFormats {
 			: DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 
+	static Timestamp getDateAsTimestamp(FormattedDateTimeType dateTime) {
+		if(dateTime==null) return null;
+		String format = dateTime.getDateTimeString()==null ? null : dateTime.getDateTimeString().getFormat();
+		return format.equals(DateTimeFormats.CCYYMMDDHHMM_QUALIFIER) ? 
+			  DateTimeFormats.yyyyMMddhhmmToTs(dateTime.getDateTimeString().getValue()) 
+			: DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
 	static DateTimeType toDateTime(Timestamp ts) {
 		if(ts==null) return null;
 		
