@@ -39,10 +39,7 @@ public class OrderInfo extends ORDERINFO implements BG4_Seller, BG7_Buyer {
 	
 	// copy ctor
 	private OrderInfo(ORDERINFO object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	// Order number BT-1 Identifier (mandatory) - A unique identification of the Order.

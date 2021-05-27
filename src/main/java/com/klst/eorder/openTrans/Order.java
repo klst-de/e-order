@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bmecat.bmecat._2005.DtLANG;
+import org.bmecat.bmecat._2005.LANGUAGE;
 import org.opentrans.xmlschema._2.ORDER;
 import org.opentrans.xmlschema._2.ORDERITEM;
 
@@ -189,16 +191,19 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
+	// 927: BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112
+	// in ORDERSUMMARY gibt es nur protected BigDecimal totalamount
+	// aber TODO required = true : protected BigInteger totalitemnum
 	@Override
 	public BG22_DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
-		// TODO Auto-generated method stub
+		// TODO class xxx extends ORDERSUMMARY implements BG22_DocumentTotals
 		return null;
 	}
 
+	// 928: BG-22.BT-106 - 1..1/1..1
 	@Override
 	public IAmount getLineNetTotal() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getORDERSUMMARY()==null ? null : Amount.create(getORDERSUMMARY().getTOTALAMOUNT());
 	}
 
 	@Override
@@ -566,14 +571,19 @@ public class Order extends ORDER implements CoreOrder {
 
 	@Override
 	public void addLanguage(String id) {
-		// TODO Auto-generated method stub
-		
+		LANGUAGE language = new LANGUAGE();
+		language.setValue(DtLANG.fromValue(id));
+		orderInfo.getLANGUAGE().add(language);
 	}
 
 	@Override
 	public List<String> getLanguage() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> res = new ArrayList<String>();
+		List<LANGUAGE> list = orderInfo.getLANGUAGE();
+		list.forEach(lang -> {
+			res.add(lang.getValue().value()); // DtLANG ist enum, Bsp ZUL("zul");
+		});
+		return res;
 	}
 
 	@Override
@@ -627,19 +637,22 @@ public class Order extends ORDER implements CoreOrder {
 	// 524: BT-14 0..1 SALES ORDER REFERENCED DOCUMENT
 	// eine vom Verkäufer ausgegebene Kennung für einen referenzierten Verkaufsauftrag
 	@Override
-	public void setOrderReference(String docRefId) {
-		// TODO Auto-generated method stub	
+	public void setOrderReference(String docRefId, Timestamp timestamp) {
+		orderHeader.setContractReference(docRefId, timestamp);
 	}
 	@Override
 	public String getOrderReference() {
-		// TODO Auto-generated method stub
-		return null;
+		return orderHeader.getContractReference();
+	}
+	@Override
+	public Timestamp getOrderDate() {
+		return orderHeader.getOrderDate();
 	}
 
 	// 529: BT-13 0..1 Purchase order reference
 	// eine vom Käufer ausgegebene Kennung für eine referenzierte Bestellung
 	@Override
-	public void setPurchaseOrderReference(String id) {
+	public void setPurchaseOrderReference(String docRefId, Timestamp timestamp) {
 		// TODO Auto-generated method stub	
 	}
 	@Override
@@ -647,14 +660,24 @@ public class Order extends ORDER implements CoreOrder {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public Timestamp getPurchaseOrderDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	// 534: 0..1 QUOTATION REFERENCE, not in CII
 	@Override
-	public void setQuotationReference(String id) {
+	public void setQuotationReference(String docRefId, Timestamp timestamp) {
 		// TODO Auto-generated method stub	
 	}
 	@Override
 	public String getQuotationReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public Timestamp getQuotationDate() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -663,14 +686,34 @@ public class Order extends ORDER implements CoreOrder {
 	// Die Vertragsreferenz sollte im Kontext der spezifischen Handelsbeziehung 
 	// und für einen definierten Zeitraum einmalig vergeben sein
 	@Override
-	public void setContractReference(String id) {
-		orderHeader.setContractReference(id);
+	public void setContractReference(String docRefId, Timestamp timestamp) {
+		orderHeader.setContractReference(docRefId, timestamp);
 	}
 	@Override
 	public String getContractReference() {
 		return orderHeader.getContractReference();
 	}
+	@Override
+	public Timestamp getContractDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	// 544: 0..1 REQUISITION REFERENCE, not in CII
+	@Override
+	public void setRequisitionReference(String id, Timestamp timestamp) {
+		// TODO
+	}
+	@Override
+	public String getRequisitionReference() {
+		return null;
+	}
+	@Override
+	public Timestamp getRequisitionDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	// 549: BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, String description, String uri) {

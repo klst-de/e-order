@@ -32,24 +32,10 @@ public class OpenTrans extends OPENTRANS implements CoreOrder {
 	private static final Logger LOG = Logger.getLogger(OpenTrans.class.getName());
 
 	public OpenTrans(OPENTRANS doc) {
-		super();
-		if(doc!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, doc);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, doc);
 
 		LOG.info("ORDER:"+super.getORDER());
 		LOG.info("ORDERCHANGE:"+super.getORDERCHANGE());
-//		supplyChainTradeTransaction = SupplyChainTradeTransaction.create(super.getSupplyChainTradeTransaction(), this);
-//		applicableHeaderTradeAgreement = supplyChainTradeTransaction.createtHeaderTradeAgreement();
-//		applicableHeaderTradeDelivery = supplyChainTradeTransaction.createtHeaderTradeDelivery();
-//		applicableHeaderTradeSettlement = supplyChainTradeTransaction.createtHeaderTradeSettlement();
-//		if(super.getSupplyChainTradeTransaction()==null) {
-//			super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
-//			supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(applicableHeaderTradeAgreement);
-//			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
-//			supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
-//		}
-
 	}
 
 	@Override
@@ -513,7 +499,7 @@ public class OpenTrans extends OPENTRANS implements CoreOrder {
 	}
 
 	@Override
-	public void setContractReference(String id) {
+	public void setContractReference(String docRefId, Timestamp timestamp) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -525,7 +511,13 @@ public class OpenTrans extends OPENTRANS implements CoreOrder {
 	}
 
 	@Override
-	public void setPurchaseOrderReference(String id) {
+	public Timestamp getContractDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPurchaseOrderReference(String docRefId, Timestamp timestamp) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -537,13 +529,61 @@ public class OpenTrans extends OPENTRANS implements CoreOrder {
 	}
 
 	@Override
-	public void setOrderReference(String docRefId) {
+	public Timestamp getPurchaseOrderDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setOrderReference(String docRefId, Timestamp timestamp) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public String getOrderReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Timestamp getOrderDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setQuotationReference(String docRefId, Timestamp timestamp) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getQuotationReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Timestamp getQuotationDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setRequisitionReference(String docRefId, Timestamp timestamp) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getRequisitionReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Timestamp getRequisitionDate() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -646,18 +686,6 @@ public class OpenTrans extends OPENTRANS implements CoreOrder {
 
 	@Override
 	public String getDeliveryFunctionCode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setQuotationReference(String id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getQuotationReference() {
 		// TODO Auto-generated method stub
 		return null;
 	}

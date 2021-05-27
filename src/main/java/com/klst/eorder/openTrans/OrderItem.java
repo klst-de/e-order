@@ -2,11 +2,13 @@ package com.klst.eorder.openTrans;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.COSTCATEGORYID;
+import org.opentrans.xmlschema._2.CUSTOMERORDERREFERENCE;
 import org.opentrans.xmlschema._2.FEATURE;
 import org.opentrans.xmlschema._2.ORDERITEM;
 
@@ -26,6 +28,8 @@ import com.klst.eorder.api.ISupplyChainEvent;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
+import com.klst.eorder.impl.ID;
+import com.klst.eorder.impl.ReferencedDocument;
 import com.klst.eorder.impl.TradeProductInstance;
 import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.eorder.openTrans.reflection.Mapper;
@@ -738,17 +742,77 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 		
 	}
 
+	/* SupportingDocument
+	   - at document line level:
+-  79ff: 0..n ADDITIONAL REFERENCED PRODUCT DOCUMENT in SpecifiedTradeProduct
+- 141ff: 0..n ADDITIONAL REFERENCED DOCUMENT in SpecifiedLineTradeAgreement
+- 154: BG.25.BT-128 0..1 line object identifier
+
+CUSTOMER_ORDER_REFERENCE / (Kundenauftragsbezug)
+Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die Position bezieht.
+<ORDER_ITEM> ...
+<CUSTOMER_ORDER_REFERENCE>
+	<ORDER_ID>PLEX-141269</ORDER_ID>
+	<LINE_ITEM_ID>1</LINE_ITEM_ID>
+	<ORDER_DATE>2020-01-22</ORDER_DATE>
+</CUSTOMER_ORDER_REFERENCE>
+
+	class INTERNATIONAL_PID extends INTERNATIONALPID implements Identifier {
+                                                                Reference
+*/
+	class SimpleId implements Reference {
+
+		private String content;
+		
+		SimpleId(String content, String type) {
+			setContent(content);
+			setSchemeIdentifier(type);
+		}
+
+		@Override
+		public void setContent(String content) {
+			this.content = content;
+		}
+
+		@Override
+		public String getContent() {
+			return content;
+		}
+
+		@Override
+		public void setSchemeIdentifier(String id) {
+		}
+
+		@Override
+		public String getSchemeIdentifier() {
+			return null;
+		}
+		
+	}
 	@Override
 	public List<SupportingDocument> getReferencedProductDocuments() {
-		// TODO Auto-generated method stub
-		return null;
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
+		List<CUSTOMERORDERREFERENCE> list = super.getCUSTOMERORDERREFERENCE();
+		list.forEach(cor -> {
+			String docRefId = cor.getORDERID();
+//			Reference lineId = new SimpleId(cor.getLINEITEMID(), null);
+			Reference lineId = new ID(cor.getLINEITEMID());
+			Timestamp ts = DateTimeFormats.dtDATETIMEToTs(cor.getORDERDATE());
+//			List<ORDERDESCR> description = TODO cor.getORDERDESCR();
+			String description = null;
+//			TypePARTYID cor.getCUSTOMERIDREF()
+			res.add(createSupportigDocument(docRefId, lineId, description, ts, null));
+		});
+		return res;
 	}
 
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
 			Timestamp ts, String uri) {
-		// TODO Auto-generated method stub
-		return null;
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, lineId, description);
+		rd.setDate(ts);
+//		return ReferencedDocument.create(docRefId, lineId, description);
+		return rd;
 	}
 
 	@Override

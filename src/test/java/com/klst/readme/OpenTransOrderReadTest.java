@@ -2,7 +2,7 @@ package com.klst.readme;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.LogManager;
@@ -24,6 +26,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
@@ -36,12 +39,18 @@ import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.api.SupportingDocument;
+import com.klst.eorder.impl.Amount;
+import com.klst.eorder.impl.ID;
 import com.klst.eorder.impl.Percent;
+import com.klst.eorder.impl.Quantity;
+import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.marshaller.CioTransformer;
 import com.klst.marshaller.OpenTransTransformer;
+import com.klst.test.CommonUtils;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class OpenTransOrderReadTest {
+public class OpenTransOrderReadTest extends Constants {
 
 	private static final String LOG_PROPERTIES = "testLogging.properties";
 	private static LogManager logManager = LogManager.getLogManager(); // Singleton
@@ -62,8 +71,6 @@ public class OpenTransOrderReadTest {
     	}
 		LOG = Logger.getLogger(OpenTransOrderReadTest.class.getName());		
 	}
-	static private final String TESTDIR = "src/test/resources/";
-	static private final String EUR = "EUR";
 
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer otTransformer;
@@ -84,15 +91,76 @@ public class OpenTransOrderReadTest {
 	   	object = null;
     }
 
-	private File getTestFile(String uri) {
-		File file = new File(uri);
-		LOG.info("test file "+file.getAbsolutePath() + " canRead:"+file.canRead());
-		return file;
+	static private final String ORDER_ID = "PLEX-141269";
+	static private final Timestamp ORDER_DATE = Timestamp.valueOf("2020-01-22"+_HMS);
+	static private final IAmount TOTAL_AMOUNT = new Amount(new BigDecimal(1080.25));
+	ArrayList<ExpectedLine> expected() {
+		ArrayList<ExpectedLine> lines = new ArrayList<ExpectedLine>(11);
+		ExpectedLine line = new ExpectedLine();
+		line.id = "1";
+		line.qty = new Quantity(C62, new BigDecimal(2000));
+		line.upa = new UnitPriceAmount(new BigDecimal(5.16));
+		line.upq = new Quantity(null, new BigDecimal(100));
+		line.lna = new Amount(line.upa.getValue().multiply(line.qty.getValue()).divide(line.upq.getValue()));
+		line.name = "BLISTOM25K";
+		line.desc = "BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs";
+		line.pdi = OrderLine.YES;
+		line.sid = new ID("7611577104836", EAN);
+		line.sai = "G4525220";
+		line.bai = "907216725";
+		line.tcc = TaxCategoryCode.ExemptFromTax;
+		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
+		// TODO CUSTOMER_ORDER_REFERENCE
+/* Benutzerdefinierte Erweiterung, wie können diese abgebildet werden? :
+		<ITEM_UDX>
+				<UDX.JA.LABEL_TEXT_LINE1 lang="deu">BLISTO K (sz)</UDX.JA.LABEL_TEXT_LINE1>
+				<UDX.JA.LABEL_TEXT_LINE1 lang="fra">BLISTO K (nr)</UDX.JA.LABEL_TEXT_LINE1>
+				<UDX.JA.LABEL_TEXT_LINE1 lang="eng">BLISTO K (bl)</UDX.JA.LABEL_TEXT_LINE1>
+				<UDX.JA.LABEL_TEXT_LINE1 lang="ita"/>
+				<UDX.JA.LABEL_TEXT_LINE2>M25</UDX.JA.LABEL_TEXT_LINE2>
+				<UDX.JA.BUYER_LINE_ITEM_ID>1</UDX.JA.BUYER_LINE_ITEM_ID>
+		</ITEM_UDX>
+ */
+		lines.add(line);
+		
+		line = new ExpectedLine();
+		line.id = "2";
+		line.sai = "D4816931";
+		line.sid = new ID("7601577560732", EAN);
+		line.bai = "916850027";
+		line.name = "BLISTOM16MSATEX";
+		line.desc = "Bst EX d/e MS M16 6-pans 25pcs, Bouch. de f. laiton";
+		line.qty = new Quantity(C62, new BigDecimal(25));
+		line.upa = new UnitPriceAmount(new BigDecimal(60.69));
+		line.upq = new Quantity(null, new BigDecimal(100));
+		line.lna = new Amount(line.upa.getValue().multiply(line.qty.getValue()).divide(line.upq.getValue()));
+		line.pdi = OrderLine.YES;
+		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
+		lines.add(line);
+		
+		line = new ExpectedLine();
+		line.id = "3";
+		line.sai = "D7875920";
+		line.sid = new ID("7611577099484", EAN);
+		line.bai = "926001075";
+		line.name = "GGMM75IN";
+		line.desc = "GGM INOX V4A M75, Contre-écrou INOX V4A 1pce";
+		line.qty = new Quantity(C62, new BigDecimal(1));
+		line.upa = new UnitPriceAmount(new BigDecimal(2855));
+		line.upq = new Quantity(null, new BigDecimal(100));
+		line.lna = new Amount(line.upa.getValue().multiply(line.qty.getValue()).divide(line.upq.getValue()));
+		line.pdi = OrderLine.YES;
+		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
+		lines.add(line);
+		
+		// TODO rest
+		
+		return lines;
 	}
 
 	@Test
     public void cioEX01() {
-		testFile = getTestFile(TESTDIR+"ORDER-X_EX01_ORDER_FULL_DATA-BASIC.xml");
+		testFile = CommonUtils.getTestFile(TESTDIR+"ORDER-X_EX01_ORDER_FULL_DATA-BASIC.xml");
 		transformer = otTransformer;
 		CoreOrder cio = null;
 		// toModel:
@@ -138,53 +206,97 @@ public class OpenTransOrderReadTest {
 	// ein paar Beispiele: https://github.com/zdavatz/yopenedi/tree/master/yopenedi_dokumentation/Musternachrichten%20OpenTrans%202.1
 	@Test
     public void pldOrder() {
-		File testFile = getTestFile(TESTDIR+"PLD_257444_Order_example.XML");
+		File testFile = CommonUtils.getTestFile(TESTDIR+"PLD_257444_Order_example.XML");
 		transformer = otTransformer;
 		CoreOrder co = null;	
 		if(!transformer.isValid(testFile)) return; // not valid
 		co = getCoreOrder(testFile);
 		
 		// keine Methode für <GENERATION_DATE>2020-01-22T07:35:18.6258</GENERATION_DATE>
-		// <ORDER_INFO> ... <ORDER_DATE>2020-01-22</ORDER_DATE>
-		LOG.info("IssueDateAsTimestamp:"+co.getIssueDateAsTimestamp());
+		assertEquals(ORDER_ID, co.getId());
+		assertEquals(ORDER_DATE, co.getIssueDateAsTimestamp());
+		assertEquals("fra", co.getLanguage().get(0));
 		
 		BusinessParty seller = co.getSeller();
 		LOG.info("seller:"+seller);
 		BusinessParty buyer = co.getBuyer();
 		LOG.info("buyer:"+buyer);
 
-		assertEquals(11, co.getLines().size());
-		OrderLine line = co.getLines().get(0);
-		assertEquals("1", line.getId());               // BT-126 1..1 <LINE_ITEM_ID>1</LINE_ITEM_ID>
-/*
-			<PRODUCT_ID>
-				<bmecat:SUPPLIER_PID type="supplier_specific">G4525220</bmecat:SUPPLIER_PID>
-				<bmecat:INTERNATIONAL_PID type="ean">7611577104836</bmecat:INTERNATIONAL_PID>
-				<bmecat:BUYER_PID type="buyer_specific">907216725</bmecat:BUYER_PID>
-				<bmecat:DESCRIPTION_SHORT>BLISTOM25K</bmecat:DESCRIPTION_SHORT>
-				<bmecat:DESCRIPTION_LONG>BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs</bmecat:DESCRIPTION_LONG>
-			</PRODUCT_ID>		
- */
-		assertEquals("G4525220", line.getSellerAssignedID());     // BG-31.BT-155 0..1 ohne type/Schema
-		assertEquals("907216725", line.getBuyerAssignedID());     // BG-31.BT-156 0..1
-		List<Identifier> stdId = line.getStandardIdentifier();    // BG-31.BT-157 0..n
-		assertEquals("ean", stdId.get(0).getSchemeIdentifier());
-		assertEquals("7611577104836", stdId.get(0).getContent());
-		assertEquals("BLISTOM25K", line.getItemName());           // BG-31.BT-153 1..1 Artikelname
-		assertEquals("BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs", line.getDescription()); // BG-31.BT-154
-/*
-			<QUANTITY>2000</QUANTITY>
-			<bmecat:ORDER_UNIT>C62</bmecat:ORDER_UNIT>		
- */
-		assertEquals("2000.0000:C62", line.getQuantity().toString());       // BT-129 1..1 bestellte Menge
-		assertEquals(TaxCategoryCode.ExemptFromTax, line.getTaxCategory()); // BG-30.BT-151 1..1 Code der UStCat
-		
+		ArrayList<ExpectedLine> exp = expected();
+		List<OrderLine> ol = co.getLines();
+		assertEquals(11, ol.size());
+//		OrderLine line = co.getLines().get(0);
+//		assertEquals("1", line.getId());               // BT-126 1..1 <LINE_ITEM_ID>1</LINE_ITEM_ID>
+///*
+//			<PRODUCT_ID>
+//				<bmecat:SUPPLIER_PID type="supplier_specific">G4525220</bmecat:SUPPLIER_PID>
+//				<bmecat:INTERNATIONAL_PID type="ean">7611577104836</bmecat:INTERNATIONAL_PID>
+//				<bmecat:BUYER_PID type="buyer_specific">907216725</bmecat:BUYER_PID>
+//				<bmecat:DESCRIPTION_SHORT>BLISTOM25K</bmecat:DESCRIPTION_SHORT>
+//				<bmecat:DESCRIPTION_LONG>BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs</bmecat:DESCRIPTION_LONG>
+//			</PRODUCT_ID>		
+// */
+//		assertEquals("G4525220", line.getSellerAssignedID());     // BG-31.BT-155 0..1 ohne type/Schema
+//		assertEquals("907216725", line.getBuyerAssignedID());     // BG-31.BT-156 0..1
+//		List<Identifier> stdId = line.getStandardIdentifier();    // BG-31.BT-157 0..n
+//		assertEquals("ean", stdId.get(0).getSchemeIdentifier());
+//		assertEquals("7611577104836", stdId.get(0).getContent());
+//		assertEquals("BLISTOM25K", line.getItemName());           // BG-31.BT-153 1..1 Artikelname
+//		assertEquals("BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs", line.getDescription()); // BG-31.BT-154
+///*
+//			<QUANTITY>2000</QUANTITY>
+//			<bmecat:ORDER_UNIT>C62</bmecat:ORDER_UNIT>		
+// */
+//		assertEquals("2000.0000C62", line.getQuantity().toString());       // BT-129 1..1 bestellte Menge
+//		assertEquals(TaxCategoryCode.ExemptFromTax, line.getTaxCategory()); // BG-30.BT-151 1..1 Code der UStCat
+		for(int i=0; i<ol.size(); i++) {
+			OrderLine l = ol.get(i);
+			LOG.info("line "+i + ":"+l);
+			
+			if(i>=exp.size()) continue;
+			
+			ExpectedLine e = exp.get(i);
+			assertEquals(e.id, l.getId());
+			if(e.note==null) {
+				assertTrue(l.getNotes().isEmpty());
+			} else {
+				assertEquals(e.note.toString(), l.getNotes().get(0).toString());
+			}
+			assertEquals(e.qty.toString(), l.getQuantity().toString());
+			LOG.info("upa expected:"+e.upa + " =?= "+new UnitPriceAmount(l.getUnitPriceAmount().getValue()));
+			assertEquals(e.upa.toString(), new UnitPriceAmount(l.getUnitPriceAmount().getValue()).toString());
+			assertEquals(e.lna.toString(), l.getLineTotalAmount().toString());
+			assertEquals(e.upq.toString(), l.getUnitPriceQuantity().toString());
+			assertEquals(e.name, l.getItemName());
+			assertEquals(e.desc, l.getDescription());
+			assertEquals(e.sid.toString(), l.getStandardIdentifier().get(0).toString());
+			assertEquals(e.sai, l.getSellerAssignedID());
+			assertEquals(e.bai, l.getBuyerAssignedID());
+			assertEquals(e.pdi, l.isPartialDeliveryAllowed());
+			assertEquals(e.delivery, l.getDeliveryDateAsTimestamp());
+			assertEquals(e.tcc, l.getTaxCategory());
+//		<CUSTOMER_ORDER_REFERENCE>
+//			<ORDER_ID>PLEX-141269</ORDER_ID>
+//			<LINE_ITEM_ID>1</LINE_ITEM_ID>
+//			<ORDER_DATE>2020-01-22</ORDER_DATE>
+//		</CUSTOMER_ORDER_REFERENCE>
+			List<SupportingDocument> sdList = l.getReferencedProductDocuments();
+			LOG.info("CUSTOMER_ORDER_REFERENCE:"+l.getReferencedProductDocuments()
+			+ sdList.get(0).getLineReference()
+			+ sdList.get(0).getDateAsTimestamp()
+			);
+			assertEquals(ORDER_ID, sdList.get(0).getDocumentReference().getName());
+			assertEquals(ORDER_DATE, sdList.get(0).getDateAsTimestamp());
+		}
+
+		assertEquals(EUR, co.getDocumentCurrency());
+		assertEquals(TOTAL_AMOUNT.toString(), co.getLineNetTotal().toString());
 		LOG.info("fertig.\n");
 	}
 	
 	@Test
     public void otOrder() {
-		File testFile = getTestFile(TESTDIR+"sample_order_opentrans_2_1.xml");
+		File testFile = CommonUtils.getTestFile(TESTDIR+"sample_order_opentrans_2_1.xml");
 		transformer = otTransformer;
 		CoreOrder co = null;	
 		if(transformer.isValid(testFile)) {
