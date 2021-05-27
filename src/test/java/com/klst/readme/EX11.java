@@ -25,9 +25,6 @@ import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
-import com.klst.edoc.api.IAmount;
-import com.klst.edoc.api.IQuantity;
-import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
@@ -36,7 +33,6 @@ import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
-import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.impl.Amount;               // impl.jar
 import com.klst.eorder.impl.CrossIndustryOrder;   // impl.jar
 import com.klst.eorder.impl.ID;
@@ -46,7 +42,7 @@ import com.klst.eorder.impl.TradeContact;
 import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
 import com.klst.marshaller.CioTransformer;
 
-public class EX11 {
+public class EX11 extends Constants {
 	
 	private static final String LOG_PROPERTIES = "testLogging.properties";
 	private static LogManager logManager = LogManager.getLogManager(); // Singleton
@@ -68,19 +64,6 @@ public class EX11 {
 		LOG = Logger.getLogger(EX11.class.getName());		
 	}
 //	private static final Logger LOG = Logger.getLogger(OrderTest.class.getName());
-
-	static private final String TESTDIR = "src/test/resources/";
-
-	static final String EUR = "EUR";
-	static final String C62 = "C62";
-	static final String MTK = "MTK"; // m²
-	static final String PRD = "PRD"; // UNTDID 4451: Product information
-
-	// Coding Systems aka ICD Schemas : 
-	// System Information et Repertoire des Entreprise et des Etablissements: SIRENE
-	static final String SIRENE 		= "0002"; // ICD Schema for SIRENE
-	static final String EAN_LOCO 	= "0088"; // ICD Schema for EAN Location Code
-	static final String GTIN 		= "0160"; // Global Trade Item Number (GTIN)
 	
 	static private AbstactTransformer cioTransformer;
 	static private AbstactTransformer transformer;
@@ -165,16 +148,21 @@ public class EX11 {
 				assertEquals(e.note.toString(), l.getNotes().get(0).toString());
 			}
 			assertEquals(e.qty.toString(), l.getQuantity().toString());
-			//LOG.info("compare:"+((Quantity)(e.qty)).compareTo((Quantity)(l.getQuantity())));
-			LOG.info("expected:"+e.upa + " =?= "+new UnitPriceAmount(l.getUnitPriceAmount().getValue()));
+			LOG.info("upa expected:"+e.upa + " =?= "+new UnitPriceAmount(l.getUnitPriceAmount().getValue())
+					+" delivery:"+l.getDeliveryDateAsTimestamp()
+					+" tcc:"+l.getTaxCategory()
+					);
 			assertEquals(e.upa.toString(), new UnitPriceAmount(l.getUnitPriceAmount().getValue()).toString());
 			assertEquals(e.lna.toString(), l.getLineTotalAmount().toString());
 			assertEquals(e.upq.toString(), l.getUnitPriceQuantity().toString());
 			assertEquals(e.name, l.getItemName());
-			assertEquals(e.pdi, l.isPartialDeliveryAllowed());
+			assertEquals(e.desc, l.getDescription());
 			assertEquals(e.sid.toString(), l.getStandardIdentifier().get(0).toString());
 			assertEquals(e.sai, l.getSellerAssignedID());
 			assertEquals(e.bai, l.getBuyerAssignedID());
+			assertEquals(e.pdi, l.isPartialDeliveryAllowed());
+			assertEquals(e.delivery, l.getDeliveryDateAsTimestamp());
+			assertEquals(e.tcc, l.getTaxCategory());
 		}
 	}
 	
@@ -190,19 +178,6 @@ public class EX11 {
 		}	
 	}
 
-	public class ExpectedLine {
-		String id;
-		OrderNote note = null;
-		IQuantity qty;
-		IAmount lna;         // line net amount
-		UnitPriceAmount upa;
-		IQuantity upq;       // UnitPriceQuantity
-		String name;
-		boolean pdi;         // PartialDeliveryIndicator
-		Identifier sid;      // StandardIdentifier
-		String sai;          // SellerAssignedID
-		String bai;          // BuyerAssignedID
-	}
 	static final String NODE_CONTENT = "certifiés  PEFC mini 90% PEFC/10-34-97 ";
 	ArrayList<ExpectedLine> expected() {
 		ArrayList<ExpectedLine> lines = new ArrayList<ExpectedLine>(3);
