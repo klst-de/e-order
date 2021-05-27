@@ -289,7 +289,7 @@ mindestens 1 Zeichen und darf höchstens 80 Zeichen betragen.
 	@Override
 	public TaxCategoryCode getTaxCategory() {
 		TAXDETAILSFIX vatDatails = getVatDatails();
-		return MAP_OT_TAXCATEGORY.get(vatDatails.getTAXCATEGORY());
+		return vatDatails==null ? null : MAP_OT_TAXCATEGORY.get(vatDatails.getTAXCATEGORY());
 	}
 	
 	// BG-30.BT-152 0..1 item VAT rate
