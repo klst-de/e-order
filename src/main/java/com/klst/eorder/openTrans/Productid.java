@@ -141,6 +141,11 @@ public class Productid extends PRODUCTID implements BG31_ItemInformation {
 			return super.getType();
 		}
 		
+		@Override
+		public String toString() {
+			return "["+(super.getType()==null ? "" : "SchemeID="+getSchemeIdentifier()+", ")
+				+"\""+super.getValue()+"\"]";
+		}
 	}
 	@Override
 	public Identifier createStandardIdentifier(String globalID, String schemeID) {
