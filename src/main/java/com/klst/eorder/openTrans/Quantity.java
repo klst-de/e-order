@@ -42,7 +42,8 @@ public class Quantity implements IQuantity {
 
 	@Override
 	public String toString() {
-		return getValue(RoundingMode.HALF_UP) + ":" + (getUnitCode()==null ? "" : getUnitCode());
+		return getValue()==null ? "" : getValue(RoundingMode.HALF_UP) 
+				+ (getUnitCode()==null ? "" : getUnitCode());
 	}
 
 }
