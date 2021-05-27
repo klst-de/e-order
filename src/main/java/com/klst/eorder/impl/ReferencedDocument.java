@@ -51,10 +51,9 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._128.BinaryObjectType
  * @see com.klst.eorder.api._79_AdditionalReferencedProductDocs
  */
 public class ReferencedDocument extends ReferencedDocumentType implements SupportingDocument {
-// in CII: implements BG24_AdditionalSupportingDocs, PrecedingInvoice
-// in CIO: orderLine AdditionalReferencedDocument, ...
 /*
- * BG-3  REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG gibt es in CIO nicht
+CII: implements BG24_AdditionalSupportingDocs, PrecedingInvoice
+BG-3  REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG gibt es in CIO nicht
 
 aber 549: BG-24  ADDITIONAL SUPPORTING DOCUMENTS
 
@@ -134,9 +133,8 @@ Beispiel:
 		return rd;
 	}
 
-	static ReferencedDocument create(String docRefId, Reference lineId, String description) {
-		ReferencedDocument rd = new ReferencedDocument(docRefId, lineId, description);
-		return rd;
+	public static ReferencedDocument create(String docRefId, Reference lineId, String description) {
+		return new ReferencedDocument(docRefId, lineId, description);
 	}
 	
 	// factory for
@@ -147,10 +145,6 @@ Beispiel:
 		return new ReferencedDocument(docRefId, code, referenceTypeCode);
 	}
 
-	// create a factory
-	static ReferencedDocument create() {
-		return new ReferencedDocument(null); 
-	}
 	// copy factory
 	static ReferencedDocument create(ReferencedDocumentType object) {
 		if(object instanceof ReferencedDocumentType && object.getClass()!=ReferencedDocumentType.class) {
