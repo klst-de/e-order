@@ -1700,7 +1700,7 @@ A group of business terms providing information about where and when the goods a
 	}
 	@Override
 	public TaxCategoryCode getTaxCategory() {
-		return tradeTax.getTaxCategoryCode();
+		return tradeTax==null ? null : tradeTax.getTaxCategoryCode();
 	}
 
 	// TODO 316: VAT Exemption Reason Code
