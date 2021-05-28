@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.PaymentMeansEnum;
 
@@ -68,6 +69,26 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType {
 		}
 	}
 	
+	// 792: 0..1 (EXTENDED) INVOICER PARTY
+	void setInvoicer(BusinessParty party) {
+		if(party==null) return;
+		super.setInvoicerTradeParty((TradeParty)party);
+	}
+	BusinessParty getInvoicer() {
+		return super.getInvoicerTradeParty()==null ? null 
+			: TradeParty.create(super.getInvoicerTradeParty());
+	}
+
+	// 833: 0..1 (COMFORT) INVOICEE PARTY / The "BILL TO"
+	void setBillTo(BusinessParty party) {
+		if(party==null) return;
+		super.setInvoiceeTradeParty((TradeParty)party);
+	}
+	BusinessParty getBillTo() {
+		return super.getInvoicerTradeParty()==null ? null 
+			: TradeParty.create(super.getInvoiceeTradeParty());
+	}
+
 	private static final String FIELD_specifiedTradeSettlementPaymentMeans = "specifiedTradeSettlementPaymentMeans";
 	// in super FIELD_specifiedTradeSettlementPaymentMeans:
 //  protected PaymentMeansCodeType typeCode;

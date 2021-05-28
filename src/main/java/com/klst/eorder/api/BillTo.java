@@ -15,7 +15,8 @@ import com.klst.edoc.api.PostalAddress;
  */
 public interface BillTo {
 
-	public void setBillToParty(String name, PostalAddress address, ContactInfo contact);
-	public void setBillToParty(BusinessParty party);
+	public void setBillTo(String name, PostalAddress address, ContactInfo contact);
+	public void setBillTo(BusinessParty party);
+	public BusinessParty getBillTo();
 
 }

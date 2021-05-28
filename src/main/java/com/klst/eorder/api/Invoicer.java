@@ -15,8 +15,8 @@ import com.klst.edoc.api.PostalAddress;
  */
 public interface Invoicer {
 
-	public void setInvoicerParty(String name, PostalAddress address, ContactInfo contact);
-	public void setInvoicerParty(BusinessParty party);
-	public BusinessParty getInvoicerParty();
+	public void setInvoicer(String name, PostalAddress address, ContactInfo contact);
+	public void setInvoicer(BusinessParty party);
+	public BusinessParty getInvoicer();
 
 }
