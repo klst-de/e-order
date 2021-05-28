@@ -248,6 +248,10 @@ Beispiele:
 		return getParty(PartyRole.buyer);
 	}
 
+	BusinessParty getShipToParty() {
+		return getParty(PartyRole.delivery);
+	}
+	
 //	void setDeliveryType(String deliveryType) {
 //		Mapper.newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, deliveryType);
 //		Mapper.set(getApplicableTradeDeliveryTerms(), "deliveryTypeCode", deliveryType);

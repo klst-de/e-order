@@ -135,10 +135,12 @@ public class Order extends ORDER implements CoreOrder {
 	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
 			String companyLegalForm) {
 		// TODO Auto-generated method stub	
+//		orderInfo.setSeller(name, address, contact, companyLegalForm);
 	}
 	@Override
 	public void setSeller(BusinessParty party) {
 		// TODO Auto-generated method stub	
+//		orderInfo.setSeller(party);
 	}
 	@Override
 	public BusinessParty getSeller() {
@@ -147,20 +149,46 @@ public class Order extends ORDER implements CoreOrder {
 
 	@Override
 	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
+//		orderInfo.setBuyer(name, address, contact);
 	}
-
 	@Override
 	public void setBuyer(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
+//		orderInfo.setBuyer(party);
 	}
-
 	@Override
 	public BusinessParty getBuyer() {
 		return orderInfo.getBuyer();
 	}
+
+	@Override
+	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public void setShipToParty(BusinessParty party) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public BusinessParty getShipToParty() {
+		return orderInfo.getShipToParty();
+	}
+
+	@Override
+	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
+		// TODO Auto-generated method stub		
+	}
+	@Override
+	public void setShipFromParty(BusinessParty party) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public BusinessParty getShipFromParty() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
@@ -272,42 +300,6 @@ public class Order extends ORDER implements CoreOrder {
 //		this.supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add((SupplyChainTradeLineItem)line);
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setShipToParty(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public BusinessParty getShipToParty() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setShipFromParty(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public BusinessParty getShipFromParty() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

@@ -167,19 +167,19 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	// businessName       BT-28 0..1 Handelsname des Verkäufers / Seller trading name
 	@Override
 	public String getBusinessName() {
-		return null;
-		// TODO
-//		TextType text = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getTradingBusinessName();
-//		return text==null ? null : text.getValue();
+		if(super.getADDRESS().isEmpty()) return null;
+		return getAddress().getAddressLine1();
 	}
 	@Override
 	public void setBusinessName(String name) {
 		if(name==null) return;
-		// TODO
-//		if(super.getSpecifiedLegalOrganization()==null) {
-//			setSpecifiedLegalOrganization(new LegalOrganizationType());
-//		}
-//		getSpecifiedLegalOrganization().setTradingBusinessName(Text.create(name));
+		if(super.getADDRESS().isEmpty()) {
+			// ??? TODO
+		} else {
+			if(getAddress().getAddressLine1()==null) {
+				getAddress().setAddressLine1(name);
+			}
+		}
 	}
 
 	// BT-29 ++ 0..n Seller identifier ( mit Schema ) / Kennung des Verkäufers
@@ -284,9 +284,9 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	// BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
 	@Override
 	public Identifier getUriUniversalCommunication() {
-		return null;
-		// TODO
-//		return super.getURIUniversalCommunication()==null ? null : new ID(getURIUniversalCommunication().getURIID());
+		Address address = (Address)getAddress();
+		if(address==null) return null;
+		return address.getURL()==null ? null : new ID(address.getURL());
 	}
 
 	@Override

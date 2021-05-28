@@ -217,38 +217,31 @@ public class OpenTransOrderReadTest extends Constants {
 		assertEquals(ORDER_DATE, co.getIssueDateAsTimestamp());
 		assertEquals("fra", co.getLanguage().get(0));
 		
-		BusinessParty seller = co.getSeller();
-		LOG.info("seller:"+seller);
 		BusinessParty buyer = co.getBuyer();
 		LOG.info("buyer:"+buyer);
+		assertEquals("7611577000008", buyer.getIdentifier().getContent());
+		// type="supplier_specific">1786
+		// BusinessName: <ADDRESS><bmecat:NAME>Plica AG
+		assertEquals("Plica AG", buyer.getBusinessName());
+		// VATRegistrationId: <ADDRESS><bmecat:VAT_ID>CHE-103.663.775 MWST</bmecat:VAT_ID>
+		assertEquals("CHE-103.663.775 MWST", buyer.getVATRegistrationId());
+		// UriUniversalCommunication: <ADDRESS><bmecat:URL>www.plica.ch</bmecat:URL>
+		assertEquals("www.plica.ch", buyer.getUriUniversalCommunication().getContent());
+		assertEquals("Marbach", buyer.getBPContact().getContactPoint());
+		
+		// invoice_recipient ???
+		
+		// Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
+		BusinessParty shipTo = co.getShipToParty();
+		LOG.info("shipTo:"+shipTo);
+		assertEquals("Logistik", shipTo.getBPContact().getContactPoint());
+
+		BusinessParty seller = co.getSeller();
+		LOG.info("seller:"+seller);
 
 		ArrayList<ExpectedLine> exp = expected();
 		List<OrderLine> ol = co.getLines();
 		assertEquals(11, ol.size());
-//		OrderLine line = co.getLines().get(0);
-//		assertEquals("1", line.getId());               // BT-126 1..1 <LINE_ITEM_ID>1</LINE_ITEM_ID>
-///*
-//			<PRODUCT_ID>
-//				<bmecat:SUPPLIER_PID type="supplier_specific">G4525220</bmecat:SUPPLIER_PID>
-//				<bmecat:INTERNATIONAL_PID type="ean">7611577104836</bmecat:INTERNATIONAL_PID>
-//				<bmecat:BUYER_PID type="buyer_specific">907216725</bmecat:BUYER_PID>
-//				<bmecat:DESCRIPTION_SHORT>BLISTOM25K</bmecat:DESCRIPTION_SHORT>
-//				<bmecat:DESCRIPTION_LONG>BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs</bmecat:DESCRIPTION_LONG>
-//			</PRODUCT_ID>		
-// */
-//		assertEquals("G4525220", line.getSellerAssignedID());     // BG-31.BT-155 0..1 ohne type/Schema
-//		assertEquals("907216725", line.getBuyerAssignedID());     // BG-31.BT-156 0..1
-//		List<Identifier> stdId = line.getStandardIdentifier();    // BG-31.BT-157 0..n
-//		assertEquals("ean", stdId.get(0).getSchemeIdentifier());
-//		assertEquals("7611577104836", stdId.get(0).getContent());
-//		assertEquals("BLISTOM25K", line.getItemName());           // BG-31.BT-153 1..1 Artikelname
-//		assertEquals("BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs", line.getDescription()); // BG-31.BT-154
-///*
-//			<QUANTITY>2000</QUANTITY>
-//			<bmecat:ORDER_UNIT>C62</bmecat:ORDER_UNIT>		
-// */
-//		assertEquals("2000.0000C62", line.getQuantity().toString());       // BT-129 1..1 bestellte Menge
-//		assertEquals(TaxCategoryCode.ExemptFromTax, line.getTaxCategory()); // BG-30.BT-151 1..1 Code der UStCat
 		for(int i=0; i<ol.size(); i++) {
 			OrderLine l = ol.get(i);
 			LOG.info("line "+i + ":"+l);
@@ -286,6 +279,7 @@ public class OpenTransOrderReadTest extends Constants {
 			+ sdList.get(0).getDateAsTimestamp()
 			);
 			assertEquals(ORDER_ID, sdList.get(0).getDocumentReference().getName());
+			assertEquals(e.id, sdList.get(0).getLineReference().getName());
 			assertEquals(ORDER_DATE, sdList.get(0).getDateAsTimestamp());
 		}
 
