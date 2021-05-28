@@ -5,7 +5,7 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 
 /**
- * BG-4 1..1 SELLER 
+ * 345: BG-4 1..1 SELLER 
  * <p>
  * A group of business terms providing information about the Seller.
  * <p>

@@ -2,6 +2,7 @@ package com.klst.readme;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -33,6 +34,7 @@ import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.BG2_ProcessControl;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.Amount;               // impl.jar
 import com.klst.eorder.impl.CrossIndustryOrder;   // impl.jar
 import com.klst.eorder.impl.ID;
@@ -101,25 +103,31 @@ public class EX11 extends Constants {
 		return null;
 	}
 
+	private File xmlToTempFile(String filename, byte[] xml) {
+		try {
+			Path temp = Files.createTempFile(filename, XML_SUFFIX); // throws IOException
+			Files.write(temp, xml); // throws IOException
+			LOG.info("written to "+temp);
+			return getTestFile(temp.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+			LOG.warning("write to "+filename + " : "+e);
+		}
+		return null;
+	}
+	
 	private void marshal() {
 		LOG.info("object.Class:"+object.getClass());
 		
 		byte[] xml = transformer.marshal(object);
 		LOG.info(new String(xml));
-		try {
-			Path temp = Files.createTempFile("EX11-TestResult", ".xml");
-			Files.write(temp, xml);
-			LOG.info("written to "+temp);
-			File testFile = getTestFile(temp.toString());
-			CoreOrder cio = null;
-			// unmarshal toModel:
-			if(transformer.isValid(testFile)) {
-				cio = unmarshal(testFile);
-				doAssert(cio);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		File testFile = xmlToTempFile("EX11-TestResult", xml);
+		CoreOrder cio = null;
+		// unmarshal the result file toModel and perform assertions:
+		if(transformer.isValid(testFile)) {
+			cio = unmarshal(testFile);
+			doAssert(cio);
 		}
 	}
 
@@ -130,8 +138,8 @@ public class EX11 extends Constants {
 		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());      // 11
 		assertEquals(issueDate, cio.getIssueDateAsTimestamp());
 		assertFalse(cio.isCopy());
-		assertEquals(MessageFunctionEnum.Original, cio.getPurposeCode());
-		assertEquals("AC", cio.getRequestedResponse()); // 20: "AC" to request an Order Response
+		assertEquals(MessageFunctionEnum.Original, cio.getPurposeCode()); // 19
+		assertEquals(AC, cio.getRequestedResponse()); // 20: "AC" to request an Order Response
 		
 		List<OrderLine> ol = cio.getLines();
 		assertEquals(3, ol.size());
@@ -163,6 +171,47 @@ public class EX11 extends Constants {
 			assertEquals(e.pdi, l.isPartialDeliveryAllowed());
 			assertEquals(e.delivery, l.getDeliveryDateAsTimestamp());
 			assertEquals(e.tcc, l.getTaxCategory());
+			List<SupportingDocument> sdList = l.getReferencedProductDocuments();
+			assertTrue(sdList.isEmpty());
+		}
+		
+		BusinessParty seller = cio.getSeller(); // 345
+		LOG.info("seller:"+seller);
+		ExpectedBP expSeller = expectedSeller();
+		assertEquals(expSeller.id.toString(), seller.getIdentifier().toString());
+		assertEquals(expSeller.companyId.toString(), seller.getCompanyIdentifier().toString());
+		assertEquals(expSeller.name, seller.getRegistrationName());
+		assertEquals(expSeller.bpn, seller.getBusinessName());
+		assertEquals(expSeller.vatId, seller.getVATRegistrationId());
+		if(expSeller.uriId==null) {
+			assertNull(seller.getUriUniversalCommunication());
+		} else {
+			assertEquals(expSeller.uriId.toString(), seller.getUriUniversalCommunication().toString());
+		}
+		assertEquals(expSeller.pa.toString(), seller.getAddress().toString());
+		if(expSeller.ci==null) {
+			assertNull(seller.getBPContact());
+		} else {
+			assertEquals(expSeller.ci.toString(), seller.getBPContact().toString());
+		}
+		BusinessParty buyer = cio.getBuyer(); // 390
+		LOG.info("buyer:"+buyer);
+		ExpectedBP expBuyer = expectedBuyer();
+		assertEquals(expBuyer.id.toString(), buyer.getIdentifier().toString());
+		assertEquals(expBuyer.companyId.toString(), buyer.getCompanyIdentifier().toString());
+		assertEquals(expBuyer.name, buyer.getRegistrationName());
+		assertEquals(expBuyer.bpn, buyer.getBusinessName());
+		assertEquals(expBuyer.vatId, buyer.getVATRegistrationId());
+		if(expBuyer.uriId==null) {
+			assertNull(buyer.getUriUniversalCommunication());
+		} else {
+			assertEquals(expBuyer.uriId.toString(), buyer.getUriUniversalCommunication().toString());
+		}
+		assertEquals(expBuyer.pa.toString(), buyer.getAddress().toString());
+		if(expBuyer.ci==null) {
+			assertNull(buyer.getBPContact());
+		} else {
+			assertEquals(expBuyer.ci.toString(), buyer.getBPContact().toString());
 		}
 	}
 	
@@ -178,6 +227,36 @@ public class EX11 extends Constants {
 		}	
 	}
 
+	ExpectedBP expectedSeller() {
+		ExpectedBP bp = new ExpectedBP();
+		bp.id = new ID("3020816001302", EAN_LOCO);
+		bp.companyId = new ID("50810215900334", SIRENE);
+		bp.name = "DMBP NANTES DISPANO ROUX - 1535";
+		bp.vatId = "FR86508102159";
+		
+//		bp.zip = "44100";
+//		bp.city = "NANTES";
+		bp.pa = TradeAddress.create().createAddress("FR", "44100", "NANTES");
+		bp.al1 = "12 RUE DE LA FONTAINE SALEE";
+		
+		return bp;
+	}
+	
+	ExpectedBP expectedBuyer() {
+		ExpectedBP bp = new ExpectedBP();
+		bp.id = new ID("3306949923804", EAN_LOCO);
+		bp.companyId = new ID("57214188502180", SIRENE);
+		bp.name = "AMBERIEU EN BUGEY CEDEO";
+		bp.vatId = "FR94572141885";
+		bp.uriId = new ID("alain.dupond@saint-gobain.com", "EM");
+		
+		bp.pa = TradeAddress.create().createAddress("FR", "01500", "Amberieu en bugey");
+		bp.al1 = "Avenue Leon Blum";
+		bp.ci = TradeContact.create().createContactInfo("ALAIN DUPOND", "06 78 56 23 00", "alain.dupond@saint-gobain.com");
+		
+		return bp;
+	}
+	
 	static final String NODE_CONTENT = "certifiés  PEFC mini 90% PEFC/10-34-97 ";
 	ArrayList<ExpectedLine> expected() {
 		ArrayList<ExpectedLine> lines = new ArrayList<ExpectedLine>(3);
