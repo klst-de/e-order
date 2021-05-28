@@ -11,6 +11,7 @@ import org.bmecat.bmecat._2005.ZIP;
 import org.opentrans.xmlschema._2.ADDRESS;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.openTrans.reflection.Mapper;
 
@@ -19,13 +20,21 @@ import com.klst.eorder.openTrans.reflection.Mapper;
 		<bmecat:PARTY_ID type="supplier_specific">108304</bmecat:PARTY_ID>
 		<PARTY_ROLE>document_creator</PARTY_ROLE>
 		<ADDRESS>
-			<bmecat:NAME>Power Supply Corp.</bmecat:NAME>
+			<bmecat:NAME>Power Supply Corp.</bmecat:NAME> <!-- AddressLine1 -->
+			<!-- <bmecat:NAME2>...</bmecat:NAME2>              AddressLine2 -->
+			<!-- <bmecat:NAME3>...</bmecat:NAME3>              AddressLine3 -->
+			                                              <!-- "department" -->
 			<CONTACT_DETAILS>
 				<bmecat:CONTACT_ID>MA02</bmecat:CONTACT_ID>
 				<bmecat:CONTACT_NAME>Mustermann</bmecat:CONTACT_NAME>
 				<bmecat:FIRST_NAME>Max</bmecat:FIRST_NAME>
 				<bmecat:ACADEMIC_TITLE>Dr</bmecat:ACADEMIC_TITLE>
 			</CONTACT_DETAILS>
+			                                              <!-- "street",
+                                                               "zip",
+                                                               "boxno",
+                                                               "zipbox",
+                                                               "city"       -->
 			<bmecat:STATE>Sachsen Anhalt</bmecat:STATE>
 			<bmecat:COUNTRY>Germany</bmecat:COUNTRY>
 			<bmecat:COUNTRY_CODED>DE</bmecat:COUNTRY_CODED>
@@ -44,7 +53,7 @@ import com.klst.eorder.openTrans.reflection.Mapper;
 		</ACCOUNT>
 	</PARTY>
  */
-public class Address extends ADDRESS implements PostalAddress {
+public class Address extends ADDRESS implements PostalAddress, ContactInfo {
 
 	@Override // implements PostalAddressFactory
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
@@ -73,10 +82,7 @@ public class Address extends ADDRESS implements PostalAddress {
 
 	// copy ctor
 	private Address(ADDRESS address) {
-		super();
-		if(address!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, address);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, address);
 	}
 	
 	private Address(String countryCode, String postalCode, String city, String street) {
@@ -177,7 +183,7 @@ public class Address extends ADDRESS implements PostalAddress {
 	public String getCity() {
 //		super.getCITY() liefert List<CITY> // class CITY extends DtMLSTRING mit String value und DtLANG lang
 		return super.getCITY().isEmpty() ? null : getCITY().get(0).getValue();
-		// Citi in mehreren Sprachen!
+		// City in mehreren Sprachen!
 		// ==> In openTRANS® sind alle Dokumente per Vorgabe als einsprachig definiert.
 		// Doku 3.2 Mehrsprachige Dokumente
 	}
@@ -208,6 +214,38 @@ public class Address extends ADDRESS implements PostalAddress {
 		stringBuilder.append(getCity()==null ? "null" : getCity());
 		stringBuilder.append("]");
 		return stringBuilder.toString();
+	}
+
+	@Override
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
+		return Contactdetails.create(contactName, contactTel, contactMail);
+	}
+
+	ContactInfo getContactInfo() {
+		if(super.getCONTACTDETAILS().isEmpty()) return null;
+		return Contactdetails.create(getCONTACTDETAILS().get(0));
+	}
+	void setContactInfo(ContactInfo contact) {
+		if(contact==null) return;
+		super.getCONTACTDETAILS().add((Contactdetails)contact);
+	}
+	
+	@Override
+	public String getContactPoint() {
+		if(super.getCONTACTDETAILS().isEmpty()) return null;
+		return getContactInfo().getContactPoint();
+	}
+
+	@Override
+	public String getContactTelephone() {
+		if(super.getCONTACTDETAILS().isEmpty()) return null;
+		return getContactInfo().getContactTelephone();
+	}
+
+	@Override
+	public String getContactEmail() {
+		if(super.getCONTACTDETAILS().isEmpty()) return null;
+		return getContactInfo().getContactEmail();
 	}
 
 }

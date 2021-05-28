@@ -3,6 +3,7 @@ package com.klst.eorder.openTrans;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.DtCURRENCIES;
 import org.opentrans.xmlschema._2.ORDERINFO;
@@ -16,6 +17,7 @@ import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
+import com.klst.eorder.openTrans.Party.PartyRole;
 
 public class OrderInfo extends ORDERINFO implements BG4_Seller, BG7_Buyer {
 
@@ -34,8 +36,7 @@ public class OrderInfo extends ORDERINFO implements BG4_Seller, BG7_Buyer {
 		}
 	}
 
-	private static final String FIELD_applicableTradeDeliveryTerms = "applicableTradeDeliveryTerms";
-	private static final String FIELD_issuerAssignedID = "issuerAssignedID";
+	private static final Logger LOG = Logger.getLogger(OrderInfo.class.getName());
 	
 	// copy ctor
 	private OrderInfo(ORDERINFO object) {
@@ -204,27 +205,31 @@ Beispiele:
 	/**
 	 * 
 	 * @param partyrole, siehe doku: Zulässige Werte für das Element PARTY_ROLE
-
-	 * @return
+	 * - supplier: BG4_Seller: Lieferant, Geschäftspartner ist ein Lieferant.
+	 * - buyer: BG7_Buyer: Einkaufende Organisation, Geschäftspartner ist ein einkaufendes Unternehmen.
+	 * - invoice_recipient: Rechnungsempfänger, Geschäftspartner ist ein Rechnungsempfänger.
+	 * - delivery: Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung.
+	 * ...
+	 * @return BP mit dieser Rolle
 	 */
-	private BusinessParty getParty(String partyrole) {
-//		super.getPARTIES(); // required = true mit public List<PARTY> getPARTY() 
-		// <PARTY_ROLE>buyer</PARTY_ROLE>
-		// <PARTY_ROLE>seller</PARTY_ROLE> existiert nicht im Beispiel
+	private BusinessParty getParty(PartyRole partyrole) {
 		List<PARTY> bpList = super.getPARTIES().getPARTY();
 		if(bpList.isEmpty()) return null;
 		List<BusinessParty> resList = new ArrayList<BusinessParty>(bpList.size());
-		// partyrole "buyer" or "seller"
 		bpList.forEach(bp -> {
 			bp.getPARTYROLE().forEach(role ->{
-				if(partyrole.equals(role)) resList.add(Party.create(bp));
+				if(partyrole.toString().equals(role)) {
+					Party party = Party.create(bp);
+					LOG.info(partyrole+":"+party);
+					resList.add(Party.create(bp));
+				}
 			});
 		});
 		return resList.isEmpty() ? null : resList.get(0);
 	}
 	@Override
 	public BusinessParty getSeller() {
-		return getParty("seller");
+		return getParty(PartyRole.supplier);
 	}
 	
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
@@ -240,7 +245,7 @@ Beispiele:
 	}
 	@Override
 	public BusinessParty getBuyer() {
-		return getParty("buyer");
+		return getParty(PartyRole.buyer);
 	}
 
 //	void setDeliveryType(String deliveryType) {

@@ -130,19 +130,16 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
+	// 345: BG-4 1..1 SELLER @see BG4_Seller
 	@Override
 	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
 			String companyLegalForm) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
-
 	@Override
 	public void setSeller(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
-
 	@Override
 	public BusinessParty getSeller() {
 		return orderInfo.getSeller();

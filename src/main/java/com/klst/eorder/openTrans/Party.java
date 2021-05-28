@@ -1,19 +1,43 @@
 package com.klst.eorder.openTrans;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bmecat.bmecat._2005.TypePARTYID;
 import org.opentrans.xmlschema._2.PARTY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.BusinessPartyAddress;
+import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.eorder.impl.ID;
 
-public class Party extends PARTY implements BusinessParty /*, BusinessPartyAddress, BusinessPartyContact*/ {
+/*
+    protected List<TypePARTYID> partyid , required = true
+    protected List<String> partyrole;
+    protected List<ADDRESS> address;
+    protected List<ACCOUNT> account;
+    protected MIMEINFO mimeinfo;
+ */
+public class Party extends PARTY implements BusinessParty, BusinessPartyAddress, BusinessPartyContact {
 
+	/*
+	 * Zulässige Werte für das Element PARTY_ROLE
+	 * Vollständige Liste siehe doku
+	 * 
+	 */
+	public enum PartyRole {
+		supplier, // BG4_Seller: Lieferant
+		buyer,    // BG7_Buyer: Einkaufende Organisation, einkaufendes Unternehmen
+		invoice_recipient, // Rechnungsempfänger
+		delivery           // Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
+	}
+	
 	@Override  // implements BusinessPartyFactory
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return create(name, tradingName, address, contact);
@@ -39,12 +63,8 @@ public class Party extends PARTY implements BusinessParty /*, BusinessPartyAddre
 	private static final Logger LOG = Logger.getLogger(Party.class.getName());
 
 	// copy ctor
-	private Party(PARTY doc) {
-		super();
-		if(doc!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, doc);
-			LOG.config("copy ctor:"+this);
-		}
+	private Party(PARTY object) {
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 
 	/**
@@ -70,7 +90,7 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 		super();
 //		setRegistrationName(registrationName);
 //		setBusinessName(businessName);
-//		setAddress(address);
+		setAddress(address);
 //		if(contact!=null) setContactInfo(contact);
 	}
 
@@ -87,7 +107,7 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 		stringBuilder.append(getAddress()==null ? "null" : getAddress());
 		
 		stringBuilder.append(", Contact:");
-//		stringBuilder.append(getContactInfo()==null ? "null" : getContactInfo());
+		stringBuilder.append(getContactInfo()==null ? "null" : getContactInfo());
 		
 		stringBuilder.append("]");
 		return stringBuilder.toString();
@@ -99,75 +119,38 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 		return super.getADDRESS().isEmpty() ? null : Address.create(getADDRESS().get(0));
 	}
 
-//	@Override
-//	public void setAddress(PostalAddress address) {
-//		if(address!=null) setAddress((TradeAddressType)address);
-//	}
-//	void setAddress(TradeAddressType address) {
-//		super.setPostalTradeAddress(address);
-//	}
-//	@Override
-//	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-//		return TradeAddress.create(countryCode, postalCode, city);
-//	}
-//
-//
-//	// Contact
-//	@Override
-//	public ContactInfo getContactInfo() {
-////		TradeContactType tradeContact = super.getDefinedTradeContact();
-////		return tradeContact==null ? null : TradeContact.create(tradeContact);
-//		List<TradeContactType> tradeContactList = super.getDefinedTradeContact();
-//		return tradeContactList.isEmpty() ? null : TradeContact.create(tradeContactList.get(0));
-//	}
-//
-//	@Override
-//	public void setContactInfo(ContactInfo contact) {
-////		super.setDefinedTradeContact((TradeContact)contact);
-//		super.getDefinedTradeContact().add((TradeContact)contact);
-//	}
-//
-//	@Override
-//	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
-//		return TradeContact.create(contactName, contactTel, contactMail);
-//	}
-//
-///*
-//			<ram:SellerTradeParty>
-//				<ram:ID>SUPPLIER_ID_321654</ram:ID>                                         <!-- Identifier
-//				<ram:GlobalID schemeID="0088">123654879</ram:GlobalID>                      <!--BT-29 Identifier
-//				<ram:Name>SELLER_NAME</ram:Name>                                            <!--BT-27 RegistrationName
-//				<ram:SpecifiedLegalOrganization>
-//					<ram:ID schemeID="0002">123456789</ram:ID>                              <!-- CompanyId
-//					<ram:TradingBusinessName>SELLER_TRADING_NAME</ram:TradingBusinessName>  <!--BT-28 BusinessName
-//				</ram:SpecifiedLegalOrganization>
-//				<ram:DefinedTradeContact>
-//					<ram:PersonName>SELLER_CONTACT_NAME</ram:PersonName>
-//					<ram:DepartmentName>SELLER_CONTACT_DEP</ram:DepartmentName>
-//					<ram:TelephoneUniversalCommunication>
-//						<ram:CompleteNumber>+33 6 25 64 98 75</ram:CompleteNumber>
-//					</ram:TelephoneUniversalCommunication>
-//					<ram:EmailURIUniversalCommunication>
-//						<ram:URIID>contact@seller.com</ram:URIID>
-//					</ram:EmailURIUniversalCommunication>
-//				</ram:DefinedTradeContact>
-//				<ram:PostalTradeAddress>
-//					<ram:PostcodeCode>75001</ram:PostcodeCode>
-//					<ram:LineOne>SELLER_ADDR_1</ram:LineOne>
-//					<ram:LineTwo>SELLER_ADDR_2</ram:LineTwo>
-//					<ram:LineThree>SELLER_ADDR_3</ram:LineThree>
-//					<ram:CityName>SELLER_CITY</ram:CityName>
-//					<ram:CountryID>FR</ram:CountryID>
-//				</ram:PostalTradeAddress>
-//				<ram:URIUniversalCommunication>
-//					<ram:URIID schemeID="EM">sales@seller.com</ram:URIID>                   <!-- UriUniversalCommunication
-//				</ram:URIUniversalCommunication>
-//				<ram:SpecifiedTaxRegistration>
-//					<ram:ID schemeID="VA">FR 32 123 456 789</ram:ID>                        <!-- TaxRegistrationIdentifier
-//				</ram:SpecifiedTaxRegistration>
-//			</ram:SellerTradeParty>
-//
-// */
+	@Override
+	public void setAddress(PostalAddress address) {
+		if(address!=null) addAddress((Address)address);
+	}
+	void addAddress(Address address) {
+		super.getADDRESS().add(address);
+	}
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		return Address.create(countryCode, postalCode, city);
+	}
+
+
+	// Contact
+	@Override
+	public ContactInfo getContactInfo() {
+		Address address = (Address)getAddress();
+		return address.getContactInfo();
+	}
+
+	@Override
+	public void setContactInfo(ContactInfo contact) {
+		Address address = (Address)getAddress();
+		address.setContactInfo(contact);
+	}
+
+	@Override
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
+//		return Address.create().createContactInfo(contactName, contactTel, contactMail)
+		return Contactdetails.create(contactName, contactTel, contactMail);
+	}
+
 	// (registration)Name BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
 	@Override
 	public String getRegistrationName() {
@@ -199,13 +182,20 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 //		getSpecifiedLegalOrganization().setTradingBusinessName(Text.create(name));
 	}
 
-	// BT-29 ++ 0..n Seller identifier ( mit Schema )         / Kennung des Verkäufers
+	// BT-29 ++ 0..n Seller identifier ( mit Schema ) / Kennung des Verkäufers
 	@Override
 	public Identifier getIdentifier() { // holt nur den ersten
-		return null;
-		// TODO
-//		List<IDType> idList = super.getGlobalID();
-//		return idList.isEmpty() ? null : new ID(idList.get(0));
+		List<TypePARTYID> idList = super.getPARTYID();
+		if(idList.isEmpty()) return null;
+		
+		List<Identifier> res = new ArrayList<Identifier>();
+		idList.forEach(id -> {
+			// iln ==> GLN, https://de.wikipedia.org/wiki/Global_Location_Number
+			if("iln".equals(id.getType())) res.add(new ID(id.getValue(), "iln"));
+		});
+//		<bmecat:PARTY_ID type="iln">7611577000008</bmecat:PARTY_ID>
+//		<bmecat:PARTY_ID type="supplier_specific">1786</bmecat:PARTY_ID>
+		return res.isEmpty() ? null : res.get(0);
 	}
 	public String getId() {
 		Identifier id = getIdentifier();
