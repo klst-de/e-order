@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.impl.UnitPriceAmount;
@@ -26,6 +27,8 @@ public class Constants {
 	static final String EAN_LOCO 	= "0088"; // ICD Schema for EAN Location Code
 	// Global Trade Item Number (GTIN), Alt. Names: EAN article number, UPC Code
 	static final String GTIN 		= "0160";
+	// Bis 2009 hieß die GTIN noch EAN (kurz für europäische Artikelnummer). 
+	// EAN und GTIN meinen also das Gleiche.
 	static final String EAN 		= "ean"; // used in OpenTrans
 
 	class ExpectedLine {
@@ -43,6 +46,9 @@ public class Constants {
 		boolean pdi;         // PartialDeliveryIndicator
 		Timestamp delivery  = null; // xxx / DELIVERY_DATE
 		TaxCategoryCode tcc = null;
+		Reference sddr = null; // SupportingDocument.DocumentReference / CUSTOMER_ORDER_REFERENCE
+		Reference sdlr = null; // SupportingDocument.LineReference
+		Timestamp sdts = null; // SupportingDocument.Date
 	}
 
 }
