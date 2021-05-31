@@ -5,14 +5,14 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 
 /**
- * BG-7 + 1..1 BUYER
+ * 390: BG-7 1..1 BUYER
  * <p>
  * A group of business terms providing information about the Buyer.
  * <p>
  * Cardinality: 	1..1
  * <br>EN16931-ID: 	BG-7
  * <br>Rule ID: 	
- * <br>Request ID: 	R57
+ * <br>Order-X-No: 	390
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */

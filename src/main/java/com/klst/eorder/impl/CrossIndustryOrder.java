@@ -600,6 +600,36 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 		return applicableHeaderTradeSettlement.getDocumentCurrency();
 	}
 
+	// 792: 0..1 (EXTENDED) INVOICER PARTY
+	@Override
+	public void setInvoicer(String name, PostalAddress address, ContactInfo contact) {
+		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
+		setInvoicer(party);
+	}
+	@Override
+	public void setInvoicer(BusinessParty party) {
+		applicableHeaderTradeSettlement.setInvoicer(party);
+	}
+	@Override
+	public BusinessParty getInvoicer() {
+		return applicableHeaderTradeSettlement.getInvoicer();
+	}
+
+	// 833: 0..1 (COMFORT) INVOICEE PARTY / The "BILL TO"
+	@Override
+	public void setBillTo(String name, PostalAddress address, ContactInfo contact) {
+		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
+		setBillTo(party);
+	}
+	@Override
+	public void setBillTo(BusinessParty party) {
+		applicableHeaderTradeSettlement.setBillTo(party);
+	}
+	@Override
+	public BusinessParty getBillTo() {
+		return applicableHeaderTradeSettlement.getBillTo();
+	}
+
 	// 875:	BG-16.BT-81 0..1 Payment Means Code
 	public void setPaymentMeansEnum(PaymentMeansEnum code) {
 		applicableHeaderTradeSettlement.setPaymentMeansEnum(code);
