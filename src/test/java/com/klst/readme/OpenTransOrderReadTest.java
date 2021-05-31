@@ -1,7 +1,9 @@
 package com.klst.readme;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -44,6 +46,8 @@ import com.klst.eorder.impl.Amount;
 import com.klst.eorder.impl.ID;
 import com.klst.eorder.impl.Percent;
 import com.klst.eorder.impl.Quantity;
+import com.klst.eorder.impl.TradeAddress;
+import com.klst.eorder.impl.TradeContact;
 import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.marshaller.CioTransformer;
 import com.klst.marshaller.OpenTransTransformer;
@@ -94,6 +98,94 @@ public class OpenTransOrderReadTest extends Constants {
 	static private final String ORDER_ID = "PLEX-141269";
 	static private final Timestamp ORDER_DATE = Timestamp.valueOf("2020-01-22"+_HMS);
 	static private final IAmount TOTAL_AMOUNT = new Amount(new BigDecimal(1080.25));
+
+	ExpectedBP expectedBuyer() {
+		ExpectedBP bp = new ExpectedBP();
+/*
+				<PARTY>
+					<bmecat:PARTY_ID type="iln">7611577000008</bmecat:PARTY_ID>
+					<bmecat:PARTY_ID type="supplier_specific">1786</bmecat:PARTY_ID>
+					<PARTY_ROLE>buyer</PARTY_ROLE>
+					<ADDRESS>
+						<bmecat:NAME>Plica AG</bmecat:NAME>
+						<bmecat:NAME2>Systeme für Elektrotechnik</bmecat:NAME2>
+						<CONTACT_DETAILS>
+							<bmecat:CONTACT_NAME>Marbach</bmecat:CONTACT_NAME>
+							<bmecat:FIRST_NAME>Laura</bmecat:FIRST_NAME>
+							<bmecat:PHONE>+41 52 723 67 34</bmecat:PHONE>
+							<bmecat:FAX>+41 52 723 67 18</bmecat:FAX>
+							<bmecat:EMAILS>
+							<bmecat:EMAIL>laura.marbach@plica.ch</bmecat:EMAIL>
+							</bmecat:EMAILS>
+						</CONTACT_DETAILS>
+						<bmecat:STREET>Zürcherstrasse 350</bmecat:STREET>
+						<bmecat:ZIP>8500</bmecat:ZIP>
+						<bmecat:CITY>Frauenfeld</bmecat:CITY>
+						<bmecat:COUNTRY>Schweiz</bmecat:COUNTRY>
+						<bmecat:COUNTRY_CODED>CH</bmecat:COUNTRY_CODED>
+						<bmecat:VAT_ID>CHE-103.663.775 MWST</bmecat:VAT_ID>
+						<bmecat:PHONE>+41 52 723 67 20</bmecat:PHONE>
+						<bmecat:FAX>+41 52 723 67 18</bmecat:FAX>
+						<bmecat:EMAIL>verkauf@plica.ch;einkauf@plica.ch</bmecat:EMAIL>
+						<bmecat:URL>www.plica.ch</bmecat:URL>
+ */
+		bp.id = new ID("7611577000008", "iln");
+		//<bmecat:PARTY_ID type="supplier_specific">1786</bmecat:PARTY_ID>
+		bp.al1 = "Plica AG";
+		bp.bpn = bp.al1;
+		bp.ci = TradeContact.create().createContactInfo("Marbach", "+41 52 723 67 34", "laura.marbach@plica.ch");
+		bp.pa = TradeAddress.create().createAddress("CH", "8500", "Frauenfeld");
+		bp.pa.setAddressLine1(bp.al1);
+		bp.pa.setAddressLine2("Systeme für Elektrotechnik");
+		bp.vatId = "CHE-103.663.775 MWST";
+		bp.uriId = new ID("www.plica.ch");
+				
+		return bp;
+	}
+	ExpectedBP expectedBillTo() {
+		ExpectedBP bp = new ExpectedBP();
+		bp.id = new ID("7611577000008", "iln");
+		//<bmecat:PARTY_ID type="supplier_specific">1786</bmecat:PARTY_ID>
+		bp.al1 = "Plica AG";
+		bp.bpn = bp.al1;
+		bp.ci = TradeContact.create().createContactInfo("Administration", "+41 52 723 61 11", "administration@janico.ch");
+		bp.pa = TradeAddress.create().createAddress("CH", "8500", "Frauenfeld");
+		bp.pa.setAddressLine1(bp.al1);
+		bp.pa.setAddressLine2("Systeme für Elektrotechnik");
+		bp.vatId = "CHE-103.663.775 MWST";
+		bp.uriId = new ID("www.plica.ch");
+		
+		return bp;
+	}
+	ExpectedBP expectedShipTo() {
+		ExpectedBP bp = new ExpectedBP();
+		bp.id = new ID("7611577000008", "iln");
+		//<bmecat:PARTY_ID type="supplier_specific">1786</bmecat:PARTY_ID>
+		bp.al1 = "Plica AG";
+		bp.bpn = bp.al1;
+		bp.ci = TradeContact.create().createContactInfo("Logistik", "+41 52 723 61 11", "jlogistik@janico.ch");
+		bp.pa = TradeAddress.create().createAddress("CH", "8500", "Frauenfeld");
+		bp.pa.setAddressLine1(bp.al1);
+		bp.pa.setAddressLine2("Systeme für Elektrotechnik");
+		bp.vatId = "CHE-103.663.775 MWST";
+		bp.uriId = new ID("www.plica.ch");
+		
+		return bp;
+	}
+	ExpectedBP expectedSeller() {
+		ExpectedBP bp = new ExpectedBP();
+		bp.id = new ID("3661458000003", "iln");
+		bp.al1 = "A Company";
+		bp.bpn = bp.al1;
+		bp.ci = TradeContact.create().createContactInfo("Weber", "24257572524", "hans.weber@ultra.fyi");
+		bp.pa = TradeAddress.create().createAddress("FR", "54152", "Citoyene");
+		bp.pa.setAddressLine1(bp.al1);
+		bp.pa.setAddressLine2("Industry for dummy Manufacturing");
+		bp.vatId = "CHE-000.000.000 MWST";
+		bp.uriId = new ID("https://www.ultra.fyi/");
+		
+		return bp;
+	}
 	ArrayList<ExpectedLine> expected() {
 		ArrayList<ExpectedLine> lines = new ArrayList<ExpectedLine>(11);
 		ExpectedLine line = new ExpectedLine();
@@ -110,6 +202,9 @@ public class OpenTransOrderReadTest extends Constants {
 		line.bai = "907216725";
 		line.tcc = TaxCategoryCode.ExemptFromTax;
 		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
+		line.sddr = new ID(ORDER_ID);
+		line.sdlr = new ID(line.id);
+		line.sdts = ORDER_DATE;
 		// TODO CUSTOMER_ORDER_REFERENCE
 /* Benutzerdefinierte Erweiterung, wie können diese abgebildet werden? :
 		<ITEM_UDX>
@@ -136,6 +231,9 @@ public class OpenTransOrderReadTest extends Constants {
 		line.lna = new Amount(line.upa.getValue().multiply(line.qty.getValue()).divide(line.upq.getValue()));
 		line.pdi = OrderLine.YES;
 		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
+		line.sddr = new ID(ORDER_ID);
+		line.sdlr = new ID(line.id);
+		line.sdts = ORDER_DATE;
 		lines.add(line);
 		
 		line = new ExpectedLine();
@@ -151,6 +249,9 @@ public class OpenTransOrderReadTest extends Constants {
 		line.lna = new Amount(line.upa.getValue().multiply(line.qty.getValue()).divide(line.upq.getValue()));
 		line.pdi = OrderLine.YES;
 		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
+		line.sddr = new ID(ORDER_ID);
+		line.sdlr = new ID(line.id);
+		line.sdts = ORDER_DATE;
 		lines.add(line);
 		
 		// TODO rest
@@ -219,25 +320,108 @@ public class OpenTransOrderReadTest extends Constants {
 		
 		BusinessParty buyer = co.getBuyer();
 		LOG.info("buyer:"+buyer);
-		assertEquals("7611577000008", buyer.getIdentifier().getContent());
-		// type="supplier_specific">1786
-		// BusinessName: <ADDRESS><bmecat:NAME>Plica AG
-		assertEquals("Plica AG", buyer.getBusinessName());
-		// VATRegistrationId: <ADDRESS><bmecat:VAT_ID>CHE-103.663.775 MWST</bmecat:VAT_ID>
-		assertEquals("CHE-103.663.775 MWST", buyer.getVATRegistrationId());
-		// UriUniversalCommunication: <ADDRESS><bmecat:URL>www.plica.ch</bmecat:URL>
-		assertEquals("www.plica.ch", buyer.getUriUniversalCommunication().getContent());
-		assertEquals("Marbach", buyer.getBPContact().getContactPoint());
+		ExpectedBP expBuyer = expectedBuyer();
+		assertEquals(expBuyer.id.toString(), buyer.getIdentifier().toString());
+		if(expBuyer.companyId==null) {
+			assertNull(buyer.getCompanyIdentifier());
+		} else {
+			assertEquals(expBuyer.companyId.toString(), buyer.getCompanyIdentifier().toString());
+		}
+		assertEquals(expBuyer.name, buyer.getRegistrationName());
+		assertEquals(expBuyer.bpn, buyer.getBusinessName());
+		assertEquals(expBuyer.vatId, buyer.getVATRegistrationId());
+		if(expBuyer.uriId==null) {
+			assertNull(buyer.getUriUniversalCommunication());
+		} else {
+			assertEquals(expBuyer.uriId.toString(), buyer.getUriUniversalCommunication().toString());
+		}
+		assertEquals(expBuyer.pa.toString(), buyer.getAddress().toString());
+		assertEquals(expBuyer.pa.getAddressLine1(), buyer.getAddress().getAddressLine1());
+		assertEquals(expBuyer.pa.getAddressLine2(), buyer.getAddress().getAddressLine2());
+		if(expBuyer.ci==null) {
+			assertNull(buyer.getBPContact());
+		} else {
+			assertEquals(expBuyer.ci.toString(), buyer.getBPContact().toString());
+		}
 		
-		// invoice_recipient ???
+		BusinessParty billTo = co.getBillTo(); // invoice_recipient
+		LOG.info("billTo:"+billTo);
+		ExpectedBP expBillTo = expectedBillTo();
+		assertEquals(expBillTo.id.toString(), billTo.getIdentifier().toString());
+		if(expBillTo.companyId==null) {
+			assertNull(billTo.getCompanyIdentifier());
+		} else {
+			assertEquals(expBillTo.companyId.toString(), billTo.getCompanyIdentifier().toString());
+		}
+		assertEquals(expBillTo.name, billTo.getRegistrationName());
+		assertEquals(expBillTo.bpn, billTo.getBusinessName());
+		assertEquals(expBillTo.vatId, billTo.getVATRegistrationId());
+		if(expBillTo.uriId==null) {
+			assertNull(billTo.getUriUniversalCommunication());
+		} else {
+			assertEquals(expBillTo.uriId.toString(), billTo.getUriUniversalCommunication().toString());
+		}
+		assertEquals(expBillTo.pa.toString(), billTo.getAddress().toString());
+		assertEquals(expBillTo.pa.getAddressLine1(), billTo.getAddress().getAddressLine1());
+		assertEquals(expBillTo.pa.getAddressLine2(), billTo.getAddress().getAddressLine2());
+		if(expBillTo.ci==null) {
+			assertNull(billTo.getBPContact());
+		} else {
+			assertEquals(expBillTo.ci.toString(), billTo.getBPContact().toString());
+		}
 		
 		// Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
 		BusinessParty shipTo = co.getShipToParty();
 		LOG.info("shipTo:"+shipTo);
-		assertEquals("Logistik", shipTo.getBPContact().getContactPoint());
+		ExpectedBP expShipTo = expectedShipTo();
+		assertEquals(expShipTo.id.toString(), shipTo.getIdentifier().toString());
+		if(expShipTo.companyId==null) {
+			assertNull(shipTo.getCompanyIdentifier());
+		} else {
+			assertEquals(expShipTo.companyId.toString(), shipTo.getCompanyIdentifier().toString());
+		}
+		assertEquals(expShipTo.name, shipTo.getRegistrationName());
+		assertEquals(expShipTo.bpn, shipTo.getBusinessName());
+		assertEquals(expShipTo.vatId, shipTo.getVATRegistrationId());
+		if(expShipTo.uriId==null) {
+			assertNull(shipTo.getUriUniversalCommunication());
+		} else {
+			assertEquals(expShipTo.uriId.toString(), shipTo.getUriUniversalCommunication().toString());
+		}
+		assertEquals(expShipTo.pa.toString(), shipTo.getAddress().toString());
+		assertEquals(expShipTo.pa.getAddressLine1(), shipTo.getAddress().getAddressLine1());
+		assertEquals(expShipTo.pa.getAddressLine2(), shipTo.getAddress().getAddressLine2());
+		if(expShipTo.ci==null) {
+			assertNull(shipTo.getBPContact());
+		} else {
+			assertEquals(expShipTo.ci.toString(), shipTo.getBPContact().toString());
+		}
 
 		BusinessParty seller = co.getSeller();
 		LOG.info("seller:"+seller);
+		ExpectedBP expSeller = expectedSeller();
+		assertEquals(expSeller.id.toString(), seller.getIdentifier().toString());
+		if(expSeller.companyId==null) {
+			assertNull(seller.getCompanyIdentifier());
+		} else {
+			assertEquals(expSeller.companyId.toString(), seller.getCompanyIdentifier().toString());
+		}
+		assertEquals(expSeller.name, seller.getRegistrationName());
+		assertEquals(expSeller.bpn, seller.getBusinessName());
+		assertEquals(expSeller.vatId, seller.getVATRegistrationId());
+		if(expSeller.uriId==null) {
+			assertNull(seller.getUriUniversalCommunication());
+		} else {
+			assertEquals(expSeller.uriId.toString(), seller.getUriUniversalCommunication().toString());
+		}
+		assertEquals(expSeller.pa.toString(), seller.getAddress().toString());
+		assertEquals(expSeller.pa.getAddressLine1(), seller.getAddress().getAddressLine1());
+		assertEquals(expSeller.pa.getAddressLine2(), seller.getAddress().getAddressLine2());
+		if(expSeller.ci==null) {
+			assertNull(seller.getBPContact());
+		} else {
+			assertEquals(expSeller.ci.toString(), seller.getBPContact().toString());
+		}
 
 		ArrayList<ExpectedLine> exp = expected();
 		List<OrderLine> ol = co.getLines();
@@ -274,6 +458,8 @@ public class OpenTransOrderReadTest extends Constants {
 //			<ORDER_DATE>2020-01-22</ORDER_DATE>
 //		</CUSTOMER_ORDER_REFERENCE>
 			List<SupportingDocument> sdList = l.getReferencedProductDocuments();
+			assertFalse(sdList.isEmpty());
+			SupportingDocument sd = sdList.get(0);
 			LOG.info("CUSTOMER_ORDER_REFERENCE:"+l.getReferencedProductDocuments()
 			+ sdList.get(0).getLineReference()
 			+ sdList.get(0).getDateAsTimestamp()
@@ -281,6 +467,9 @@ public class OpenTransOrderReadTest extends Constants {
 			assertEquals(ORDER_ID, sdList.get(0).getDocumentReference().getName());
 			assertEquals(e.id, sdList.get(0).getLineReference().getName());
 			assertEquals(ORDER_DATE, sdList.get(0).getDateAsTimestamp());
+			assertEquals(e.sddr.getName(), sd.getDocumentReference().getName());
+			assertEquals(e.sdlr.getName(), sd.getLineReference().getName());
+			assertEquals(e.sdts, sd.getDateAsTimestamp());
 		}
 
 		assertEquals(EUR, co.getDocumentCurrency());

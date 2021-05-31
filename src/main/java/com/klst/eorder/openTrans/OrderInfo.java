@@ -252,6 +252,10 @@ Beispiele:
 		return getParty(PartyRole.delivery);
 	}
 	
+	BusinessParty getBillTo() {
+		return getParty(PartyRole.invoice_recipient);
+	}
+	
 //	void setDeliveryType(String deliveryType) {
 //		Mapper.newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, deliveryType);
 //		Mapper.set(getApplicableTradeDeliveryTerms(), "deliveryTypeCode", deliveryType);

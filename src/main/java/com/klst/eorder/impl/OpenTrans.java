@@ -738,4 +738,40 @@ public class OpenTrans extends OPENTRANS implements CoreOrder {
 		return null;
 	}
 
+	@Override
+	public void setBillTo(String name, PostalAddress address, ContactInfo contact) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setBillTo(BusinessParty party) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public BusinessParty getBillTo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setInvoicer(String name, PostalAddress address, ContactInfo contact) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setInvoicer(BusinessParty party) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public BusinessParty getInvoicer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
