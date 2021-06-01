@@ -38,6 +38,21 @@ public class Party extends PARTY implements BusinessParty, BusinessPartyAddress,
 		delivery           // Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
 	}
 	
+	static BusinessParty getParty(List<PARTY> bpList, PartyRole partyrole) {
+		if(bpList.isEmpty()) return null;
+		List<BusinessParty> resList = new ArrayList<BusinessParty>(bpList.size());
+		bpList.forEach(bp -> {
+			bp.getPARTYROLE().forEach(role ->{
+				if(partyrole.toString().equals(role)) {
+					Party party = Party.create(bp);
+					LOG.info(partyrole+":"+party);
+					resList.add(Party.create(bp));
+				}
+			});
+		});
+		return resList.isEmpty() ? null : resList.get(0);
+	}
+	
 	@Override  // implements BusinessPartyFactory
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return create(name, tradingName, address, contact);

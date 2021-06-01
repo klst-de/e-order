@@ -1,13 +1,10 @@
 package com.klst.eorder.openTrans;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.DtCURRENCIES;
 import org.opentrans.xmlschema._2.ORDERINFO;
-import org.opentrans.xmlschema._2.PARTY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
@@ -106,9 +103,9 @@ Beispiele:
 	void setDocumentCurrency(String isoCurrencyCode) {
 		super.setCURRENCY(DtCURRENCIES.fromValue(isoCurrencyCode)); // enum DtCURRENCIES value
 	}
-	 String getDocumentCurrency() {
-		 return getCURRENCY().value();
-	 }
+	String getDocumentCurrency() {
+		return getCURRENCY().value();
+	}
 
 //	// BT-10 0..1 Buyer reference
 //	public void setBT10_BuyerReference(String reference) {
@@ -202,34 +199,34 @@ Beispiele:
 //		super.setSellerTradeParty((TradeParty)party);
 	}
 	
-	/**
-	 * 
-	 * @param partyrole, siehe doku: Zulässige Werte für das Element PARTY_ROLE
-	 * - supplier: BG4_Seller: Lieferant, Geschäftspartner ist ein Lieferant.
-	 * - buyer: BG7_Buyer: Einkaufende Organisation, Geschäftspartner ist ein einkaufendes Unternehmen.
-	 * - invoice_recipient: Rechnungsempfänger, Geschäftspartner ist ein Rechnungsempfänger.
-	 * - delivery: Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung.
-	 * ...
-	 * @return BP mit dieser Rolle
-	 */
-	private BusinessParty getParty(PartyRole partyrole) {
-		List<PARTY> bpList = super.getPARTIES().getPARTY();
-		if(bpList.isEmpty()) return null;
-		List<BusinessParty> resList = new ArrayList<BusinessParty>(bpList.size());
-		bpList.forEach(bp -> {
-			bp.getPARTYROLE().forEach(role ->{
-				if(partyrole.toString().equals(role)) {
-					Party party = Party.create(bp);
-					LOG.info(partyrole+":"+party);
-					resList.add(Party.create(bp));
-				}
-			});
-		});
-		return resList.isEmpty() ? null : resList.get(0);
-	}
+//	/**
+//	 * 
+//	 * @param partyrole, siehe doku: Zulässige Werte für das Element PARTY_ROLE
+//	 * - supplier: BG4_Seller: Lieferant, Geschäftspartner ist ein Lieferant.
+//	 * - buyer: BG7_Buyer: Einkaufende Organisation, Geschäftspartner ist ein einkaufendes Unternehmen.
+//	 * - invoice_recipient: Rechnungsempfänger, Geschäftspartner ist ein Rechnungsempfänger.
+//	 * - delivery: Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung.
+//	 * ...
+//	 * @return BP mit dieser Rolle
+//	 */
+//	private BusinessParty getParty(PartyRole partyrole) {
+//		List<PARTY> bpList = super.getPARTIES().getPARTY();
+//		if(bpList.isEmpty()) return null;
+//		List<BusinessParty> resList = new ArrayList<BusinessParty>(bpList.size());
+//		bpList.forEach(bp -> {
+//			bp.getPARTYROLE().forEach(role ->{
+//				if(partyrole.toString().equals(role)) {
+//					Party party = Party.create(bp);
+//					LOG.info(partyrole+":"+party);
+//					resList.add(Party.create(bp));
+//				}
+//			});
+//		});
+//		return resList.isEmpty() ? null : resList.get(0);
+//	}
 	@Override
 	public BusinessParty getSeller() {
-		return getParty(PartyRole.supplier);
+		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.supplier);
 	}
 	
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
@@ -245,15 +242,15 @@ Beispiele:
 	}
 	@Override
 	public BusinessParty getBuyer() {
-		return getParty(PartyRole.buyer);
+		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.buyer);
 	}
 
 	BusinessParty getShipToParty() {
-		return getParty(PartyRole.delivery);
+		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.delivery);
 	}
 	
 	BusinessParty getBillTo() {
-		return getParty(PartyRole.invoice_recipient);
+		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.invoice_recipient);
 	}
 	
 //	void setDeliveryType(String deliveryType) {
