@@ -23,7 +23,7 @@
 						<bmecat:STREET>Zürcherstrasse 350</bmecat:STREET>
 						<bmecat:ZIP>8500</bmecat:ZIP>
 						<bmecat:CITY>Frauenfeld</bmecat:CITY>
-						<bmecat:COUNTRY>CH</bmecat:COUNTRY>
+						<bmecat:COUNTRY_CODED>CH</bmecat:COUNTRY_CODED>
 					</ADDRESS>
 				</PARTY>
 				<PARTY>
@@ -34,7 +34,7 @@
 						<bmecat:STREET>Zum breiten Streifen 8</bmecat:STREET>
 						<bmecat:ZIP>8957</bmecat:ZIP>
 						<bmecat:CITY>Spreitenbach</bmecat:CITY>
-						<bmecat:COUNTRY>CH</bmecat:COUNTRY>
+						<bmecat:COUNTRY_CODED>CH</bmecat:COUNTRY_CODED>
 					</ADDRESS>
 				</PARTY>
 				<PARTY>
@@ -45,7 +45,7 @@
 						<bmecat:STREET>Zum breiten Streifen 8</bmecat:STREET>
 						<bmecat:ZIP>8957</bmecat:ZIP>
 						<bmecat:CITY>Spreitenbach</bmecat:CITY>
-						<bmecat:COUNTRY>CH</bmecat:COUNTRY>
+						<bmecat:COUNTRY_CODED>CH</bmecat:COUNTRY_CODED>
 					</ADDRESS>
 				</PARTY>
 				<PARTY>
@@ -56,7 +56,7 @@
 						<bmecat:STREET>Limmatstrasse 8</bmecat:STREET>
 						<bmecat:ZIP>8957</bmecat:ZIP>
 						<bmecat:CITY>Spreitenbach</bmecat:CITY>
-						<bmecat:COUNTRY>CH</bmecat:COUNTRY>
+						<bmecat:COUNTRY_CODED>CH</bmecat:COUNTRY_CODED>
 					</ADDRESS>
 				</PARTY>
 			</PARTIES>
