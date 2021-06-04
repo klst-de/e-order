@@ -36,6 +36,8 @@ public class OpenTransNamespacePrefixMapper extends NamespacePrefixMapper implem
 		return new OpenTransNamespacePrefixMapper();
 	}
 
+	private static final String OT="http://www.opentrans.org/XMLSchema/2.1";
+	
 	/**
 	 * eBusiness standard BMEcat allows to manage product catalogues by
 	 * Bundesverband Materialwirtschaft, Einkauf und Logistik e.V. (BME)
@@ -62,9 +64,10 @@ public class OpenTransNamespacePrefixMapper extends NamespacePrefixMapper implem
 	 * Create mappings.
 	 */
 	private OpenTransNamespacePrefixMapper() {
+		namespaceMap.put(OT    , "");
 		namespaceMap.put(BMECAT, "bmecat");
-		namespaceMap.put(XMIME, "xmime");
-		namespaceMap.put(XSIG, "xsig");
+		namespaceMap.put(XMIME , "xmime");
+		namespaceMap.put(XSIG  , "xsig");
 	}
 
 	/* (non-Javadoc)
