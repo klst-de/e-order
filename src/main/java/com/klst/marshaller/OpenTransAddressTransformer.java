@@ -3,7 +3,6 @@ package com.klst.marshaller;
 import javax.inject.Named;
 
 import com.klst.eorder.api.AbstactTransformer;
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 @Named
 /* Notice 
@@ -35,9 +34,5 @@ public class OpenTransAddressTransformer extends OpenTransTransformer {
 	protected String getSupertypeName() {
 		return CONTENT_SUPERTYPE_NAME;
 	}
-
-//	public NamespacePrefixMapper createNamespacePrefixMapper() {
-//		return OTNamespacePrefixMapper.getNamespacePrefixMapper();
-//	}
 
 }

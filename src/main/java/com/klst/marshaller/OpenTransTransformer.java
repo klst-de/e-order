@@ -60,8 +60,8 @@ public abstract class OpenTransTransformer extends AbstactTransformer {
 		return (T) result;
 	}
 
-//	public NamespacePrefixMapper createNamespacePrefixMapper() {
-//		return OTNamespacePrefixMapper.getNamespacePrefixMapper();
-//	}
+	public NamespacePrefixMapper createNamespacePrefixMapper() {
+		return OpenTransNamespacePrefixMapper.getNamespacePrefixMapper();
+	}
 
 }
