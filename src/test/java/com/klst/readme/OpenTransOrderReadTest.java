@@ -50,6 +50,7 @@ import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.TradeContact;
 import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.marshaller.CioTransformer;
+import com.klst.marshaller.OpenTransOrderTransformer;
 import com.klst.marshaller.OpenTransTransformer;
 import com.klst.test.CommonUtils;
 
@@ -91,7 +92,7 @@ public class OpenTransOrderReadTest extends Constants {
 	@Before 
     public void setup() {
 	   	cioTransformer = CioTransformer.getInstance();
-	   	otTransformer = OpenTransTransformer.getInstance();
+	   	otTransformer = OpenTransOrderTransformer.getInstance();
 	   	object = null;
     }
 
@@ -295,7 +296,7 @@ public class OpenTransOrderReadTest extends Constants {
 			InputStream is = new FileInputStream(testFile);
 			object = transformer.unmarshal(is);
 			LOG.info(">>>>"+object);
-			Class<?> type = Class.forName(com.klst.marshaller.OpenTransTransformer.CONTENT_TYPE_NAME); // openTrans.Order aus jar laden
+			Class<?> type = Class.forName(com.klst.marshaller.OpenTransOrderTransformer.CONTENT_TYPE_NAME); // openTrans.Order aus jar laden
 			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
 		} catch (Exception ex) {
 			ex.printStackTrace();

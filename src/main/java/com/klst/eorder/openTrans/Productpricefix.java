@@ -21,7 +21,6 @@ import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG29_PriceDetails;
 import com.klst.eorder.api.BG30_LineVATInformation;
-import com.klst.eorder.openTrans.reflection.Mapper;
 
 /* Kandidat für BG-27, BG-28, BG-29, BG-30
 
@@ -183,7 +182,8 @@ public class ALLOWORCHARGESFIX {
 		return Amount.create(super.getPRICEAMOUNT());
 	}
 	void setUnitPriceAmount(IAmount unitPriceAmount) {
-		Mapper.set(this, "priceamount", unitPriceAmount);
+//		Mapper.set(this, "priceamount", unitPriceAmount); BUG TODO
+		super.setPRICEAMOUNT(unitPriceAmount.getValue());
 	}
 	
 	// BG-29.BT-148 0..1 GrossPrice
@@ -211,7 +211,8 @@ public class ALLOWORCHARGESFIX {
 	}
 	@Override
 	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-		Mapper.set(this, "pricequantity", basisQuantity);
+//		Mapper.set(this, "pricequantity", basisQuantity); // BUG
+		super.setPRICEQUANTITY(basisQuantity.getValue());
 	}
 	
 /* BG-30 1..1 LINE VAT INFORMATION =============================================================== >>

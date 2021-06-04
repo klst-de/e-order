@@ -7,6 +7,7 @@ import org.bmecat.bmecat._2005.BUYERPID;
 import org.bmecat.bmecat._2005.DESCRIPTIONLONG;
 import org.bmecat.bmecat._2005.DESCRIPTIONSHORT;
 import org.bmecat.bmecat._2005.INTERNATIONALPID;
+import org.bmecat.bmecat._2005.SUPPLIERPID;
 import org.opentrans.xmlschema._2.PRODUCTID;
 
 import com.klst.ebXml.reflection.SCopyCtor;
@@ -86,11 +87,11 @@ public class Productid extends PRODUCTID implements BG31_ItemInformation {
 	// BG-31.BT-155 0..1 SpecifiedTradeProduct.sellerAssignedID
 	@Override
 	public void setSellerAssignedID(String id) {
-//		SUPPLIERPID supplierpid = new SUPPLIERPID();
-//		supplierpid.setValue(id);
-//		super.setSUPPLIERPID(supplierpid);
+		SUPPLIERPID supplierpid = new SUPPLIERPID();
+		supplierpid.setValue(id);
+		super.setSUPPLIERPID(supplierpid);
 		// äquivalent:
-		Mapper.set(this, "supplierpid", id);
+//		Mapper.set(this, "supplierpid", id); // BUG TODO
 	}
 	@Override
 	public String getSellerAssignedID() {
@@ -100,7 +101,10 @@ public class Productid extends PRODUCTID implements BG31_ItemInformation {
 	// BG-31.BT-156 0..1 <bmecat:BUYER_PID type="buyer_specific">907216725</bmecat:BUYER_PID>
 	@Override
 	public void setBuyerAssignedID(String id) {
-		Mapper.add(getBUYERPID(), new BUYERPID(), id);
+//		Mapper.add(getBUYERPID(), new BUYERPID(), id); // ??? TODO
+		BUYERPID buyerpid = new BUYERPID();
+		buyerpid.setValue(id);
+		super.getBUYERPID().add(buyerpid);
 	}
 	@Override
 	public String getBuyerAssignedID() {
