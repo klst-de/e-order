@@ -16,12 +16,11 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
  * @see https://github.com/javax-inject/javax-inject
  */
 @javax.inject.Singleton
-public class OpenTransTransformer extends AbstactTransformer {
+public abstract class OpenTransTransformer extends AbstactTransformer {
 
-	public static AbstactTransformer SINGLETON = new OpenTransTransformer();
-
-	public static AbstactTransformer getInstance() {
-		return SINGLETON;
+	// ctor
+	protected OpenTransTransformer(String contentPath, AbstactTransformer instance) {
+		super(contentPath, instance);
 	}
 	
 	/* xsd file name in the output folder started with "/" == project_loc
@@ -30,33 +29,29 @@ public class OpenTransTransformer extends AbstactTransformer {
 	 */
 	private static final String OT_2_1_XSD = "/xsd/opentrans_2_1.xsd";
 	// CONTENT_PATH aka package name
-	private static final String CONTENT_PATH = "org.opentrans.xmlschema._2"; 
-	// CONTENT_SUPERTYPE_NAME aka class name
-	private static final String CONTENT_SUPERTYPE_NAME = CONTENT_PATH+".ORDER"; 
-	// CONTENT_TYPE_NAME aka class name
-	public static final String CONTENT_TYPE_NAME = "com.klst.eorder.openTrans.Order"; 
-	
-	private OpenTransTransformer() {
-		super(CONTENT_PATH, SINGLETON);
-	}
+	static final String CONTENT_PATH = "org.opentrans.xmlschema._2"; 
 	
 	@Override
 	protected String getResource() {
 		return OT_2_1_XSD;
 	}
+	
+	abstract protected String getSupertypeName();
 
 	@Override
 	protected Class<?> loadClass() {
 		Class<?> type = null;
 		try {
-			// dynamisch die CIO  Klasse laden 
-			type = Class.forName(CONTENT_SUPERTYPE_NAME);
+			// dynamisch die OT Klasse laden 
+			type = Class.forName(getSupertypeName());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return type;
 	}
 
+//	public byte[] marshal(Object document) in super
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Object> T unmarshal(InputStream xmlInputStream) {
