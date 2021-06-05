@@ -5,6 +5,9 @@ import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.DtCURRENCIES;
 import org.opentrans.xmlschema._2.ORDERINFO;
+import org.opentrans.xmlschema._2.ORDERPARTIESREFERENCE;
+import org.opentrans.xmlschema._2.PARTIES;
+import org.opentrans.xmlschema._2.PARTY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
@@ -18,11 +21,13 @@ import com.klst.eorder.openTrans.Party.PartyRole;
 
 public class OrderInfo extends ORDERINFO implements BG4_Seller, BG7_Buyer {
 
-	// factory
-	static OrderInfo create() {
-		return new OrderInfo(null); 
-	}
-	
+	private static final Logger LOG = Logger.getLogger(OrderInfo.class.getName());
+
+//	// factory
+//	static OrderInfo create() {
+//		return new OrderInfo(null); 
+//	}
+//	
 	// copy factory
 	static OrderInfo create(ORDERINFO object) {
 		if(object instanceof ORDERINFO && object.getClass()!=ORDERINFO.class) {
@@ -32,12 +37,14 @@ public class OrderInfo extends ORDERINFO implements BG4_Seller, BG7_Buyer {
 			return new OrderInfo(object); 
 		}
 	}
-
-	private static final Logger LOG = Logger.getLogger(OrderInfo.class.getName());
 	
 	// copy ctor
 	private OrderInfo(ORDERINFO object) {
 		SCopyCtor.getInstance().invokeCopy(this, object);
+		if(object==null) {
+			setPARTIES(new PARTIES());
+			setORDERPARTIESREFERENCE(new ORDERPARTIESREFERENCE());
+		}
 	}
 
 	// Order number BT-1 Identifier (mandatory) - A unique identification of the Order.
@@ -99,14 +106,6 @@ Beispiele:
 		return DeliveryDate.create(getDELIVERYDATE());
 	}
 	
-	// BT-5 + 1..1 Invoice currency code
-	void setDocumentCurrency(String isoCurrencyCode) {
-		super.setCURRENCY(DtCURRENCIES.fromValue(isoCurrencyCode)); // enum DtCURRENCIES value
-	}
-	String getDocumentCurrency() {
-		return getCURRENCY().value();
-	}
-
 //	// BT-10 0..1 Buyer reference
 //	public void setBT10_BuyerReference(String reference) {
 //		if(reference==null) return;
@@ -188,42 +187,39 @@ Beispiele:
 	// BG-4 + 1..1 SELLER @see BG4_Seller
 	@Override
 	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
-//		BusinessParty party = TradeParty.create(name, null, address, contact);
-//		party.setCompanyId(companyId);
-//		party.setCompanyLegalForm(companyLegalForm);
-//		setSeller(party);
+		BusinessParty party = Party.create(name, null, address, contact);
+		party.setCompanyId(companyId);
+		party.setCompanyLegalForm(companyLegalForm);
+		setSeller(party);
 	}
 	@Override
 	public void setSeller(BusinessParty party) {
 		if(party==null) return;
-//		super.setSellerTradeParty((TradeParty)party);
+		setParty(party, Party.PartyRole.supplier);
+		// required:
+		PartyID id = (PartyID)party.getIdentifier();
+		if(id!=null) {
+			super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF(id);
+			return;
+		}
+		id = (PartyID)party.getCompanyIdentifier();
+		if(id!=null) {
+			super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF(id);
+			return;
+		}
+		String name = party.getRegistrationName();
+		if(name!=null) {
+			super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF(new PartyID(name));
+			return;
+		}
+		name = party.getBusinessName();
+		if(name!=null) {
+			super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF(new PartyID(name));
+			return;
+		}
+		LOG.warning("No SUPPLIERIDREF for party:"+party);
 	}
 	
-//	/**
-//	 * 
-//	 * @param partyrole, siehe doku: Zulässige Werte für das Element PARTY_ROLE
-//	 * - supplier: BG4_Seller: Lieferant, Geschäftspartner ist ein Lieferant.
-//	 * - buyer: BG7_Buyer: Einkaufende Organisation, Geschäftspartner ist ein einkaufendes Unternehmen.
-//	 * - invoice_recipient: Rechnungsempfänger, Geschäftspartner ist ein Rechnungsempfänger.
-//	 * - delivery: Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung.
-//	 * ...
-//	 * @return BP mit dieser Rolle
-//	 */
-//	private BusinessParty getParty(PartyRole partyrole) {
-//		List<PARTY> bpList = super.getPARTIES().getPARTY();
-//		if(bpList.isEmpty()) return null;
-//		List<BusinessParty> resList = new ArrayList<BusinessParty>(bpList.size());
-//		bpList.forEach(bp -> {
-//			bp.getPARTYROLE().forEach(role ->{
-//				if(partyrole.toString().equals(role)) {
-//					Party party = Party.create(bp);
-//					LOG.info(partyrole+":"+party);
-//					resList.add(Party.create(bp));
-//				}
-//			});
-//		});
-//		return resList.isEmpty() ? null : resList.get(0);
-//	}
 	@Override
 	public BusinessParty getSeller() {
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.supplier);
@@ -232,27 +228,53 @@ Beispiele:
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
 	@Override
 	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-//		BusinessParty party = TradeParty.create(name, null, address, contact);
-//		setBuyer(party);
+		setBuyer(Party.create(name, null, address, contact));
 	}
 	@Override
 	public void setBuyer(BusinessParty party) {
-//		if(party==null) return;
-//		super.setBuyerTradeParty((TradeParty)party);
+		setParty(party, Party.PartyRole.buyer);
+		// required:
+		PartyID id = (PartyID)party.getIdentifier();
+		if(id!=null) {
+			super.getORDERPARTIESREFERENCE().setBUYERIDREF(id);
+			return;
+		}
+		id = (PartyID)party.getCompanyIdentifier();
+		if(id!=null) {
+			super.getORDERPARTIESREFERENCE().setBUYERIDREF(id);
+			return;
+		}
+		String name = party.getRegistrationName();
+		if(name!=null) {
+			super.getORDERPARTIESREFERENCE().setBUYERIDREF(new PartyID(name));
+			return;
+		}
+		name = party.getBusinessName();
+		if(name!=null) {
+			super.getORDERPARTIESREFERENCE().setBUYERIDREF(new PartyID(name));
+			return;
+		}
+		LOG.warning("No BUYERIDREF for party:"+party);
 	}
 	@Override
 	public BusinessParty getBuyer() {
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.buyer);
 	}
 
-	BusinessParty getShipToParty() {
+	void setShipTo(BusinessParty party) {
+		setParty(party, Party.PartyRole.delivery);
+	}
+	BusinessParty getShipTo() {
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.delivery);
 	}
 	
+	void setBillTo(BusinessParty party) {
+		setParty(party, Party.PartyRole.invoice_recipient);
+	}
 	BusinessParty getBillTo() {
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.invoice_recipient);
 	}
-	
+
 //	void setDeliveryType(String deliveryType) {
 //		Mapper.newFieldInstance(this, FIELD_applicableTradeDeliveryTerms, deliveryType);
 //		Mapper.set(getApplicableTradeDeliveryTerms(), "deliveryTypeCode", deliveryType);
@@ -331,5 +353,21 @@ Beispiele:
 //		});
 //		return res;
 //	}
+
+	private void setParty(BusinessParty party, PartyRole partyrole) {
+//		if(super.getPARTIES()==null) {
+//			super.setPARTIES(new PARTIES());
+//		}
+		((PARTY)party).getPARTYROLE().add(partyrole.toString());
+		super.getPARTIES().getPARTY().add((Party)party);
+	}
+
+	// 790: BT-5 1..1 Document currency code
+	void setDocumentCurrency(String isoCurrencyCode) {
+		super.setCURRENCY(DtCURRENCIES.fromValue(isoCurrencyCode)); // enum DtCURRENCIES value
+	}
+	String getDocumentCurrency() {
+		return getCURRENCY().value();
+	}
 
 }

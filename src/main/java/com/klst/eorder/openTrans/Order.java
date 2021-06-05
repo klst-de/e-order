@@ -211,7 +211,7 @@ public class Order extends ORDER implements CoreOrder {
 	}
 	@Override
 	public BusinessParty getShipTo() {
-		return orderInfo.getShipToParty();
+		return orderInfo.getShipTo();
 	}
 
 	@Override

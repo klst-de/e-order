@@ -335,30 +335,27 @@ BT-34 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des 
 		super.getPARTYID().add(new PartyID(name, schemeID));
 	}
 
-	// BT-31 ++ 0..1 Seller VAT identifier / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
+	// BT-31 0..1 Seller VAT identifier / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
 	@Override
 	public List<Identifier> getTaxRegistrationIdentifier() {
 		return null;
 //		Address address = (Address)getAddress();
 //		return address==null ? null : new ID(address.getVATID(), "VAT"); // ID aus CIO
 	}
+	@Override
 	public String getVATRegistrationId() {
 		Address address = (Address)getAddress();
 		return address==null ? null : address.getVATID();
 	}
-	
+	@Override
 	public void addTaxRegistrationId(String name, String schemeID) {
-		// TODO
+		setTaxRegistrationId(name, schemeID);
 	}
 	@Override
 	public void setTaxRegistrationId(String name, String schemeID) {
 		if(name==null) return;
-		// TODO
-//		if(super.getSpecifiedTaxRegistration().isEmpty()) {
-//			TaxRegistrationType taxRegistrationType = new TaxRegistrationType();
-//			taxRegistrationType.setID(new ID(name, schemeID));
-//			getSpecifiedTaxRegistration().add(taxRegistrationType);
-//		}
+		Address address = (Address)getAddress();
+		address.setVATID(name);
 	}
 	
 	// BT-33 ++ 0..1 Seller additional legal information      / weitere rechtliche Informationen, wie z. B. Aktienkapital

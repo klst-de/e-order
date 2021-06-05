@@ -11,9 +11,7 @@ import org.opentrans.xmlschema._2.PARTY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IPeriod;
-import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.eorder.openTrans.Party.PartyRole;
 
@@ -22,7 +20,7 @@ import com.klst.eorder.openTrans.Party.PartyRole;
     protected String orderid;            ==> setId
     protected String orderresponsedate;  ==> setIssueDate
     protected PARTIES parties;           ==> setParty
-    protected ORDERPARTIESREFERENCE orderpartiesreference; TODO:
+    protected ORDERPARTIESREFERENCE orderpartiesreference:
      TypePARTYID orderpartiesreference.buyeridref;
      TypePARTYID orderpartiesreference.supplieridref;
 			<ORDER_PARTIES_REFERENCE>
@@ -95,12 +93,7 @@ public class OrderResponseInfo extends ORDERRESPONSEINFO {
 	}
 	
 	// 345: BG-4 1..1 SELLER @see BG4_Seller
-//	void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
-//			String companyLegalForm) {
-//		// TODO Auto-generated method stub	
-//	}
 	void setSeller(BusinessParty party) {
-		LOG.info("party:"+party); //.getIdentifier();
 		setParty(party, Party.PartyRole.supplier);
 		// required:
 		PartyID id = (PartyID)party.getIdentifier();
@@ -130,11 +123,6 @@ public class OrderResponseInfo extends ORDERRESPONSEINFO {
 	}
 
 	// 390: BG-7 1..1 BUYER @see BG7_Buyer
-//	void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-//		// TODO Auto-generated method stub	
-////		BusinessParty party = TradeParty.create(name, null, address, contact);
-////		setBuyer(party);
-//	}
 	void setBuyer(BusinessParty party) {
 		setParty(party, Party.PartyRole.buyer);
 		// required:
@@ -164,10 +152,10 @@ public class OrderResponseInfo extends ORDERRESPONSEINFO {
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.buyer);
 	}
 
-	void setShipToParty(BusinessParty party) {
+	void setShipTo(BusinessParty party) {
 		setParty(party, Party.PartyRole.delivery);
 	}
-	BusinessParty getShipToParty() {
+	BusinessParty getShipTo() {
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.delivery);
 	}
 	
@@ -179,9 +167,9 @@ public class OrderResponseInfo extends ORDERRESPONSEINFO {
 	}
 
 	private void setParty(BusinessParty party, PartyRole partyrole) {
-		if(super.getPARTIES()==null) {
-			super.setPARTIES(new PARTIES());
-		}
+//		if(super.getPARTIES()==null) {
+//			super.setPARTIES(new PARTIES());
+//		}
 		((PARTY)party).getPARTYROLE().add(partyrole.toString());
 		super.getPARTIES().getPARTY().add((Party)party);
 	}

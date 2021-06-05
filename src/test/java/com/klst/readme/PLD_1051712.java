@@ -112,13 +112,15 @@ public class PLD_1051712 extends Constants {
 		return null;
 	}
 	
-	private void marshal() {
+	private void marshal(String filename) {
 		LOG.info("object.Class:"+object.getClass());
 		
 		byte[] xml = transformer.marshal(object);
 		LOG.info(new String(xml));
 		
-		File testFile = xmlToTempFile("PLD-TestResult", xml);
+		if(filename==null) return;
+		
+		File testFile = xmlToTempFile(filename, xml);
 		CoreOrder co = null;
 		// unmarshal the result file testFile and perform assertions:
 		if(transformer.isValid(testFile)) {
@@ -381,6 +383,7 @@ public class PLD_1051712 extends Constants {
 		sellerAddress.setAddressLine1(expectedSeller().al1);
 		BusinessParty seller = or.createParty(null, sellerAddress.getAddressLine1(), sellerAddress, null);
 		seller.setId("7611577000008", "iln");
+//		seller.setVATRegistrationId("CHE-103.663.775 MWST");
 		or.setSeller(seller);
 //		or.setSeller(expectedSeller().al1, sellerAddress, null, "7611577000008", null);
 
@@ -411,7 +414,8 @@ public class PLD_1051712 extends Constants {
 		
 		transformer = otTransformer;
 		object = (OrderResponse)or;
-		marshal();
+//		marshal(null);
+		marshal("PLD-TestResult"); // unmarshal + asserts
 	}
 
 }

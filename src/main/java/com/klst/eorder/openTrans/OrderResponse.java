@@ -184,11 +184,11 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 //	}
 	@Override
 	public void setShipTo(BusinessParty party) {
-		orderInfo.setShipToParty(party);
+		orderInfo.setShipTo(party);
 	}
 	@Override
 	public BusinessParty getShipTo() {
-		return orderInfo.getShipToParty();
+		return orderInfo.getShipTo();
 	}
 
 //	@Override

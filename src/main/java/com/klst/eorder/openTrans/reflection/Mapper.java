@@ -194,7 +194,7 @@ public class Mapper {
 		try { // "setValue" existiert für objType ? ==> ausführen
 			Method setValue = objType.getDeclaredMethod(methodName, value.getClass());	
 			setValue.invoke(objToAdd, value.getClass().cast(value));
-			LOG.info(""+objType.getCanonicalName()+" - return !!!!!!!!!!!!!!!!!!");
+//			LOG.info(""+objType.getCanonicalName()+" - return !!!!!!!!!!!!!!!!!!");
 			if(list.isEmpty()) {
 				list.add(objToAdd.getClass().cast(objToAdd));				
 			} else {
