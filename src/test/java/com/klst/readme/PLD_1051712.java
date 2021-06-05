@@ -37,6 +37,7 @@ import com.klst.eorder.impl.Quantity;
 import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
 import com.klst.eorder.openTrans.OrderResponse;
+import com.klst.eorder.openTrans.PartyID;
 import com.klst.marshaller.OpenTransOrderResponseTransformer;
 
 public class PLD_1051712 extends Constants {
@@ -292,7 +293,7 @@ public class PLD_1051712 extends Constants {
 
 	ExpectedBP expectedBuyer() {
 		ExpectedBP bp = new ExpectedBP();
-		bp.id = new ID("7611007000004", "iln");
+		bp.id = new PartyID("7611007000004", "iln");
 		bp.al1 = "Adi A. Dassler AG";
 		bp.bpn = bp.al1;
 		
@@ -305,7 +306,7 @@ public class PLD_1051712 extends Constants {
 	}
 	ExpectedBP expectedBillTo() {
 		ExpectedBP bp = new ExpectedBP();
-		bp.id = new ID("7611007000004", "iln");
+		bp.id = new PartyID("7611007000004", "iln");
 		bp.al1 = "A. Steffen AG";
 		bp.bpn = bp.al1;
 		
@@ -315,7 +316,7 @@ public class PLD_1051712 extends Constants {
 	}
 	ExpectedBP expectedSeller() {
 		ExpectedBP bp = new ExpectedBP();
-		bp.id = new ID("7611577000008", "iln");
+		bp.id = new PartyID("7611577000008", "iln");
 		bp.al1 = "Plica AG";
 		bp.bpn = bp.al1;
 		
@@ -381,7 +382,7 @@ public class PLD_1051712 extends Constants {
 		BusinessParty seller = or.createParty(null, sellerAddress.getAddressLine1(), sellerAddress, null);
 		seller.setId("7611577000008", "iln");
 		or.setSeller(seller);
-//		or.setSeller(LOG_PROPERTIES, sellerAddress, null, LOG_PROPERTIES, LOG_PROPERTIES);
+//		or.setSeller(expectedSeller().al1, sellerAddress, null, "7611577000008", null);
 
 
 		PostalAddress buyerAddress = or.createAddress("CH", "8957", "Spreitenbach");

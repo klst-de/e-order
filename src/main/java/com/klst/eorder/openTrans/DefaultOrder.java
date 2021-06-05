@@ -90,7 +90,7 @@ public interface DefaultOrder extends CoreOrder {
 	@Override
 	default void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
 			String companyLegalForm) {
-		BusinessParty party = createParty(name, null, address, contact);
+		BusinessParty party = Party.create(name, null, address, contact);
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
 		setSeller(party);
@@ -360,8 +360,7 @@ public interface DefaultOrder extends CoreOrder {
 
 	@Override
 	default BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		return null;
+		return Party.create(name, tradingName, address, contact);
 	}
 
 	@Override

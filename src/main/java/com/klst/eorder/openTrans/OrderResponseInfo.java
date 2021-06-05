@@ -95,29 +95,70 @@ public class OrderResponseInfo extends ORDERRESPONSEINFO {
 	}
 	
 	// 345: BG-4 1..1 SELLER @see BG4_Seller
-	void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
-			String companyLegalForm) {
-		// TODO Auto-generated method stub	
-	}
+//	void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
+//			String companyLegalForm) {
+//		// TODO Auto-generated method stub	
+//	}
 	void setSeller(BusinessParty party) {
+		LOG.info("party:"+party); //.getIdentifier();
 		setParty(party, Party.PartyRole.supplier);
 		// required:
-		super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF((PartyID)party.getIdentifier());
+		PartyID id = (PartyID)party.getIdentifier();
+		if(id!=null) {
+			super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF(id);
+			return;
+		}
+		id = (PartyID)party.getCompanyIdentifier();
+		if(id!=null) {
+			super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF(id);
+			return;
+		}
+		String name = party.getRegistrationName();
+		if(name!=null) {
+			super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF(new PartyID(name));
+			return;
+		}
+		name = party.getBusinessName();
+		if(name!=null) {
+			super.getORDERPARTIESREFERENCE().setSUPPLIERIDREF(new PartyID(name));
+			return;
+		}
+		LOG.warning("No SUPPLIERIDREF for party:"+party);
 	}
 	BusinessParty getSeller() {
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.supplier);
 	}
 
 	// 390: BG-7 1..1 BUYER @see BG7_Buyer
-	void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub	
-//		BusinessParty party = TradeParty.create(name, null, address, contact);
-//		setBuyer(party);
-	}
+//	void setBuyer(String name, PostalAddress address, ContactInfo contact) {
+//		// TODO Auto-generated method stub	
+////		BusinessParty party = TradeParty.create(name, null, address, contact);
+////		setBuyer(party);
+//	}
 	void setBuyer(BusinessParty party) {
 		setParty(party, Party.PartyRole.buyer);
 		// required:
-		super.getORDERPARTIESREFERENCE().setBUYERIDREF((PartyID)party.getIdentifier());
+		PartyID id = (PartyID)party.getIdentifier();
+		if(id!=null) {
+			super.getORDERPARTIESREFERENCE().setBUYERIDREF(id);
+			return;
+		}
+		id = (PartyID)party.getCompanyIdentifier();
+		if(id!=null) {
+			super.getORDERPARTIESREFERENCE().setBUYERIDREF(id);
+			return;
+		}
+		String name = party.getRegistrationName();
+		if(name!=null) {
+			super.getORDERPARTIESREFERENCE().setBUYERIDREF(new PartyID(name));
+			return;
+		}
+		name = party.getBusinessName();
+		if(name!=null) {
+			super.getORDERPARTIESREFERENCE().setBUYERIDREF(new PartyID(name));
+			return;
+		}
+		LOG.warning("No BUYERIDREF for party:"+party);
 	}
 	BusinessParty getBuyer() {
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.buyer);

@@ -18,13 +18,34 @@ import com.klst.eorder.impl.ID;
 
 /* PARTY:
     protected List<TypePARTYID> partyid , required = true
-    protected List<String> partyrole;
+    protected List<String> partyrole; see enum PartyRole
     protected List<ADDRESS> address;
     protected List<ACCOUNT> account;
     protected MIMEINFO mimeinfo;
  */
 public class Party extends PARTY implements BusinessParty, BusinessPartyAddress, BusinessPartyContact {
 
+	/*
+	OT type in Identifikator eines Geschäftspartners,  namespace: BMECAT, Vordefinierte Werte:
+	buyer_specific    : Vom Einkäufer vergebene Identifikationsnummer
+	customer_specific : Vom Kunden vergebene Identifikationsnummer
+	duns              : Dun & Bradstreet DUNS-Kennung (siehe auch http://www.dnbgermany.de/datenbank/dunsnummer.html)
+	iln               : Internationale Lokationsnummer, ILN-Kennung (siehe auch http://www.gs1-germany.de/internet/content/e39/e50/e221/e222/index_ger.html)
+	gln               : Internationale Lokationsnummer, In Deutschland auch ILN genannt (siehe ILN oben)
+	party_specific    : Von der jeweiligen Organisation selbst definierte Identifikationsnummer
+	supplier_specific : Vom Lieferanten vergebene Identifikationsnummer
+	w{1,250}          : Bezeichnung des Kodierungsstandards, "\w{1,250}" bedeutet, 
+	                    die Bezeichnung des Kodierungsstandards muss mindestens 1 Zeichen lang und darf höchestens 250 Zeichen lang sein
+	 */
+	public enum PartyIDType {
+		iln,             // ==> Identifier ID
+		gln,             // ==> Identifier ID
+		party_specific,  // ==> Identifier ohne Schema
+		businessName,    // Name, unter dem der BP bekannt ist, sofern abweichend vom registrationName (auch als Firmenname bekannt)
+		registrationName // (registration)Name : der volle formelle Name, unter dem der BP 
+		                 // im nationalen Register für juristische Personen oder als steuerpflichtige Person eingetragen ist 
+						 // oder anderweitig als Person(en) handelt
+	}
 	/*
 	 * Zulässige Werte für das Element PARTY_ROLE
 	 * Vollständige Liste siehe doku
@@ -54,7 +75,7 @@ public class Party extends PARTY implements BusinessParty, BusinessPartyAddress,
 			bp.getPARTYROLE().forEach(role ->{
 				if(partyrole.toString().equals(role)) {
 					Party party = Party.create(bp);
-					LOG.info(partyrole+":"+party);
+					LOG.finer("#getParty: partyrole="+partyrole+":"+party);
 					resList.add(Party.create(bp));
 				}
 			});
@@ -102,31 +123,20 @@ public class Party extends PARTY implements BusinessParty, BusinessPartyAddress,
 	 * @see BusinessPartyFactory
 	 */
 /*
-weitere Namen (am Beispiel Seller):
+weitere Namen und IDs (am Beispiel Seller):
 BT-29 0..n Seller identifier ( mit Schema )         / Kennung des Verkäufers
 BT-30 0..1 Seller legal registration identifier     / Kennung der rechtlichen Registrierung des Verkäufers
 BT-31 0..1 Seller VAT identifier                    / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
 BT-32 0..1 Seller tax registration identifier       / Steuernummer des Verkäufers
 BT-33 0..1 Seller additional legal information      / weitere rechtliche Informationen, wie z. B. Aktienkapital
 BT-34 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
-
-OT type in Identifikator eines Geschäftspartners,  namespace: BMECAT, Vordefinierte Werte:
-buyer_specific    : Vom Einkäufer vergebene Identifikationsnummer
-customer_specific : Vom Kunden vergebene Identifikationsnummer
-duns              : Dun & Bradstreet DUNS-Kennung (siehe auch http://www.dnbgermany.de/datenbank/dunsnummer.html)
-iln               : Internationale Lokationsnummer, ILN-Kennung (siehe auch http://www.gs1-germany.de/internet/content/e39/e50/e221/e222/index_ger.html)
-gln               : Internationale Lokationsnummer, In Deutschland auch ILN genannt (siehe ILN oben)
-party_specific    : Von der jeweiligen Organisation selbst definierte Identifikationsnummer
-supplier_specific : Vom Lieferanten vergebene Identifikationsnummer
-w{1,250}          : Bezeichnung des Kodierungsstandards, "\w{1,250}" bedeutet, 
-                    die Bezeichnung des Kodierungsstandards muss mindestens 1 Zeichen lang und darf höchestens 250 Zeichen lang sein
  */
 	private Party(String registrationName, String businessName, PostalAddress address, ContactInfo contact) {
 		super();
-//		setRegistrationName(registrationName);
-//		setBusinessName(businessName);
+		setRegistrationName(registrationName);
+		setBusinessName(businessName);
 		setAddress(address);
-//		if(contact!=null) setContactInfo(contact);
+		if(contact!=null) setContactInfo(contact);
 	}
 
 	public String toString() {
@@ -186,52 +196,97 @@ w{1,250}          : Bezeichnung des Kodierungsstandards, "\w{1,250}" bedeutet,
 		return Contactdetails.create(contactName, contactTel, contactMail);
 	}
 
-	// (registration)Name BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	private List<PartyID> getPartyID(PartyIDType partyIDType) {
+		if(super.getPARTYID().isEmpty()) return null;
+		
+		List<PartyID> resList = new ArrayList<PartyID>(getPARTYID().size());
+		getPARTYID().forEach(id -> {
+			if(partyIDType.toString().equals(id.getType())) {
+				resList.add(new PartyID(id));
+			}
+		});
+		return resList;
+	}
+	
+	// (registration)Name BT-27 1..1 Name des Verkäufers / BT-44 1..1 Name des Käufers
 	@Override
 	public String getRegistrationName() {
-		return null;
-		// TODO
-//		return super.getName()==null ? null : getName().getValue();
+//		if(super.getPARTYID().isEmpty()) return null;
+//		
+//		List<Identifier> resList = new ArrayList<Identifier>(getPARTYID().size());
+//		getPARTYID().forEach(id -> {
+//			if(PartyIDType.registrationName.toString().equals(id.getType())) {
+//				resList.add(new PartyID(id));
+//			}
+//		});
+//		return resList.isEmpty() ? null : resList.get(0).getContent();
+		List<PartyID> resList = getPartyID(PartyIDType.registrationName);
+		if(resList==null) return null; // super.getPARTYID().isEmpty()
+		if(resList.isEmpty()) return null; // kein el mit passendem PartyIDType
+		return resList.get(0).getContent();
 	}
-//	// nicht public, da im ctor
-//	void setRegistrationName(String name) {
-//		if(name==null) return;
-//		super.setName(Text.create(name));
-//	}
-//
+	// in OT steht der BP Name in Address, das ist aber der businessName
+	void setRegistrationName(String name) {
+		if(name==null) return;
+		super.getPARTYID().add(new PartyID(name, PartyIDType.registrationName.toString()));
+	}
+
 	// businessName       BT-28 0..1 Handelsname des Verkäufers / Seller trading name
 	@Override
 	public String getBusinessName() {
+		List<PartyID> resList = getPartyID(PartyIDType.businessName);
+//		if(resList==null) return null; // super.getPARTYID().isEmpty()
+//		if(resList.isEmpty()) return null; // kein el mit passendem PartyIDType
+		if(!(resList==null || resList.isEmpty())) {
+			return resList.get(0).getContent();
+		}
+		// name aus AddressLine1 holen:
 		if(super.getADDRESS().isEmpty()) return null;
 		return getAddress().getAddressLine1();
 	}
 	@Override
 	public void setBusinessName(String name) {
+//		if(name==null) return;
+//		if(super.getADDRESS().isEmpty()) {
+//			// ??? TODO
+//		} else {
+//			if(getAddress().getAddressLine1()==null) {
+//				getAddress().setAddressLine1(name);
+//			}
+//		}
 		if(name==null) return;
-		if(super.getADDRESS().isEmpty()) {
-			// ??? TODO
-		} else {
-			if(getAddress().getAddressLine1()==null) {
-				getAddress().setAddressLine1(name);
-			}
-		}
+		super.getPARTYID().add(new PartyID(name, PartyIDType.businessName.toString()));
 	}
 
 	// BT-29 0..n Seller identifier ( mit Schema ) / Kennung des Verkäufers
 	@Override
 	public Identifier getIdentifier() { // holt nur den ersten
-		if(super.getPARTYID().isEmpty()) return null;
+//		if(super.getPARTYID().isEmpty()) return null;
+//		
+//		List<Identifier> resList = new ArrayList<Identifier>(getPARTYID().size());
+//		getPARTYID().forEach(id -> {
+//			if(PartyIDType.gln.toString().equals(id.getType())) {
+//				resList.add(new PartyID(id));
+//			}
+//			if(PartyIDType.iln.toString().equals(id.getType())) {
+//				resList.add(new PartyID(id));
+//			}
+//		});
+//		return resList.isEmpty() ? null : resList.get(0);
 		
-		List<Identifier> resList = new ArrayList<Identifier>(getPARTYID().size());
-		getPARTYID().forEach(id -> {
-			if(id.getType().equals("gln")) {
-				resList.add(new PartyID(id));
-			}
-			if(id.getType().equals("iln")) {
-				resList.add(new PartyID(id));
-			}
-		});
-		return resList.isEmpty() ? null : resList.get(0);
+		List<PartyID> resList = getPartyID(PartyIDType.iln);
+		if(!(resList==null || resList.isEmpty())) {
+			return resList.get(0);
+		}
+		resList = getPartyID(PartyIDType.gln);
+		if(!(resList==null || resList.isEmpty())) {
+			return resList.get(0);
+		}
+		resList = getPartyID(PartyIDType.party_specific);
+		if(!(resList==null || resList.isEmpty())) {
+			return resList.get(0);
+		}
+		return null;
 	}
 	public String getId() {
 		Identifier id = getIdentifier();
@@ -242,7 +297,7 @@ w{1,250}          : Bezeichnung des Kodierungsstandards, "\w{1,250}" bedeutet,
 	public void addId(String name, String schemeID) {
 		if(name==null) return;
 		if(schemeID==null) {
-			super.getPARTYID().add(new PartyID(name, "supplier_specific")); // TODO oder "buyer_specific"
+			super.getPARTYID().add(new PartyID(name, PartyIDType.party_specific.toString()));
 		} else {
 			super.getPARTYID().add(new PartyID(name, schemeID));
 		}
@@ -258,15 +313,17 @@ w{1,250}          : Bezeichnung des Kodierungsstandards, "\w{1,250}" bedeutet,
 		Identifier identifier = getCompanyIdentifier();
 		return identifier==null ? null : identifier.getContent();
 	}
+	private static boolean isNumeric(String str) {
+		  return str.matches("\\d+");  //match a number.
+		}
 	@Override
 	public Identifier getCompanyIdentifier() {
 		if(super.getPARTYID().isEmpty()) return null;
 		List<Identifier> resList = new ArrayList<Identifier>(getPARTYID().size());
 		getPARTYID().forEach(id -> {
-			if(id.getType().equals("Xgln")) { // TODO
-				resList.add(new PartyID(id));
-			}
-			if(id.getType().equals("Xiln")) {
+			// Type numerisch 
+			String type = id.getType();
+			if(type!=null && isNumeric(type)) {
 				resList.add(new PartyID(id));
 			}
 		});
