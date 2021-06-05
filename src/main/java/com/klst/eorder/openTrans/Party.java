@@ -197,20 +197,32 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 		}
 	}
 
-	// BT-29 ++ 0..n Seller identifier ( mit Schema ) / Kennung des Verkäufers
+	// BT-29 0..n Seller identifier ( mit Schema ) / Kennung des Verkäufers
 	@Override
 	public Identifier getIdentifier() { // holt nur den ersten
-		List<TypePARTYID> idList = super.getPARTYID();
-		if(idList.isEmpty()) return null;
+		if(super.getPARTYID().isEmpty()) return null;
 		
-		List<Identifier> res = new ArrayList<Identifier>();
-		idList.forEach(id -> {
-			// iln ==> GLN, https://de.wikipedia.org/wiki/Global_Location_Number
-			if("iln".equals(id.getType())) res.add(new ID(id.getValue(), "iln"));
+		List<Identifier> resList = new ArrayList<Identifier>(getPARTYID().size());
+		getPARTYID().forEach(id -> {
+			if(id.getType().equals("gln")) {
+				resList.add(new PartyID(id));
+			}
+			if(id.getType().equals("iln")) {
+				resList.add(new PartyID(id));
+			}
 		});
-//		<bmecat:PARTY_ID type="iln">7611577000008</bmecat:PARTY_ID>
-//		<bmecat:PARTY_ID type="supplier_specific">1786</bmecat:PARTY_ID>
-		return res.isEmpty() ? null : res.get(0);
+		return resList.isEmpty() ? null : resList.get(0);
+//		List<TypePARTYID> idList = super.getPARTYID();
+//		if(idList.isEmpty()) return null;
+//		
+//		List<Identifier> res = new ArrayList<Identifier>();
+//		idList.forEach(id -> {
+//			// iln ==> GLN, https://de.wikipedia.org/wiki/Global_Location_Number
+//			if("iln".equals(id.getType())) res.add(new ID(id.getValue(), "iln"));
+//		});
+////		<bmecat:PARTY_ID type="iln">7611577000008</bmecat:PARTY_ID>
+////		<bmecat:PARTY_ID type="supplier_specific">1786</bmecat:PARTY_ID>
+//		return res.isEmpty() ? null : res.get(0);
 	}
 	public String getId() {
 		Identifier id = getIdentifier();
@@ -220,43 +232,44 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	@Override
 	public void addId(String name, String schemeID) {
 		if(name==null) return;
-		// TODO
-//		if(schemeID==null) {
-//			super.setID(new ID(name));
-//		} else {
-//			super.getGlobalID().add(new ID(name, schemeID));
-//		}
+		if(schemeID==null) {
+			super.getPARTYID().add(new PartyID(name, "supplier_specific")); // TODO oder "buyer_specific"
+		} else {
+			super.getPARTYID().add(new PartyID(name, schemeID));
+		}
 	}
 	@Override
 	public void setId(String name, String schemeID) {
 		addId(name, schemeID);
-//		if(name==null) return;
-//		super.getGlobalID().add(new ID(name, schemeID));
 	}
 	
-	// BT-30 ++ 0..1 Seller legal registration identifier     / Kennung der rechtlichen Registrierung des Verkäufers
+	// BT-30 0..1 Seller legal registration identifier / Kennung der rechtlichen Registrierung des Verkäufers
 	@Override
 	public String getCompanyId() {
-		return null;
-		// TODO
-//		IDType id = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getID();
-//		return id==null ? null : id.getValue();
+		Identifier identifier = getCompanyIdentifier();
+		return identifier==null ? null : identifier.getContent();
 	}
 	@Override
 	public Identifier getCompanyIdentifier() {
-		return null;
-		// TODO
-//		IDType id = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getID();
-//		return id==null ? null : new ID(id.getValue(), id.getSchemeID());
+		if(super.getPARTYID().isEmpty()) return null;
+		List<Identifier> resList = new ArrayList<Identifier>(getPARTYID().size());
+		getPARTYID().forEach(id -> {
+			if(id.getType().equals("Xgln")) { // TODO
+				resList.add(new PartyID(id));
+			}
+			if(id.getType().equals("Xiln")) {
+				resList.add(new PartyID(id));
+			}
+		});
+		return resList.isEmpty() ? null : resList.get(0);
 	}
 	@Override
 	public void setCompanyId(String name, String schemeID) {
 		if(name==null) return;
-		// TODO
-//		if(super.getSpecifiedLegalOrganization()==null) {
-//			setSpecifiedLegalOrganization(new LegalOrganizationType());
-//		}
-//		getSpecifiedLegalOrganization().setID(new ID(name, schemeID));
+//		TypePARTYID partyid = new TypePARTYID();
+//		partyid.setValue(name);
+//		partyid.setType(schemeID);
+		super.getPARTYID().add(new PartyID(name, schemeID));
 	}
 
 	// BT-31 ++ 0..1 Seller VAT identifier / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
