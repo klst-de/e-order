@@ -1,6 +1,7 @@
 package com.klst.eorder.openTrans;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.logging.Logger;
 import org.opentrans.xmlschema._2.ORDERRESPONSE;
 import org.opentrans.xmlschema._2.ORDERRESPONSEITEM;
 import org.opentrans.xmlschema._2.ORDERRESPONSEITEMLIST;
+import org.opentrans.xmlschema._2.ORDERRESPONSESUMMARY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
@@ -19,6 +21,7 @@ import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.eorder.api.BG22_DocumentTotals;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.impl.UnitPriceAmount;
@@ -33,6 +36,16 @@ import com.klst.eorder.impl.UnitPriceAmount;
 protected String version;
 */
 public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
+
+	@Override  // implements BusinessPartyFactory
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
+		return Party.create(name, tradingName, address, contact);
+	}
+	
+	@Override // implements PostalAddressFactory
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		return Party.create().createAddress(countryCode, postalCode, city);
+	}
 
 	@Override // implements CoreOrderFactory
 	public CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
@@ -143,8 +156,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	}
 	@Override
 	public void setSeller(BusinessParty party) {
-		// TODO Auto-generated method stub	
-//		orderInfo.setSeller(party);
+		orderInfo.setSeller(party);
 	}
 	@Override
 	public BusinessParty getSeller() {
@@ -159,8 +171,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	}
 	@Override
 	public void setBuyer(BusinessParty party) {
-		// TODO Auto-generated method stub	
-//		orderInfo.setBuyer(party);
+		orderInfo.setBuyer(party);
 	}
 	@Override
 	public BusinessParty getBuyer() {
@@ -173,7 +184,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	}
 	@Override
 	public void setShipToParty(BusinessParty party) {
-		// TODO Auto-generated method stub	
+		orderInfo.setShipToParty(party);
 	}
 	@Override
 	public BusinessParty getShipToParty() {
@@ -186,7 +197,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	}
 	@Override
 	public void setBillTo(BusinessParty party) {
-		// TODO Auto-generated method stub	
+		orderInfo.setBillTo(party);
 	}
 	@Override
 	public BusinessParty getBillTo() {
@@ -206,7 +217,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
 		return DeliveryDate.create(start, end);
 	}	
-	// BG-14 0..1 DELIVERY PERIOD
+	// 770: BG-14 0..1 DELIVERY PERIOD
 	@Override
 	public void setDeliveryPeriod(IPeriod period) {
 		orderInfo.setDeliveryPeriod((DeliveryDate)period);
@@ -214,6 +225,40 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	@Override
 	public IPeriod getDeliveryPeriod() {
 		return orderInfo.getDeliveryPeriod();
+	}
+
+	// 790: BT-5 1..1 Document currency code
+	@Override
+	public void setDocumentCurrency(String isoCurrencyCode) {
+		orderInfo.setDocumentCurrency(isoCurrencyCode);
+	}
+	@Override
+	public String getDocumentCurrency() {
+		return orderInfo.getDocumentCurrency();
+	}
+
+	// 927: BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112
+	// in ORDERSUMMARY gibt es nur protected BigDecimal totalamount
+	// aber TODO required = true : protected BigInteger totalitemnum
+	@Override
+	public BG22_DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
+		// TODO class xxx extends ORDERSUMMARY implements BG22_DocumentTotals
+		if(super.getORDERRESPONSESUMMARY()==null) {
+			ORDERRESPONSESUMMARY ors = new ORDERRESPONSESUMMARY();
+//		    protected BigInteger totalitemnum; TODO required = true
+//		    protected BigDecimal totalamount;
+//		    protected ALLOWORCHARGESFIX alloworchargesfix;
+			ors.setTOTALAMOUNT(lineNet.getValue());
+			ors.setTOTALITEMNUM(BigInteger.valueOf(getLines().size()));
+			super.setORDERRESPONSESUMMARY(ors);
+		}
+		return null;
+	}
+
+	// 928: BG-22.BT-106 - 1..1/1..1
+	@Override
+	public IAmount getLineNetTotal() {
+		return super.getORDERRESPONSESUMMARY()==null ? null : Amount.create(getORDERRESPONSESUMMARY().getTOTALAMOUNT());
 	}
 
 }

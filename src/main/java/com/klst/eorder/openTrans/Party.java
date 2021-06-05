@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bmecat.bmecat._2005.TypePARTYID;
 import org.opentrans.xmlschema._2.PARTY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
@@ -17,7 +16,7 @@ import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.impl.ID;
 
-/*
+/* PARTY:
     protected List<TypePARTYID> partyid , required = true
     protected List<String> partyrole;
     protected List<ADDRESS> address;
@@ -32,10 +31,20 @@ public class Party extends PARTY implements BusinessParty, BusinessPartyAddress,
 	 * 
 	 */
 	public enum PartyRole {
-		supplier, // BG4_Seller: Lieferant
-		buyer,    // BG7_Buyer: Einkaufende Organisation, einkaufendes Unternehmen
+		supplier,          // BG4_Seller: Lieferant
+		buyer,             // BG7_Buyer: Einkaufende Organisation, einkaufendes Unternehmen
 		invoice_recipient, // Rechnungsempfänger
 		delivery           // Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
+//final_delivery Verweis auf die Adresse und den Kontakt für den Endempfänger.
+		//Die Exportkontrollbehörde prüft Aufträge derzeit nur auf Auftragskopfebene. 
+		//Daher sollte für nachweispflichtige Aufträge keine zum Kopfteil abweichende FINAL_DELIVERY_PARTY angegeben werden.
+//customer Der Geschäftspartner ist ein Kunde des einkaufenden Unternehmens.
+//central_regulator Der Geschäftspartner ist ein Zentralregulierer und unterstützt verschiedene Geschäftspartner bei der Geschäftsabwicklung.
+//deliverer Der Geschäftspartner ist ein Transporteur
+//document_creator Der Geschäftspartner ist der Ersteller des Dokumentes
+//intermediary Der Geschäftspartner nimmt die Rolle eines Intermediäres zwischen Leistungserbringer und Leistungsempfänger ein
+// ...
+//other Wenn keine andere Rolle passt, kann die Rolle 'Sonstige' verwendet werden
 	}
 	
 	static BusinessParty getParty(List<PARTY> bpList, PartyRole partyrole) {
@@ -93,13 +102,24 @@ public class Party extends PARTY implements BusinessParty, BusinessPartyAddress,
 	 * @see BusinessPartyFactory
 	 */
 /*
-weitere Namen:
-BT-29 ++ 0..n Seller identifier ( mit Schema )         / Kennung des Verkäufers
-BT-30 ++ 0..1 Seller legal registration identifier     / Kennung der rechtlichen Registrierung des Verkäufers
-BT-31 ++ 0..1 Seller VAT identifier                    / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
-BT-32 ++ 0..1 Seller tax registration identifier       / Steuernummer des Verkäufers
-BT-33 ++ 0..1 Seller additional legal information      / weitere rechtliche Informationen, wie z. B. Aktienkapital
-BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
+weitere Namen (am Beispiel Seller):
+BT-29 0..n Seller identifier ( mit Schema )         / Kennung des Verkäufers
+BT-30 0..1 Seller legal registration identifier     / Kennung der rechtlichen Registrierung des Verkäufers
+BT-31 0..1 Seller VAT identifier                    / Umsatzsteuer-Identifikationsnummer mit vorangestelltem Ländercode
+BT-32 0..1 Seller tax registration identifier       / Steuernummer des Verkäufers
+BT-33 0..1 Seller additional legal information      / weitere rechtliche Informationen, wie z. B. Aktienkapital
+BT-34 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
+
+OT type in Identifikator eines Geschäftspartners,  namespace: BMECAT, Vordefinierte Werte:
+buyer_specific    : Vom Einkäufer vergebene Identifikationsnummer
+customer_specific : Vom Kunden vergebene Identifikationsnummer
+duns              : Dun & Bradstreet DUNS-Kennung (siehe auch http://www.dnbgermany.de/datenbank/dunsnummer.html)
+iln               : Internationale Lokationsnummer, ILN-Kennung (siehe auch http://www.gs1-germany.de/internet/content/e39/e50/e221/e222/index_ger.html)
+gln               : Internationale Lokationsnummer, In Deutschland auch ILN genannt (siehe ILN oben)
+party_specific    : Von der jeweiligen Organisation selbst definierte Identifikationsnummer
+supplier_specific : Vom Lieferanten vergebene Identifikationsnummer
+w{1,250}          : Bezeichnung des Kodierungsstandards, "\w{1,250}" bedeutet, 
+                    die Bezeichnung des Kodierungsstandards muss mindestens 1 Zeichen lang und darf höchestens 250 Zeichen lang sein
  */
 	private Party(String registrationName, String businessName, PostalAddress address, ContactInfo contact) {
 		super();
@@ -212,17 +232,6 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 			}
 		});
 		return resList.isEmpty() ? null : resList.get(0);
-//		List<TypePARTYID> idList = super.getPARTYID();
-//		if(idList.isEmpty()) return null;
-//		
-//		List<Identifier> res = new ArrayList<Identifier>();
-//		idList.forEach(id -> {
-//			// iln ==> GLN, https://de.wikipedia.org/wiki/Global_Location_Number
-//			if("iln".equals(id.getType())) res.add(new ID(id.getValue(), "iln"));
-//		});
-////		<bmecat:PARTY_ID type="iln">7611577000008</bmecat:PARTY_ID>
-////		<bmecat:PARTY_ID type="supplier_specific">1786</bmecat:PARTY_ID>
-//		return res.isEmpty() ? null : res.get(0);
 	}
 	public String getId() {
 		Identifier id = getIdentifier();
@@ -266,9 +275,6 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 	@Override
 	public void setCompanyId(String name, String schemeID) {
 		if(name==null) return;
-//		TypePARTYID partyid = new TypePARTYID();
-//		partyid.setValue(name);
-//		partyid.setType(schemeID);
 		super.getPARTYID().add(new PartyID(name, schemeID));
 	}
 

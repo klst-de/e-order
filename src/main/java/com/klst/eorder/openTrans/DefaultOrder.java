@@ -90,37 +90,28 @@ public interface DefaultOrder extends CoreOrder {
 	@Override
 	default void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
 			String companyLegalForm) {
-		// TODO Auto-generated method stub
-		
+		BusinessParty party = createParty(name, null, address, contact);
+		party.setCompanyId(companyId);
+		party.setCompanyLegalForm(companyLegalForm);
+		setSeller(party);
 	}
-
 	@Override
 	default void setSeller(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	default BusinessParty getSeller() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	default void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		
+		setBuyer(createParty(name, null, address, contact));
 	}
-
 	@Override
 	default void setBuyer(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	default BusinessParty getBuyer() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

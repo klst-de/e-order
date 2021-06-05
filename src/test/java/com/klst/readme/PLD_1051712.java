@@ -22,9 +22,9 @@ import java.util.logging.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentrans.xmlschema._2.ORDERRESPONSE;
 
 import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.AbstactTransformer;
@@ -36,8 +36,6 @@ import com.klst.eorder.impl.ID;
 import com.klst.eorder.impl.Quantity;
 import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
-import com.klst.eorder.openTrans.Address;
-import com.klst.eorder.openTrans.GenericOrder;
 import com.klst.eorder.openTrans.OrderResponse;
 import com.klst.marshaller.OpenTransOrderResponseTransformer;
 
@@ -119,13 +117,13 @@ public class PLD_1051712 extends Constants {
 		byte[] xml = transformer.marshal(object);
 		LOG.info(new String(xml));
 		
-//		File testFile = xmlToTempFile("PLD-TestResult", xml);
-//		CoreOrder cio = null;
-//		// unmarshal the result file toModel and perform assertions:
-//		if(transformer.isValid(testFile)) {
-//			cio = unmarshal(testFile);
-//			doAssert(cio);
-//		}
+		File testFile = xmlToTempFile("PLD-TestResult", xml);
+		CoreOrder co = null;
+		// unmarshal the result file testFile and perform assertions:
+		if(transformer.isValid(testFile)) {
+			co = unmarshal(testFile);
+			doAssert(co);
+		}
 	}
 
 	static final Timestamp issueDate = DateTimeFormats.ymdToTs("2018-06-21");
@@ -282,12 +280,12 @@ public class PLD_1051712 extends Constants {
 		// not valid? 2 Fehler in XML behoben:
 		File testFile = getTestFile(TESTDIR+"PLD_1051712_OrderResponse_example.XML");
 		transformer = otTransformer;
-		CoreOrder cio = null;
+		CoreOrder co = null;
 		// unmarshal toModel:
 		if(transformer.isValid(testFile)) {
-			cio = unmarshal(testFile);
-			LOG.info("cio:"+cio);
-			doAssert(cio);
+			co = unmarshal(testFile);
+			LOG.info("cio:"+co);
+			doAssert(co);
 		} else {
 			LOG.severe("not valid: "+testFile);
 		}
@@ -380,51 +378,37 @@ public class PLD_1051712 extends Constants {
 		line1.setDeliveryDate(line.delivery);          // 298
 		or.addLine(line1);
 
-//		PostalAddress sellerAddress = TradeAddress.create().createAddress(
-//			"FR", "44100", "NANTES");
-//		sellerAddress.setAddressLine1("12 RUE DE LA FONTAINE SALEE");
-//		String sellerName = "DMBP NANTES DISPANO ROUX - 1535"; // 349: BG-4.BT-27
-//		BusinessParty seller = order.createParty(sellerName
-//		  , null
-//		  , sellerAddress
-//		  , null);
-//		seller.setId("3020816001302", EAN_LOCO);
-//		seller.setCompanyId("50810215900334", SIRENE);
-//		seller.setVATRegistrationId("FR86508102159");
-//		order.setSeller(seller);
-//
-//		PostalAddress buyerAddress = TradeAddress.create().createAddress(
-//			"FR", "01500", "Amberieu en bugey");
-//		buyerAddress.setAddressLine1("Avenue Leon Blum");
-//		ContactInfo contact = TradeContact.create().createContactInfo("ALAIN DUPOND"
-//			, "06 78 56 23 00"
-//			, "alain.dupond@saint-gobain.com"
-//			);
-//		BusinessParty buyer = order.createParty(
-//			"AMBERIEU EN BUGEY CEDEO" // 394: BG-7.BT-44  1..1 Buyer name
-//		  , null
-//		  , buyerAddress
-//		  , contact
-//		  );
-//		buyer.setId("3306949923804", EAN_LOCO);
-//		buyer.setCompanyId("57214188502180", SIRENE);
-//		buyer.setVATRegistrationId("FR94572141885");
-//		buyer.setUriUniversalCommunication("alain.dupond@saint-gobain.com", "EM");
-//		order.setBuyer(buyer);
-//
-//		BusinessParty shipFrom = order.createParty(sellerName
-//		  , null
-//		  , sellerAddress
-//		  , null);
-//		shipFrom.setId("3020816001302", EAN_LOCO);
-//		order.setShipFromParty(shipFrom);
-//		
-//		order.setPickupDate("2020-01-15 09:00:00"); // 778: format="203"
-//		order.setDocumentCurrency(EUR);             // 790:
-//		
-//		order.createTotals(new Amount(new BigDecimal(1561.18)) // Sum of line net amount
-//		, new Amount(new BigDecimal(1561.18))
-//		, null);
+		PostalAddress sellerAddress = or.createAddress("CH", "8500", "Frauenfeld");
+		sellerAddress.setAddressLine1(expectedSeller().al1);
+		BusinessParty seller = or.createParty(null, sellerAddress.getAddressLine1(), sellerAddress, null);
+		seller.setId("7611577000008", "iln");
+		or.setSeller(seller);
+//		or.setSeller(LOG_PROPERTIES, sellerAddress, null, LOG_PROPERTIES, LOG_PROPERTIES);
+
+
+		PostalAddress buyerAddress = or.createAddress("CH", "8957", "Spreitenbach");
+		buyerAddress.setAddressLine1(expectedBuyer().al1);
+		BusinessParty buyer = or.createParty(null, buyerAddress.getAddressLine1(), buyerAddress, null);
+		buyer.setId("7611007000004", "iln");
+		or.setBuyer(buyer);
+		
+		PostalAddress shipToAddress = or.createAddress("CH", "8957", "Spreitenbach");
+		shipToAddress.setAddressLine1(expectedShipTo().al1);
+		BusinessParty shipTo = or.createParty(null, shipToAddress.getAddressLine1(), shipToAddress, null);
+		shipTo.setId("7611007000004", "iln");
+		or.setShipToParty(shipTo);
+		
+		PostalAddress billToAddress = or.createAddress("CH", "8957", "Spreitenbach");
+		billToAddress.setAddressLine1(expectedBillTo().al1);
+		BusinessParty billTo = or.createParty(null, billToAddress.getAddressLine1(), billToAddress, null);
+		billTo.setId("7611007000004", "iln");
+		or.setBillTo(billTo);
+
+		or.setDocumentCurrency("CHF");             // 790:
+		
+		or.createTotals(new Amount(new BigDecimal(1259.65)) // Sum of line net amount
+		, new Amount(new BigDecimal(1259.65)) // total amount without VAT, aka Tax Basis
+		, null);
 		
 		transformer = otTransformer;
 		object = (OrderResponse)or;
