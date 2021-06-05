@@ -397,7 +397,7 @@ public class EX11 extends Constants {
 		  , sellerAddress
 		  , null);
 		shipFrom.setId("3020816001302", EAN_LOCO);
-		order.setShipFromParty(shipFrom);
+		order.setShipFrom(shipFrom);
 		
 		order.setPickupDate("2020-01-15 09:00:00"); // 778: format="203"
 		order.setDocumentCurrency(EUR);             // 790:

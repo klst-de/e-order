@@ -34,8 +34,8 @@ import com.klst.edoc.api.PostalAddress;
  */
 public interface ShipTo {
 
-	public void setShipToParty(String name, PostalAddress address, ContactInfo contact);
-	public void setShipToParty(BusinessParty party);
-	public BusinessParty getShipToParty();
+	public void setShipTo(String name, PostalAddress address, ContactInfo contact);
+	public void setShipTo(BusinessParty party);
+	public BusinessParty getShipTo();
 
 }
