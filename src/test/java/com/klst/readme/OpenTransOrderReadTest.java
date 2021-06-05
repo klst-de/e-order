@@ -372,7 +372,7 @@ public class OpenTransOrderReadTest extends Constants {
 		}
 		
 		// Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
-		BusinessParty shipTo = co.getShipToParty();
+		BusinessParty shipTo = co.getShipTo();
 		LOG.info("shipTo:"+shipTo);
 		ExpectedBP expShipTo = expectedShipTo();
 		assertEquals(expShipTo.id.toString(), shipTo.getIdentifier().toString());

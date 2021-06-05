@@ -148,12 +148,12 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	}
 	
 	// 345: BG-4 1..1 SELLER @see BG4_Seller
-	@Override
-	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
-			String companyLegalForm) {
-		// TODO Auto-generated method stub	
-//		orderInfo.setSeller(name, address, contact, companyLegalForm);
-	}
+//	@Override
+//	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
+//			String companyLegalForm) {
+//		// TODO Auto-generated method stub	
+////		orderInfo.setSeller(name, address, contact, companyLegalForm);
+//	}
 	@Override
 	public void setSeller(BusinessParty party) {
 		orderInfo.setSeller(party);
@@ -164,11 +164,11 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	}
 
 	// 390: BG-7 1..1 BUYER @see BG7_Buyer
-	@Override
-	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub	
-//		orderInfo.setBuyer(name, address, contact);
-	}
+//	@Override
+//	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
+//		// TODO Auto-generated method stub	
+////		orderInfo.setBuyer(name, address, contact);
+//	}
 	@Override
 	public void setBuyer(BusinessParty party) {
 		orderInfo.setBuyer(party);
@@ -178,23 +178,23 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		return orderInfo.getBuyer();
 	}
 
+//	@Override
+//	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
+//		// TODO Auto-generated method stub	
+//	}
 	@Override
-	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub	
-	}
-	@Override
-	public void setShipToParty(BusinessParty party) {
+	public void setShipTo(BusinessParty party) {
 		orderInfo.setShipToParty(party);
 	}
 	@Override
-	public BusinessParty getShipToParty() {
+	public BusinessParty getShipTo() {
 		return orderInfo.getShipToParty();
 	}
 
-	@Override
-	public void setBillTo(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub		
-	}
+//	@Override
+//	public void setBillTo(String name, PostalAddress address, ContactInfo contact) {
+//		// TODO Auto-generated method stub		
+//	}
 	@Override
 	public void setBillTo(BusinessParty party) {
 		orderInfo.setBillTo(party);

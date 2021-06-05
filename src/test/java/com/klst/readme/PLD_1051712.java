@@ -60,7 +60,7 @@ public class PLD_1051712 extends Constants {
     	}
 		LOG = Logger.getLogger(PLD_1051712.class.getName());		
 	}
-//	private static final Logger LOG = Logger.getLogger(OrderTest.class.getName());
+//	private static final Logger LOG = Logger.getLogger(PLD_1051712.class.getName());
 	
 	static private AbstactTransformer otTransformer;
 	static private AbstactTransformer transformer;
@@ -246,7 +246,7 @@ public class PLD_1051712 extends Constants {
 		}
 		
 		// Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
-		BusinessParty shipTo = cio.getShipToParty();
+		BusinessParty shipTo = cio.getShipTo();
 		LOG.info("shipTo:"+shipTo);
 		ExpectedBP expShipTo = expectedShipTo();
 		assertEquals(expShipTo.id.toString(), shipTo.getIdentifier().toString());
@@ -276,8 +276,6 @@ public class PLD_1051712 extends Constants {
 	
 	@Test
     public void readFile() {
-//		File testFile = getTestFile(TESTDIR+"PLD_257444_Order_example.XML");
-		// not valid? 2 Fehler in XML behoben:
 		File testFile = getTestFile(TESTDIR+"PLD_1051712_OrderResponse_example.XML");
 		transformer = otTransformer;
 		CoreOrder co = null;
@@ -333,7 +331,7 @@ public class PLD_1051712 extends Constants {
 		ArrayList<ExpectedLine> lines = new ArrayList<ExpectedLine>(3);
 		ExpectedLine line = new ExpectedLine();
 		line.id = "1";
-		line.qty = new Quantity("MTR", new BigDecimal(680));
+		line.qty = new Quantity(MTR, new BigDecimal(680));
 		line.upa = new UnitPriceAmount(new BigDecimal(172));
 		line.upq = new Quantity(null, new BigDecimal(100));
 		line.lna = new Amount(line.upa.getValue().multiply(line.qty.getValue()).divide(line.upq.getValue()));
@@ -365,7 +363,7 @@ public class PLD_1051712 extends Constants {
 		
 		ExpectedLine line = expected().get(0);
 		OrderLine line1 = or.createOrderLine("1"       // order line number
-		  , new Quantity("MTR", new BigDecimal(680))
+		  , new Quantity(MTR, new BigDecimal(680))
 		  , new Amount(new BigDecimal(1169.6))         // line net amount
 		  , new UnitPriceAmount(new BigDecimal(172))   // price
 		  , "PLICALU"                                  // itemName
@@ -396,7 +394,7 @@ public class PLD_1051712 extends Constants {
 		shipToAddress.setAddressLine1(expectedShipTo().al1);
 		BusinessParty shipTo = or.createParty(null, shipToAddress.getAddressLine1(), shipToAddress, null);
 		shipTo.setId("7611007000004", "iln");
-		or.setShipToParty(shipTo);
+		or.setShipTo(shipTo);
 		
 		PostalAddress billToAddress = or.createAddress("CH", "8957", "Spreitenbach");
 		billToAddress.setAddressLine1(expectedBillTo().al1);

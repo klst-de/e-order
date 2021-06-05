@@ -299,74 +299,50 @@ public interface DefaultOrder extends CoreOrder {
 	}
 
 	@Override
-	default void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		
+	default void setShipTo(String name, PostalAddress address, ContactInfo contact) {
+		setShipTo(createParty(name, null, address, contact));
 	}
-
 	@Override
-	default void setShipToParty(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
+	default void setShipTo(BusinessParty party) {
 	}
-
 	@Override
-	default BusinessParty getShipToParty() {
-		// TODO Auto-generated method stub
+	default BusinessParty getShipTo() {
 		return null;
 	}
 
 	@Override
-	default void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		
+	default void setShipFrom(String name, PostalAddress address, ContactInfo contact) {
+		setShipFrom(createParty(name, null, address, contact));
 	}
-
 	@Override
-	default void setShipFromParty(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
+	default void setShipFrom(BusinessParty party) {
 	}
-
 	@Override
-	default BusinessParty getShipFromParty() {
-		// TODO Auto-generated method stub
+	default BusinessParty getShipFrom() {
 		return null;
 	}
 
 	@Override
 	default void setBillTo(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		
+		setBillTo(createParty(name, null, address, contact));
 	}
-
 	@Override
 	default void setBillTo(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	default BusinessParty getBillTo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	default void setInvoicer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		
+		setInvoicer(createParty(name, null, address, contact));
 	}
-
 	@Override
 	default void setInvoicer(BusinessParty party) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	default BusinessParty getInvoicer() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -33,70 +33,108 @@ import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.UnitPriceAmount;
 
 /* alle drei elemente sind required:
-    "orderheader",
+    "orderheader", elemente:
+	    CONTROLINFO controlinfo; hat nur 3 String elemente: stopautomaticprocessing, generatorinfo, generationdate
+	    SOURCINGINFO sourcinginfo; Informationen über Beschaffungsaktivitäten zusammengefasst, 
+	                               die diesem Auftrag vorausgegangen sind.
+	    ORDERINFO orderinfo: required mit parties usw
     "orderitemlist",
     "ordersummary"
+   ---
+"sourcinginfo" SOURCING_INFO (Beschaffungsinformationen) : optional
+		Im Element SOURCING_INFO werden Informationen über Beschaffungsaktivitäten zusammengefasst, 
+		die diesem Auftrag vorausgegangen sind:
+	protected String quotationid;   ===> // 534: 0..1 QUOTATION REFERENCE
+	protected List<AGREEMENT> agreement;  ?? ==> wie applicableHeaderTradeAgreement ??? (Referenz auf Rahmenvertrag)
+	    protected String agreementid;
+	    protected String agreementlineid;
+	    protected String agreementstartdate;
+	    protected String agreementenddate;
+	    protected TypePARTYID supplieridref;
+	    protected List<AGREEMENTDESCR> agreementdescr;
+	    protected MIMEINFO mimeinfo;
+	    protected String type;
+	    protected String _default;
+
+	protected CATALOGREFERENCE catalogreference;
+ 
  */
 public class Order extends ORDER implements CoreOrder {
 
 	private static final Logger LOG = Logger.getLogger(Order.class.getName());
 
-	OrderHeader orderHeader;
-	// elemente:
-//    protected CONTROLINFO controlinfo; hat nur 3 String elemente: stopautomaticprocessing, generatorinfo, generationdate
-//    protected SOURCINGINFO sourcinginfo; Informationen über Beschaffungsaktivitäten zusammengefasst, die diesem Auftrag vorausgegangen sind.
-//    protected ORDERINFO orderinfo; mit parties usw
-	OrderInfo orderInfo;
+	// factory
+// ???	public static CoreOrder getFactory() {
+	// factory
+	static Order create() {
+		return new Order(null); 
+	}
 	
-	public Order(ORDER doc) {
-		super();
+	// copy factory
+	static Order create(ORDER object) {
+		if(object instanceof ORDER && object.getClass()!=ORDER.class) {
+			// object is instance of a subclass of ORDER, but not ORDER itself
+			return (Order)object;
+		} else {
+			return new Order(object); 
+		}
+	}
+	
+	@Override
+	public CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
+		return new Order(profile, processType, code);
+	}
+
+	OrderHeader orderHeader;
+	OrderInfo orderInfo;
+
+	private Order(ORDER doc) {
+		LOG.info("Type:"+doc.getType());
+		LOG.info("Version:"+doc.getVersion());
 		if(doc!=null) {
 			SCopyCtor.getInstance().invokeCopy(this, doc);
 		}
-
-		LOG.info("Type:"+super.getType());
-		LOG.info("Version:"+super.getVersion());
 		orderHeader = OrderHeader.create(super.getORDERHEADER(), this);
-// orderheader:
-//	    "controlinfo"
-		//orderHeader.createtControlInfo(); // hat nur 3 elemente
-//	    "sourcinginfo" SOURCING_INFO (Beschaffungsinformationen) : optional
-//		Im Element SOURCING_INFO werden Informationen über Beschaffungsaktivitäten zusammengefasst, 
-//		die diesem Auftrag vorausgegangen sind:
-//	protected String quotationid;   ===> // 534: 0..1 QUOTATION REFERENCE
-//	protected List<AGREEMENT> agreement;  ?? ==> wie applicableHeaderTradeAgreement ??? (Referenz auf Rahmenvertrag)
-//	    protected String agreementid;
-//	    protected String agreementlineid;
-//	    protected String agreementstartdate;
-//	    protected String agreementenddate;
-//	    protected TypePARTYID supplieridref;
-//	    protected List<AGREEMENTDESCR> agreementdescr;
-//	    protected MIMEINFO mimeinfo;
-//	    protected String type;
-//	    protected String _default;
-
-//	protected CATALOGREFERENCE catalogreference;
-
-		
-//	    "orderinfo" : required
-		
 		orderInfo = orderHeader.createOrderInfo();
-//		applicableHeaderTradeDelivery = supplyChainTradeTransaction.createtHeaderTradeDelivery();
-//		applicableHeaderTradeSettlement = supplyChainTradeTransaction.createtHeaderTradeSettlement();
-//		if(super.getSupplyChainTradeTransaction()==null) {
-//			super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
-//			supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(applicableHeaderTradeAgreement);
-//			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
-//			supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
-//		}
-
 	}
 
+	private Order(String profile, String processType, DocumentNameCode documentNameCode) {
+		// alle 3 param nicht in OT
+		// profile, aka Customization, BG-2.BT-24
+		// processType, BG-2.BT-23
+		// documentNameCode, BT-3 get liefert Order
+		this(null);
+	}
+
+	// 9: Order number BT-1 Identifier (mandatory) - A unique identification of the Order.
 	@Override
-	public CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setId(String id) {
+		orderInfo.setId(id);
 	}
+	@Override
+	public String getId() {
+		return orderInfo.getId();
+	}
+
+	/* 14: Document issue date, BT-2  Date (mandatory) 
+	 * Das Datum, an dem der Beleg ausgestellt wurde.
+	 */
+	@Override
+	public void setIssueDate(Timestamp timestamp) {
+		// in <ORDER_INFO> : <ORDER_DATE>2009-05-13T06:20:00+01:00</ORDER_DATE>
+		orderInfo.setIssueDate(timestamp);
+	}
+	@Override
+	public Timestamp getIssueDateAsTimestamp() {
+		return orderInfo.getIssueDateAsTimestamp();
+	}
+
+	// 11: BT-3 The Document TypeCode
+	@Override
+	public DocumentNameCode getDocumentCode() {
+		return DocumentNameCode.Order;
+	}
+
 
 	// BG-1
 	@Override
@@ -147,6 +185,7 @@ public class Order extends ORDER implements CoreOrder {
 		return orderInfo.getSeller();
 	}
 
+	// 390: BG-7 1..1 BUYER @see BG7_Buyer
 	@Override
 	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		// TODO Auto-generated method stub	
@@ -163,28 +202,28 @@ public class Order extends ORDER implements CoreOrder {
 	}
 
 	@Override
-	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
+	public void setShipTo(String name, PostalAddress address, ContactInfo contact) {
 		// TODO Auto-generated method stub	
 	}
 	@Override
-	public void setShipToParty(BusinessParty party) {
+	public void setShipTo(BusinessParty party) {
 		// TODO Auto-generated method stub	
 	}
 	@Override
-	public BusinessParty getShipToParty() {
+	public BusinessParty getShipTo() {
 		return orderInfo.getShipToParty();
 	}
 
 	@Override
-	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
+	public void setShipFrom(String name, PostalAddress address, ContactInfo contact) {
 		// TODO Auto-generated method stub		
 	}
 	@Override
-	public void setShipFromParty(BusinessParty party) {
+	public void setShipFrom(BusinessParty party) {
 		// TODO Auto-generated method stub	
 	}
 	@Override
-	public BusinessParty getShipFromParty() {
+	public BusinessParty getShipFrom() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -255,6 +294,15 @@ public class Order extends ORDER implements CoreOrder {
 	@Override
 	public IAmount getLineNetTotal() {
 		return super.getORDERSUMMARY()==null ? null : Amount.create(getORDERSUMMARY().getTOTALAMOUNT());
+//		if(ot instanceof ORDER) {
+//			return ((ORDER)ot).getORDERSUMMARY()==null ? null 
+//				: Amount.create(((ORDER)ot).getORDERSUMMARY().getTOTALAMOUNT());
+//		}
+//		if(ot instanceof ORDERRESPONSE) {
+//			return ((ORDERRESPONSE)ot).getORDERRESPONSESUMMARY()==null ? null 
+//				: Amount.create(((ORDERRESPONSE)ot).getORDERRESPONSESUMMARY().getTOTALAMOUNT());
+//		}
+//		return null;
 	}
 
 	@Override
@@ -305,7 +353,7 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
-	// BG-25 1..n ORDER LINE
+	// 33: BG-25 1..n ORDER LINE
 	@Override
 	public List<OrderLine> getLines() {
 		List<ORDERITEM> lines = super.getORDERITEMLIST().getORDERITEM();
@@ -320,7 +368,6 @@ public class Order extends ORDER implements CoreOrder {
 			String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
 		return OrderItem.create(this, id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
 	}
-
 	@Override
 	public void addLine(OrderLine line) {
 //		this.supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add((SupplyChainTradeLineItem)line);
@@ -346,30 +393,7 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
-	// Order number BT-1 Identifier (mandatory) - A unique identification of the Order.
-	@Override
-	public void setId(String id) {
-		orderInfo.setId(id);
-	}
-	@Override
-	public String getId() {
-		return orderInfo.getId();
-	}
-
-	/* Document issue date, BT-2  Date (mandatory) 
-	 * Das Datum, an dem der Beleg ausgestellt wurde.
-	 */
-	@Override
-	public void setIssueDate(Timestamp timestamp) {
-		// in <ORDER_INFO> : <ORDER_DATE>2009-05-13T06:20:00+01:00</ORDER_DATE>
-		orderInfo.setIssueDate(timestamp);
-	}
-	@Override
-	public Timestamp getIssueDateAsTimestamp() {
-		return orderInfo.getIssueDateAsTimestamp();
-	}
-
-	// BG-14 0..1 DELIVERY DATE
+	// 767: BG-14 0..1 DELIVERY DATE
 	@Override
 	public void setDeliveryDate(Timestamp timestamp) {
 		orderInfo.setDeliveryDate(timestamp);
@@ -392,13 +416,7 @@ public class Order extends ORDER implements CoreOrder {
 		return orderInfo.getDeliveryPeriod();
 	}
 
-	@Override
-	public DocumentNameCode getDocumentCode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	// BT-5 + 1..1 Invoice currency code
+	// 790: BT-5 1..1 Document currency code
 	@Override
 	public void setDocumentCurrency(String isoCurrencyCode) {
 		orderInfo.setDocumentCurrency(isoCurrencyCode);
