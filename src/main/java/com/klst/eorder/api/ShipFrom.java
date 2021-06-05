@@ -6,8 +6,8 @@ import com.klst.edoc.api.PostalAddress;
 
 public interface ShipFrom {
 
-	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact);
-	public void setShipFromParty(BusinessParty party);
-	public BusinessParty getShipFromParty();
+	public void setShipFrom(String name, PostalAddress address, ContactInfo contact);
+	public void setShipFrom(BusinessParty party);
+	public BusinessParty getShipFrom();
 
 }

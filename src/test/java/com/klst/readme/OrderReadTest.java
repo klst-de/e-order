@@ -109,8 +109,8 @@ public class OrderReadTest {
 		
 		BusinessParty seller = cio.getSeller();
 		BusinessParty buyer = cio.getBuyer();
-		BusinessParty shipToParty = cio.getShipToParty();
-		BusinessParty shipFromParty = cio.getShipFromParty();
+		BusinessParty shipToParty = cio.getShipTo();
+		BusinessParty shipFromParty = cio.getShipFrom();
 		LOG.info("Seller:"+seller);
 		LOG.info("Buyer:"+buyer);
 		

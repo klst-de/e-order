@@ -506,32 +506,32 @@ public class CrossIndustryOrder extends SCRDMCCBDACIOMessageStructureType implem
 
 	// 643: ShipToParty @see ShipTo
 	@Override
-	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
+	public void setShipTo(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact);
-		setShipToParty(party);
+		setShipTo(party);
 	}
 	@Override
-	public void setShipToParty(BusinessParty party) {
-		applicableHeaderTradeDelivery.setShipToParty(party);
+	public void setShipTo(BusinessParty party) {
+		applicableHeaderTradeDelivery.setShipTo(party);
 	}
 	@Override
-	public BusinessParty getShipToParty() {
-		return applicableHeaderTradeDelivery.getShipToParty();
+	public BusinessParty getShipTo() {
+		return applicableHeaderTradeDelivery.getShipTo();
 	}
 
 	// 725: ShipFromParty @see ShipFrom
 	@Override
-	public void setShipFromParty(String name, PostalAddress address, ContactInfo contact) {
+	public void setShipFrom(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact);
-		setShipFromParty(party);
+		setShipFrom(party);
 	}
 	@Override
-	public void setShipFromParty(BusinessParty party) {
-		applicableHeaderTradeDelivery.setShipFromParty(party);
+	public void setShipFrom(BusinessParty party) {
+		applicableHeaderTradeDelivery.setShipFrom(party);
 	}
 	@Override
-	public BusinessParty getShipFromParty() {
-		return applicableHeaderTradeDelivery.getShipFromParty();
+	public BusinessParty getShipFrom() {
+		return applicableHeaderTradeDelivery.getShipFrom();
 	}
 
 	// 766: REQUESTED DELIVERY DATE or PERIOD

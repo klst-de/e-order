@@ -22,6 +22,7 @@ public class Constants {
 	static final String EUR = "EUR";
 	static final String C62 = "C62";
 	static final String MTK = "MTK"; // m²
+	static final String MTR = "MTR"; // m Meter
 	static final String PRD = "PRD"; // UNTDID 4451: Product information
 	// UNTDID 4343 Response type code: Acknowledge - with detail and change; Acknowledge complete including changes.
 	static final String  AC =  "AC"; // to request an Order Response
