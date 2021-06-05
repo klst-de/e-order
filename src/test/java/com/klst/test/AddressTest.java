@@ -72,14 +72,17 @@ public class AddressTest {
 
 	@Test
 	public void xcreate() {
-		Address or;
+		Address adr;
 		Address factory = Address.create();
 		LOG.info("Address factory:"+factory);
 		PostalAddress pa = factory.createAddress("CH", "8500", "Frauenfeld");
-		or = (Address)pa;
+		pa.setAddressLine1("Plica AG");
+		pa.setAddressLine2("Systeme für Elektrotechnik");
+		adr = (Address)pa;
+		adr.setStreet("Zürcherstrasse 350");
 		
 		transformer = otTransformer;
-		object = or;
+		object = adr;
 		marshal();
 	}
 
