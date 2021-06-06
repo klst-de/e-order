@@ -36,6 +36,8 @@ public class Constants {
 	// Bis 2009 hieß die GTIN noch europäische Artikelnummer EAN. 
 	// EAN und GTIN meinen also das Gleiche, es gibt aber kein ICD Schema für EAN
 	static final String EAN 		= "ean"; // used in OpenTrans
+	static final String GLN 		= "gln"; // Global Location Number used in OpenTrans
+	static final String ILN 		= "iln"; // International Location Number (alias to GLN) used in OpenTrans
 
 	class ExpectedBP {
 		Identifier id;        // BP ID aka GlobalID
@@ -46,6 +48,7 @@ public class Constants {
 		Identifier uriId;     // Uri Universal Communication
 		PostalAddress pa;
 		String al1;           // Address Line 1
+		String street;        // used in OT interface PostalAddressExt
 		ContactInfo ci;
 	}
 	class ExpectedLine {
