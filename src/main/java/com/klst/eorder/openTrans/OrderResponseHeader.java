@@ -8,19 +8,14 @@ import com.klst.eorder.api.CoreOrder;
 public class OrderResponseHeader extends ORDERRESPONSEHEADER {
 
 	// copy factory
-	static OrderResponseHeader create(ORDERRESPONSEHEADER object, CoreOrder order) {
-		OrderResponseHeader res;
+	static OrderResponseHeader create(ORDERRESPONSEHEADER object) {
 		if(object instanceof ORDERRESPONSEHEADER && object.getClass()!=ORDERRESPONSEHEADER.class) {
 			// object is instance of a subclass of ORDERRESPONSEHEADER, but not ORDERRESPONSEHEADER itself
-			res = (OrderResponseHeader)object;
+			return (OrderResponseHeader)object;
 		} else {
-			res = new OrderResponseHeader(object); 
+			return new OrderResponseHeader(object); 
 		}
-		res.order = order;
-		return res;
 	}
-
-	private CoreOrder order;
 
 	// copy ctor
 	private OrderResponseHeader(ORDERRESPONSEHEADER object) {

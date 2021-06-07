@@ -15,7 +15,6 @@ import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.TaxCategoryCode;
-import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.impl.UnitPriceAmount;
 
@@ -23,35 +22,26 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 
 	private static final Logger LOG = Logger.getLogger(OrderResponseItem.class.getName());
 	
-	static OrderResponseItem create(CoreOrder order, String id, IQuantity quantity, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
-		OrderResponseItem orderLine =  new OrderResponseItem(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent);
-		orderLine.order = order;
-		return orderLine;
+	static OrderResponseItem create(String id, IQuantity quantity, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		return new OrderResponseItem(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent);
 	}
 
 	// copy factory
-	static OrderResponseItem create(ORDERRESPONSEITEM object, CoreOrder order) {
-		OrderResponseItem res;
+	static OrderResponseItem create(ORDERRESPONSEITEM object) {
 		if(object instanceof ORDERRESPONSEITEM && object.getClass()!=ORDERRESPONSEITEM.class) {
 			// object is instance of a subclass of ORDERRESPONSEITEM, but not ORDERRESPONSEITEM itself
-			res = (OrderResponseItem)object;
+			return (OrderResponseItem)object;
 		} else {
-			res = new OrderResponseItem(object); 
+			return new OrderResponseItem(object); 
 		}
-		res.order = order;
-		return res;
 	}
 
-	private CoreOrder order; // order this orderLine belongs to
 	Productid productid;
 	Productpricefix productpricefix;
 
 	// copy ctor
 	private OrderResponseItem(ORDERRESPONSEITEM line) {
-		if(line!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, line);
-		}
-		this.order = null;
+		SCopyCtor.getInstance().invokeCopy(this, line);
 		productid = Productid.create(super.getPRODUCTID());
 		productpricefix = Productpricefix.create(super.getPRODUCTPRICEFIX());
 		LOG.config("copy ctor:"+this);

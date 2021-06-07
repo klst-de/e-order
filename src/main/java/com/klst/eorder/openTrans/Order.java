@@ -377,7 +377,7 @@ public class Order extends ORDER implements CoreOrder {
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount,
 			String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
-		return OrderItem.create(this, id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
+		return OrderItem.create(id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
 	}
 	@Override
 	public void addLine(OrderLine line) {

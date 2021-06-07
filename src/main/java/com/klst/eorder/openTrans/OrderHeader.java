@@ -10,7 +10,6 @@ import org.opentrans.xmlschema._2.ORDERHEADER;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.untdid.DateTimeFormats;
-import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.eorder.api.CoreOrder;
 
 public class OrderHeader extends ORDERHEADER {
@@ -100,11 +99,9 @@ CATALOG_REFERENCE : Referenz auf einen (elektronischen) Produktkatalog
 //	 *     if the Buyer Order Referenced Document ID (BT-13) is present, 
 //	 *     it MUST be equal to Document ID (BT-1)
 	public void setPurchaseOrderReference(String id, Timestamp ts) {
-		if(DocumentNameCode.Order==order.getDocumentCode()) {
-			if(order.getId().equals(id)) {
-				LOG.warning("BR ignored: Buyer Order Referenced Document ID "+id);
-				return;
-			}
+		if(order.getId().equals(id)) {
+			LOG.warning("BR ignored: Buyer Order Referenced Document ID "+id);
+			return;
 		}
 		addAgreement(SourcingInfoAgreement.BUYER, id, ts);
 	}

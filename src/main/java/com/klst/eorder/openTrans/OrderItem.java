@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -21,7 +23,6 @@ import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
-import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
@@ -34,73 +35,8 @@ import com.klst.eorder.impl.TradeProductInstance;
 import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.eorder.openTrans.reflection.Mapper;
 
-/*                         BG-25 + 1..n INVOICE LINE
-    "lineitemid",                BT-126 ++ 1..1 Invoice line identifier
- PRODUCTID "productid" required, BG-31               ?BT-128
-	    "supplierpid",           BG-31.BT-155 0..1 Artikelkennung des Verkäufers
-	    "supplieridref",
-	    "configcodefix",
-	    "lotnumber",
-	    "serialnumber",
-	    "internationalpid",      BG-31.BT-157 0..1 Kennung eines Artikels nach registriertem Schema
-	    "buyerpid",              BG-31.BT-156 0..1 Artikelkennung des Käufers
-	    "descriptionshort",      BG-31.BT-153      ItemName
-	    "descriptionlong",       BG-31.BT-154 0..1 Item description
-	    "manufacturerinfo",
-	    "producttype"
-    "productfeatures",
-    "productcomponents",
-    "quantity",                  BT-129 ++ 1..1 Invoiced quantity
-    "orderunit",                 BT-130 ++ 1..1 Invoiced quantity unit of measure code
- PRODUCTPRICEFIX "productpricefix",
-    "pricelineamount",           BT-131 ++ 1..1 Invoice line net amount
-    "partialshipmentallowed",
-    "deliverydate",              BG-26 ++ 0..1 LINE PERIOD mit BG-26.BT-134 + BG-26.BT-135
-    "partialdeliverylist",
-    "sourcinginfo",
-    "customerorderreference",
-    "accountinginfo",
-    "shipmentpartiesreference",
-    "transport",
-    "internationalrestrictions",
-    "specialtreatmentclass",
-    "mimeinfo",
-    "remarks",                   BT-127 ++ 0..1 Invoice line note
-    "itemudx"
-
-BT-128 ++ 0..1 Invoice line object identifier
-          0..1 Scheme identifier
-
-BT-132 ++ 0..1 Referenced purchase order line reference
-BT-133 ++ 0..1 Invoice line Buyer accounting reference
-...
-BG-27 ++ 0..n INVOICE LINE ALLOWANCES
-...
-BG-28 ++ 0..n INVOICE LINE CHARGES
-...
-BG-29 ++ 1..1 PRICE DETAILS               ------> ram:SpecifiedLineTradeAgreement 
-BT-146 +++ 1..1 Item net price                                ram:NetPriceProductTradePrice ram:ChargeAmount
-BT-147 +++ 0..1 Item price discount
-BT-148 +++ 0..1 Item gross price
-BT-149 +++ 0..1 Item price base quantity                      ram:NetPriceProductTradePrice ram:BasisQuantity
-BT-150 +++ 0..1 Item price base quantity unit of measure code ram:NetPriceProductTradePrice ram:BasisQuantity
-
-BG-30 ++ 1..1 LINE VAT INFORMATION
-...
-BG-31 ++ 1..1 ITEM INFORMATION            ------> ram:SpecifiedTradeProduct
-erl  BT-153 +++ 1..1 Artikelname
-erl  BT-154 +++ 0..1 Artikelbeschreibung
-erl  BT-155 +++ 0..1 Artikelkennung des Verkäufers
-erl  BT-156 +++ 0..1 Artikelkennung des Käufers
-erl  BT-157 +++ 0..1 Kennung eines Artikels nach registriertem Schema
-     BT-158 +++ 0..n Kennung der Artikelklassifizierung
-     BT-159 +++ 0..1 Artikelherkunftsland
-...
-BG-32 +++ 0..n ITEM ATTRIBUTES
-
- */
 /**
- * BG-25 ORDER LINE
+ * 33: BG-25 1..n ORDER LINE
  * <p>
  * A group of business terms providing information on individual order line.
  * <p>
@@ -110,42 +46,32 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
-		return create(this.order, id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
+		return create(id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
 	}
 
-	static OrderItem create(CoreOrder order, String id, IQuantity quantity, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+	static OrderItem create(String id, IQuantity quantity, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
 		OrderItem orderLine =  new OrderItem(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent);
-		orderLine.order = order;
 		return orderLine;
 	}
 
 	// copy factory
 	static OrderItem create(ORDERITEM object, CoreOrder order) {
-		OrderItem res;
 		if(object instanceof ORDERITEM && object.getClass()!=ORDERITEM.class) {
 			// object is instance of a subclass of ORDERITEM, but not ORDERITEM itself
-			res = (OrderItem)object;
+			return (OrderItem)object;
 		} else {
-			res = new OrderItem(object); 
+			return new OrderItem(object); 
 		}
-		res.order = order;
-		return res;
 	}
 
 	private static final Logger LOG = Logger.getLogger(OrderItem.class.getName());
 
-	private CoreOrder order; // order this orderLine belongs to
-//	OrderHeader orderHeader;
 	Productid productid;
 	Productpricefix productpricefix;
 	
 	// copy ctor
 	private OrderItem(ORDERITEM line) {
-		super();
-		if(line!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, line);
-		}
-		this.order = null;
+		SCopyCtor.getInstance().invokeCopy(this, line);
 		productid = Productid.create(super.getPRODUCTID());
 		productpricefix = Productpricefix.create(super.getPRODUCTPRICEFIX());
 		LOG.config("copy ctor:"+this);
@@ -184,12 +110,23 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	}
 
 	// 35: BG-25.BT-126 1..1
+	// interface java.util.function.Function<T,R>
+	// interface java.util.function.BiFunction<T,U,R>
+	private BiFunction<ORDERITEM, String, ORDERITEM> setLineItemID = (ORDERITEM i, String s) -> {
+		i.setLINEITEMID(s);
+		return i;
+	};
+	private Function<ORDERITEM, String> getLineItemID = (ORDERITEM s) -> {
+		return s.getLINEITEMID();
+	};
 	void setId(String id) {
-		super.setLINEITEMID(id);
+		setLineItemID.apply(this, id);
+//		super.setLINEITEMID(id);
 	}
 	@Override
 	public String getId() {
-		return super.getLINEITEMID();
+		return getLineItemID.apply(this);
+//		return super.getLINEITEMID();
 	}
 
 	// 210: BT-129 1..1 bestellte Menge / The quantity, at line level, requested for this trade delivery.
@@ -225,12 +162,7 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	}
 	@Override
 	public void setStatus(String status) {
-		// TODO order.getDocumentCode() nicht implementiert
-		if(this.order.getDocumentCode()==DocumentNameCode.Order) {
-			LOG.warning(WARN_ORDERLINEID + "ignore status:'"+status+"'.");
-			return;
-		}
-		// TODO Auto-generated method stub		
+		LOG.warning(WARN_ORDERLINEID + "ignore status:'"+status+"'.");
 	}
 	
 	// 37: BT-127 0..1/n Freitext zur Rechnungsposition : ram:IncludedNote

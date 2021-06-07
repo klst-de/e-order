@@ -79,7 +79,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 //		LOG.info("Version:"+doc.getVersion());
 		SCopyCtor.getInstance().invokeCopy(this, doc);
 		
-		orderHeader = OrderResponseHeader.create(super.getORDERRESPONSEHEADER(), this);
+		orderHeader = OrderResponseHeader.create(super.getORDERRESPONSEHEADER());
 		orderInfo = orderHeader.createOrderResponseInfo();
 	}
 	private OrderResponse(String profile, String processType, DocumentNameCode documentNameCode) {
@@ -90,7 +90,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		super();
 		LOG.info("Version:"+super.getVersion());
 		setVersion("2.1"); // required
-		orderHeader = OrderResponseHeader.create(super.getORDERRESPONSEHEADER(), this);
+		orderHeader = OrderResponseHeader.create(super.getORDERRESPONSEHEADER());
 		super.setORDERRESPONSEHEADER(orderHeader);
 		orderInfo = orderHeader.createOrderResponseInfo();
 		orderHeader.setORDERRESPONSEINFO(orderInfo);
@@ -145,14 +145,14 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		List<ORDERRESPONSEITEM> lines = super.getORDERRESPONSEITEMLIST().getORDERRESPONSEITEM();
 		List<OrderLine> resultLines = new ArrayList<OrderLine>(lines.size());
 		lines.forEach(line -> {
-			resultLines.add(OrderResponseItem.create(line, this));
+			resultLines.add(OrderResponseItem.create(line));
 		});
 		return resultLines;
 	}
 	@Override
 	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount,
 			String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
-		return OrderResponseItem.create(this, id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
+		return OrderResponseItem.create(id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
 	}
 	@Override
 	public void addLine(OrderLine line) {
