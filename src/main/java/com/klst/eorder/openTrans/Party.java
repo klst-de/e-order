@@ -369,7 +369,7 @@ BT-34 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des 
 		LOG.warning("not defined");
 	}
 
-	// BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
+	// BT-34 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des Verkäufers
 	@Override
 	public Identifier getUriUniversalCommunication() {
 		Address address = (Address)getAddress();
@@ -380,11 +380,8 @@ BT-34 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des 
 	@Override
 	public void setUriUniversalCommunication(String name, String schemeID) {
 		if(name==null) return;
-		// TODO
-//		if(super.getURIUniversalCommunication()==null) {
-//			setURIUniversalCommunication(new UniversalCommunicationType());
-//		}
-//		getURIUniversalCommunication().setURIID(new ID(name, schemeID));
+		Address address = (Address)getAddress();
+		address.setURL(name);
 	}
 
 }
