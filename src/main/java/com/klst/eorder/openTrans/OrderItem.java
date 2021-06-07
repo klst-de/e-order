@@ -501,7 +501,8 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	}
 	@Override
 	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-		Mapper.set(getPRODUCTPRICEFIX(), "pricequantity", basisQuantity);
+//		Mapper.set(getPRODUCTPRICEFIX(), "pricequantity", basisQuantity); // BUG
+		productpricefix.setUnitPriceQuantity(basisQuantity);
 	}
 	
 //	158 SCT_LINE_TA COMFORT	  (Gross Price)
@@ -708,7 +709,6 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	}
 	@Override
 	public TaxCategoryCode getTaxCategory() {
-		// delegieren:
 		return productpricefix.getTaxCategory();
 	}
 
@@ -725,10 +725,12 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 
 
 	// --------------------------- CIO only:
+	// 208: 0..1
 	@Override
 	public void setPartialDeliveryIndicator(boolean indicator) {
-//		super.setPARTIALSHIPMENTALLOWED(String    TRUE ); TODO
-//		Mapper.set(getSpecifiedLineTradeDelivery(), "partialDeliveryAllowedIndicator", indicator);		
+		if(indicator) {
+			setPARTIALSHIPMENTALLOWED("TRUE");
+		}
 	}
 	@Override
 	public boolean isPartialDeliveryAllowed() {
@@ -809,29 +811,27 @@ Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die 
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
 			Timestamp ts, String uri) {
-		ReferencedDocument rd = ReferencedDocument.create(docRefId, lineId, description);
-		rd.setDate(ts);
-//		return ReferencedDocument.create(docRefId, lineId, description);
-		return rd;
+		return CustomerOrderReference.create(docRefId, lineId, description, ts);
 	}
 
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
 			Timestamp ts, byte[] content, String mimeCode, String filename) {
-		// TODO Auto-generated method stub
-		return null;
+		return CustomerOrderReference.create(docRefId, lineId, description, ts);
 	}
 
 	@Override
 	public void addReferencedDocument(SupportingDocument supportigDocument) {
-		// TODO Auto-generated method stub
-		
+		super.getCUSTOMERORDERREFERENCE().add((CustomerOrderReference)supportigDocument);		
 	}
 
 	@Override
 	public List<SupportingDocument> getReferencedDocuments() {
-		// TODO Auto-generated method stub
-		return null;
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
+		super.getCUSTOMERORDERREFERENCE().forEach(cor -> {
+			res.add( CustomerOrderReference.create(cor) );
+		});
+		return res;
 	}
 
 	@Override
