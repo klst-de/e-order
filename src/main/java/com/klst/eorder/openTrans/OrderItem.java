@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.COSTCATEGORYID;
@@ -725,16 +726,20 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 
 	// --------------------------- CIO only:
 	// 208: 0..1
+	static final String TRUE = Boolean.TRUE.toString().toUpperCase();
+	// funktonal:
+	private Predicate<String> isTRUE = indicator -> {
+		return indicator!=null && indicator.equals(TRUE);
+	};
+	@Override
+	public boolean isPartialDeliveryAllowed() {
+		return isTRUE.test(super.getPARTIALSHIPMENTALLOWED());
+	}
 	@Override
 	public void setPartialDeliveryIndicator(boolean indicator) {
 		if(indicator) {
-			setPARTIALSHIPMENTALLOWED("TRUE");
+			setPARTIALSHIPMENTALLOWED(TRUE);
 		}
-	}
-	@Override
-	public boolean isPartialDeliveryAllowed() {
-		String indicator = super.getPARTIALSHIPMENTALLOWED();
-		return indicator!=null && indicator.equals("TRUE");
 	}
 
 	@Override
