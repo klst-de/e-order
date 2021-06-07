@@ -19,6 +19,22 @@ import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.TradeProductInstance;
 
+/* Vergleich fields in
+class ORDERITEMLIST {
+    protected List<ORDERITEM> orderitem;
+class ORDERCHANGEITEMLIST:
+    protected List<ORDERITEM> orderitem;
+==> sind gleich. Also nur Vergleich fields in
+
+ORDERRESPONSEITEM ist Untermenge von ORDERITEM, denn:
+ORDERITEM						ORDERRESPONSEITEM
+ String partialshipmentallowed; fehlt
+ SOURCINGINFO sourcinginfo;     fehlt ...
+ List<CUSTOMERORDERREFERENCE> customerorderreference;
+ ACCOUNTINGINFO accountinginfo;
+ TRANSPORT transport;
+ List<INTERNATIONALRESTRICTIONS> internationalrestrictions;
+ */
 public interface DefaultOrderLine extends OrderLine {
 
 	@Override
