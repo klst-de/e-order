@@ -113,18 +113,18 @@ public class PLD_257444 extends Constants {
 
 	static final String ORDER_ID = "PLEX-141269";
 	static final Timestamp issueDate = Timestamp.valueOf("2020-01-22"+_HMS);
-	private void doAssert(CoreOrder cio) {
-//		assertFalse(cio.isTest());                                           // 2
-//		assertEquals(BG2_ProcessControl.PROFILE_BASIC, cio.getProfile());    // 7
+	private void doAssert(CoreOrder co) {
+//		assertFalse(co.isTest());                                           // 2
+//		assertEquals(BG2_ProcessControl.PROFILE_BASIC, co.getProfile());    // 7
 // keine Methode für <GENERATION_DATE>2020-01-22T07:35:18.6258</GENERATION_DATE>
-		assertEquals(ORDER_ID, cio.getId());                                 // 9: BT-1
-		assertEquals(DocumentNameCode.Order, cio.getDocumentCode());         // 11
-		assertEquals(issueDate, cio.getIssueDateAsTimestamp());              // 14
-//		assertFalse(cio.isCopy());
-//		assertEquals(MessageFunctionEnum.Original, cio.getPurposeCode());    // 19
-//		assertEquals(AC, cio.getRequestedResponse());                        // 20
+		assertEquals(ORDER_ID, co.getId());                                 // 9: BT-1
+		assertEquals(DocumentNameCode.Order, co.getDocumentCode());         // 11
+		assertEquals(issueDate, co.getIssueDateAsTimestamp());              // 14
+//		assertFalse(co.isCopy());
+//		assertEquals(MessageFunctionEnum.Original, co.getPurposeCode());    // 19
+//		assertEquals(AC, co.getRequestedResponse());                        // 20
 //		
-		List<OrderLine> ol = cio.getLines();
+		List<OrderLine> ol = co.getLines();
 		//assertEquals(11, ol.size());
 		
 		ArrayList<ExpectedLine> exp = expected();
@@ -172,8 +172,8 @@ public class PLD_257444 extends Constants {
 			assertEquals(e.sdts, sd.getDateAsTimestamp());		
 		}
 		
-		BusinessParty seller = cio.getSeller(); // 345
-		LOG.info("seller:"+seller + ", BuyerReferenceValue="+cio.getBuyerReferenceValue());
+		BusinessParty seller = co.getSeller(); // 345
+		LOG.info("seller:"+seller + ", BuyerReferenceValue="+co.getBuyerReferenceValue());
 		ExpectedBP expSeller = expectedSeller();
 		assertEquals(expSeller.id.toString(), seller.getIdentifier().toString());
 		if(expSeller.companyId==null) {
@@ -196,7 +196,7 @@ public class PLD_257444 extends Constants {
 			assertEquals(expSeller.ci.toString(), seller.getBPContact().toString());
 		}
 		
-		BusinessParty buyer = cio.getBuyer(); // 390
+		BusinessParty buyer = co.getBuyer(); // 390
 		LOG.info("buyer:"+buyer);
 		ExpectedBP expBuyer = expectedBuyer();
 		assertEquals(expBuyer.id.toString(), buyer.getIdentifier().toString());
@@ -220,7 +220,7 @@ public class PLD_257444 extends Constants {
 			assertEquals(expBuyer.ci.toString(), buyer.getBPContact().toString());
 		}
 		
-		BusinessParty billTo = cio.getBillTo(); // invoice_recipient
+		BusinessParty billTo = co.getBillTo(); // invoice_recipient
 		LOG.info("billTo:"+billTo);
 		ExpectedBP expBillTo = expectedBillTo();
 		assertEquals(expBillTo.id.toString(), billTo.getIdentifier().toString());
@@ -247,7 +247,7 @@ public class PLD_257444 extends Constants {
 		}
 		
 		// Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
-		BusinessParty shipTo = cio.getShipTo();
+		BusinessParty shipTo = co.getShipTo();
 		LOG.info("shipTo:"+shipTo);
 		ExpectedBP expShipTo = expectedShipTo();
 		assertEquals(expShipTo.id.toString(), shipTo.getIdentifier().toString());
@@ -272,7 +272,8 @@ public class PLD_257444 extends Constants {
 		} else {
 			assertEquals(expShipTo.ci.toString(), shipTo.getBPContact().toString());
 		}
-
+		
+		assertEquals(EUR, co.getDocumentCurrency()); // 790: BT-5, in OT optional
 	}
 	
 	@Test
@@ -415,7 +416,8 @@ public class PLD_257444 extends Constants {
 		or.setIssueDate(issueDate);                              // 14: BT-2
 //		order.setCopyIndicator(!CoreOrder.COPY);                 // 16:
 		
-//		<bmecat:LANGUAGE default="true">fra</bmecat:LANGUAGE> <!-- TODO type
+//		<bmecat:LANGUAGE default="true">fra</bmecat:LANGUAGE> <!-- with type
+// In OT ISO 639-2 alpha-3 code, in CIO/order-x ISO 639-1: de, en, es, ...
 		or.addLanguage("fra");                                   // 18:
 		
 //		order.setPurpose(MessageFunctionEnum.Original);          // 19: defined in UNTDID 1225
@@ -500,7 +502,7 @@ public class PLD_257444 extends Constants {
 		billTo.setUriUniversalCommunication("www.plica.ch", null);
 		or.setBillTo(billTo);
 
-		or.setDocumentCurrency("CHF");             // 790:
+		or.setDocumentCurrency(EUR);             // 790: BT-5, in OT optional
 		
 		or.createTotals(new Amount(new BigDecimal(1259.65)) // Sum of line net amount
 		, new Amount(new BigDecimal(1259.65)) // total amount without VAT, aka Tax Basis

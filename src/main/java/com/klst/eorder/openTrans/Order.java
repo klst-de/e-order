@@ -612,13 +612,14 @@ public class Order extends ORDER implements CoreOrder {
 		return false;
 	}
 
+	// 18: In OT ISO 639-2 alpha-3 code, in CIO/order-x ISO 639-1: de, en, es, ...
 	@Override
 	public void addLanguage(String id) {
 		LANGUAGE language = new LANGUAGE();
 		language.setValue(DtLANG.fromValue(id));
+		language.setDefault("TRUE");
 		orderInfo.getLANGUAGE().add(language);
 	}
-
 	@Override
 	public List<String> getLanguage() {
 		List<String> res = new ArrayList<String>();

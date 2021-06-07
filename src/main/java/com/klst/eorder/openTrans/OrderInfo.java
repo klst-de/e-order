@@ -374,7 +374,8 @@ Beispiele:
 		super.getPARTIES().getPARTY().add((Party)party);
 	}
 
-	// 790: BT-5 1..1 Document currency code
+	// 790: BT-5 1..1 Document currency code, in OT optional
+	// Währung als Vorgabewert für alle Preisangaben im Dokument
 	void setDocumentCurrency(String isoCurrencyCode) {
 		super.setCURRENCY(DtCURRENCIES.fromValue(isoCurrencyCode)); // enum DtCURRENCIES value
 	}

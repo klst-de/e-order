@@ -11,8 +11,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +32,12 @@ import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.Amount;               // impl.jar
 import com.klst.eorder.impl.ID;
 import com.klst.eorder.impl.Quantity;
-import com.klst.eorder.impl.TradeAddress;
 import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
+import com.klst.eorder.openTrans.Address;
 import com.klst.eorder.openTrans.OrderResponse;
 import com.klst.eorder.openTrans.PartyID;
 import com.klst.marshaller.OpenTransOrderResponseTransformer;
+import com.klst.test.CommonUtils;
 
 public class PLD_1051712 extends Constants {
 	
@@ -78,19 +77,13 @@ public class PLD_1051712 extends Constants {
 	   	object = null;
     }
 
-	private File getTestFile(String uri) {
-		File file = new File(uri);
-		LOG.info("test file "+file.getAbsolutePath() + " canRead:"+file.canRead());
-		return file;
-	}
-
 	private CoreOrder unmarshal(File testFile) {
 		try {
 			InputStream is = new FileInputStream(testFile);
 			object = transformer.unmarshal(is);
 			LOG.info("unmarshaled object:"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.OpenTransOrderResponseTransformer.CONTENT_TYPE_NAME); // OT aus jar laden
-			// dynamisch, dazu muss der public ctor: public OrderResponse(ORDERRESPONSE doc):
+			// dynamisch, dazu muss der ctor public sein: public OrderResponse(ORDERRESPONSE doc):
 			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -99,19 +92,6 @@ public class PLD_1051712 extends Constants {
 		return null;
 	}
 
-	private File xmlToTempFile(String filename, byte[] xml) {
-		try {
-			Path temp = Files.createTempFile(filename, XML_SUFFIX); // throws IOException
-			Files.write(temp, xml); // throws IOException
-			LOG.info("written to "+temp);
-			return getTestFile(temp.toString());
-		} catch (IOException e) {
-			e.printStackTrace();
-			LOG.warning("write to "+filename + " : "+e);
-		}
-		return null;
-	}
-	
 	private void marshal(String filename) {
 		LOG.info("object.Class:"+object.getClass());
 		
@@ -120,7 +100,7 @@ public class PLD_1051712 extends Constants {
 		
 		if(filename==null) return;
 		
-		File testFile = xmlToTempFile(filename, xml);
+		File testFile = CommonUtils.xmlToTempFile(filename, xml);
 		CoreOrder co = null;
 		// unmarshal the result file testFile and perform assertions:
 		if(transformer.isValid(testFile)) {
@@ -175,7 +155,7 @@ public class PLD_1051712 extends Constants {
 		}
 		
 		BusinessParty seller = cio.getSeller(); // 345
-		LOG.info("seller:"+seller);
+		LOG.info("seller:"+seller + ", BuyerReferenceValue="+cio.getBuyerReferenceValue());
 		ExpectedBP expSeller = expectedSeller();
 		assertEquals(expSeller.id.toString(), seller.getIdentifier().toString());
 		if(expSeller.companyId==null) {
@@ -279,13 +259,13 @@ public class PLD_1051712 extends Constants {
 	
 	@Test
     public void readFile() {
-		File testFile = getTestFile(TESTDIR+"PLD_1051712_OrderResponse_example.XML");
+		File testFile = CommonUtils.getTestFile(TESTDIR+"PLD_1051712_OrderResponse_example.XML");
 		transformer = otTransformer;
 		CoreOrder co = null;
 		// unmarshal toModel:
 		if(transformer.isValid(testFile)) {
 			co = unmarshal(testFile);
-			LOG.info("cio:"+co);
+			LOG.info("CoreOrder co:"+co);
 			doAssert(co);
 		} else {
 			LOG.severe("not valid: "+testFile);
@@ -295,12 +275,12 @@ public class PLD_1051712 extends Constants {
 
 	ExpectedBP expectedBuyer() {
 		ExpectedBP bp = new ExpectedBP();
-		bp.id = new PartyID("7611007000004", "iln");
+		bp.id = new PartyID("7611007000004", ILN);
 		bp.al1 = "Adi A. Dassler AG";
 		bp.bpn = bp.al1;
 		
-		bp.pa = TradeAddress.create().createAddress("CH", "8957", "Spreitenbach");		
-//		bp.street = "Zum breiten Streifen 8";
+		bp.pa = Address.create().createAddress("CH", "8957", "Spreitenbach");		
+		bp.street = "Zum breiten Streifen 8";
 		return bp;
 	}
 	ExpectedBP expectedShipTo() {
@@ -308,25 +288,22 @@ public class PLD_1051712 extends Constants {
 	}
 	ExpectedBP expectedBillTo() {
 		ExpectedBP bp = new ExpectedBP();
-		bp.id = new PartyID("7611007000004", "iln");
+		bp.id = new PartyID("7611007000004", ILN);
 		bp.al1 = "A. Steffen AG";
 		bp.bpn = bp.al1;
 		
-		bp.pa = TradeAddress.create().createAddress("CH", "8957", "Spreitenbach");		
-//		bp.street = "Limmatstrasse 8";
+		bp.pa = Address.create().createAddress("CH", "8957", "Spreitenbach");		
+		bp.street = "Limmatstrasse 8";
 		return bp;
 	}
 	ExpectedBP expectedSeller() {
 		ExpectedBP bp = new ExpectedBP();
-		bp.id = new PartyID("7611577000008", "iln");
+		bp.id = new PartyID("7611577000008", ILN);
 		bp.al1 = "Plica AG";
 		bp.bpn = bp.al1;
 		
-		bp.pa = TradeAddress.create().createAddress("CH", "8500", "Frauenfeld");
-//		bp.street = "Zürcherstrasse 350";
-		// im orig.Beispiel ist
-		// 						<bmecat:COUNTRY>CH</bmecat:COUNTRY>
-		// und nicht	  <bmecat:COUNTRY_CODED>CH</bmecat:COUNTRY_CODED>
+		bp.pa = Address.create().createAddress("CH", "8500", "Frauenfeld");
+		bp.street = "Zürcherstrasse 350";
 		return bp;
 	}
 	
@@ -351,17 +328,15 @@ public class PLD_1051712 extends Constants {
 	@Test
 	public void xcreate() {
 		CoreOrder or;
-//		OrderResponse factory = OrderResponse.create();
-//		LOG.info("OrderResponse factory:"+factory);
-//		or = factory.createOrder("?", DocumentNameCode.OrderResponse);
 		or = OrderResponse.create().createOrder("???", DocumentNameCode.OrderResponse);
-		or.setTestIndicator(CoreOrder.PROD);                    // 2:
-		or.setId("180008092");                                  // 9: BT-1 Identifier (mandatory)
-		or.setIssueDate(DateTimeFormats.ymdToTs("2018-06-21")); // 14: BT-2
+		or.setTestIndicator(CoreOrder.PROD);                     // 2: ignored in OT
+		or.setId("180008092");                                   // 9: BT-1 Identifier (mandatory)
+		or.setIssueDate(DateTimeFormats.ymdToTs("2018-06-21"));  // 14: BT-2
 		// liefert <ORDERRESPONSE_DATE>2018-06-21T00:00:00+02:00<
 //		order.setCopyIndicator(!CoreOrder.COPY);                 // 16:
 //		order.setPurpose(MessageFunctionEnum.Original);          // 19: defined in UNTDID 1225
 //		order.setRequestedResponse("AC");                        // 20: defined in UNTDID 4343
+//		or.addNote("type aka subjectCode", "String content");    // 21
 		or.setDeliveryDate("2018-06-26");
 		
 		ExpectedLine line = expected().get(0);
@@ -382,7 +357,7 @@ public class PLD_1051712 extends Constants {
 		PostalAddress sellerAddress = or.createAddress("CH", "8500", "Frauenfeld");
 		sellerAddress.setAddressLine1(expectedSeller().al1);
 		BusinessParty seller = or.createParty(null, sellerAddress.getAddressLine1(), sellerAddress, null);
-		seller.setId("7611577000008", "iln");
+		seller.setId("7611577000008", ILN);
 //		seller.setVATRegistrationId("CHE-103.663.775 MWST");
 		or.setSeller(seller);
 //		or.setSeller(expectedSeller().al1, sellerAddress, null, "7611577000008", null);
@@ -391,19 +366,19 @@ public class PLD_1051712 extends Constants {
 		PostalAddress buyerAddress = or.createAddress("CH", "8957", "Spreitenbach");
 		buyerAddress.setAddressLine1(expectedBuyer().al1);
 		BusinessParty buyer = or.createParty(null, buyerAddress.getAddressLine1(), buyerAddress, null);
-		buyer.setId("7611007000004", "iln");
+		buyer.setId("7611007000004", ILN);
 		or.setBuyer(buyer);
 		
 		PostalAddress shipToAddress = or.createAddress("CH", "8957", "Spreitenbach");
 		shipToAddress.setAddressLine1(expectedShipTo().al1);
 		BusinessParty shipTo = or.createParty(null, shipToAddress.getAddressLine1(), shipToAddress, null);
-		shipTo.setId("7611007000004", "iln");
+		shipTo.setId("7611007000004", ILN);
 		or.setShipTo(shipTo);
 		
 		PostalAddress billToAddress = or.createAddress("CH", "8957", "Spreitenbach");
 		billToAddress.setAddressLine1(expectedBillTo().al1);
 		BusinessParty billTo = or.createParty(null, billToAddress.getAddressLine1(), billToAddress, null);
-		billTo.setId("7611007000004", "iln");
+		billTo.setId("7611007000004", ILN);
 		or.setBillTo(billTo);
 
 		or.setDocumentCurrency("CHF");             // 790:
