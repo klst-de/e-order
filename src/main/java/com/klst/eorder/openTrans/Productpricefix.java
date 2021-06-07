@@ -239,10 +239,22 @@ public class ALLOWORCHARGESFIX {
 	// BG-30.BT-151 1..1 item VAT category code
 	@Override
 	public void setTaxCategory(TaxCategoryCode codeEnum) {
+		if(codeEnum==null) return;
 		// public List<TAXDETAILSFIX> getTAXDETAILSFIX()
 		// TODO ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate);
-
-		
+		TAXDETAILSFIX tdf = new TAXDETAILSFIX();
+		tdf.setTAXTYPE("vat"); // default
+		switch(codeEnum) {
+		case StandardRate :
+			tdf.setTAXCATEGORY("standard_rate");
+			break;
+		case ExemptFromTax :
+			tdf.setTAXCATEGORY("exemption");
+			break;
+		default:
+			LOG.warning("not defined for TaxCategoryCode:"+codeEnum);
+		}
+		super.getTAXDETAILSFIX().add(tdf);
 	}
 	
 	private TAXDETAILSFIX getVatDatails() {
@@ -272,9 +284,9 @@ public class ALLOWORCHARGESFIX {
 	 * https://ec.europa.eu/taxation_customs/sites/taxation/files/resources/documents/taxation/vat/how_vat_works/rates/vat_rates_en.pdf
 	 * 
 	 * Vordefinierte Werte für das Element TAX_CATEGORY:
-Steuerbefreit           : exemption Das Produkt ist von der Steuer befreit.
-Zwischensatz            : parking_rate Auf das Produkt ist ein Zwischensatz anzuwenden.
-Ermäßigter Satz         : reduced_rate Auf das Produkt ist ein reduzierter Steuersatz anzuwenden.
+Steuerbefreit           : exemption     Das Produkt ist von der Steuer befreit.
+Zwischensatz            : parking_rate  Auf das Produkt ist ein Zwischensatz anzuwenden.
+Ermäßigter Satz         : reduced_rate  Auf das Produkt ist ein reduzierter Steuersatz anzuwenden.
 Normalsatz              : standard_rate Auf das Produkt ist der normale Steuersatz anzuwenden.
 Stark ermäßigter Satz   : super_reduced_rate Auf das Produkt ist ein stark ermäßigter Steuersatz anzuwenden.
 Nullsatz                : zero_rate Auf das Produkt ist der Nullsatz anzuwenden.

@@ -1,6 +1,7 @@
 package com.klst.eorder.openTrans;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,8 @@ import org.bmecat.bmecat._2005.DtLANG;
 import org.bmecat.bmecat._2005.LANGUAGE;
 import org.opentrans.xmlschema._2.ORDER;
 import org.opentrans.xmlschema._2.ORDERITEM;
+import org.opentrans.xmlschema._2.ORDERITEMLIST;
+import org.opentrans.xmlschema._2.ORDERSUMMARY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
@@ -64,12 +67,9 @@ public class Order extends ORDER implements CoreOrder {
 	private static final Logger LOG = Logger.getLogger(Order.class.getName());
 
 	// factory
-// ???	public static CoreOrder getFactory() {
-	// factory
-	static Order create() {
-		return new Order(null); 
+	public static Order create() {
+		return create((ORDER)null);
 	}
-	
 	// copy factory
 	static Order create(ORDER object) {
 		if(object instanceof ORDER && object.getClass()!=ORDER.class) {
@@ -88,12 +88,12 @@ public class Order extends ORDER implements CoreOrder {
 	OrderHeader orderHeader;
 	OrderInfo orderInfo;
 
-	private Order(ORDER doc) {
-		LOG.info("Type:"+doc.getType());
-		LOG.info("Version:"+doc.getVersion());
-		if(doc!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, doc);
-		}
+	// ctor public, damit dynamisches cast im Test möglich ist
+	public Order(ORDER doc) {
+//		LOG.info("Type:"+doc.getType());
+//		LOG.info("Version:"+doc.getVersion());
+		SCopyCtor.getInstance().invokeCopy(this, doc);
+		
 		orderHeader = OrderHeader.create(super.getORDERHEADER(), this);
 		orderInfo = orderHeader.createOrderInfo();
 	}
@@ -103,7 +103,15 @@ public class Order extends ORDER implements CoreOrder {
 		// profile, aka Customization, BG-2.BT-24
 		// processType, BG-2.BT-23
 		// documentNameCode, BT-3 get liefert Order
-		this(null);
+		super();
+		LOG.info("Version:"+super.getVersion());
+		setVersion("2.1"); // required
+		// Attribut 'type' muss in Element 'ORDER' vorkommen
+		super.setType("standard"); // andere: express , release , consignment
+		orderHeader = OrderHeader.create(super.getORDERHEADER(), this);
+		super.setORDERHEADER(orderHeader);
+		orderInfo = orderHeader.createOrderInfo();
+		orderHeader.setORDERINFO(orderInfo);
 	}
 
 	// 9: Order number BT-1 Identifier (mandatory) - A unique identification of the Order.
@@ -136,7 +144,7 @@ public class Order extends ORDER implements CoreOrder {
 	}
 
 
-	// BG-1
+	// 21: BG-1
 	@Override
 	public List<OrderNote> getOrderNotes() {
 		// in ORDER_INFO : <REMARKS type="customType">a</REMARKS>
@@ -172,13 +180,15 @@ public class Order extends ORDER implements CoreOrder {
 	@Override
 	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
 			String companyLegalForm) {
-		// TODO Auto-generated method stub	
-//		orderInfo.setSeller(name, address, contact, companyLegalForm);
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		BusinessParty party = Party.create(name, null, address, contact);
+		party.setCompanyId(companyId);
+		party.setCompanyLegalForm(companyLegalForm);
+		setSeller(party);
 	}
 	@Override
 	public void setSeller(BusinessParty party) {
-		// TODO Auto-generated method stub	
-//		orderInfo.setSeller(party);
+		orderInfo.setSeller(party);
 	}
 	@Override
 	public BusinessParty getSeller() {
@@ -188,13 +198,12 @@ public class Order extends ORDER implements CoreOrder {
 	// 390: BG-7 1..1 BUYER @see BG7_Buyer
 	@Override
 	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub	
-//		orderInfo.setBuyer(name, address, contact);
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		setBuyer(createParty(name, null, address, contact));
 	}
 	@Override
 	public void setBuyer(BusinessParty party) {
-		// TODO Auto-generated method stub	
-//		orderInfo.setBuyer(party);
+		orderInfo.setBuyer(party);
 	}
 	@Override
 	public BusinessParty getBuyer() {
@@ -203,11 +212,12 @@ public class Order extends ORDER implements CoreOrder {
 
 	@Override
 	public void setShipTo(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub	
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		setShipTo(createParty(name, null, address, contact));
 	}
 	@Override
 	public void setShipTo(BusinessParty party) {
-		// TODO Auto-generated method stub	
+		orderInfo.setShipTo(party);
 	}
 	@Override
 	public BusinessParty getShipTo() {
@@ -216,7 +226,8 @@ public class Order extends ORDER implements CoreOrder {
 
 	@Override
 	public void setShipFrom(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub		
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		setShipFrom(createParty(name, null, address, contact));
 	}
 	@Override
 	public void setShipFrom(BusinessParty party) {
@@ -228,22 +239,26 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
+	// 833: 0..1 INVOICEE PARTY / The "BILL TO"
 	@Override
 	public void setBillTo(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub		
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		setBillTo(createParty(name, null, address, contact));
 	}
 	@Override
 	public void setBillTo(BusinessParty party) {
-		// TODO Auto-generated method stub	
+		orderInfo.setBillTo(party);
 	}
 	@Override
 	public BusinessParty getBillTo() {
 		return orderInfo.getBillTo();
 	}
 	
+	// 792: 0..1 INVOICER PARTY
 	@Override
 	public void setInvoicer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub		
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		setInvoicer(createParty(name, null, address, contact));
 	}
 	@Override
 	public void setInvoicer(BusinessParty party) {
@@ -283,10 +298,15 @@ public class Order extends ORDER implements CoreOrder {
 
 	// 927: BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112
 	// in ORDERSUMMARY gibt es nur protected BigDecimal totalamount
-	// aber TODO required = true : protected BigInteger totalitemnum
+	// aber required = true : protected BigInteger totalitemnum
 	@Override
 	public BG22_DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
-		// TODO class xxx extends ORDERSUMMARY implements BG22_DocumentTotals
+		if(super.getORDERSUMMARY()==null) {
+			ORDERSUMMARY sum = new ORDERSUMMARY();
+			sum.setTOTALAMOUNT(lineNet.getValue());
+			sum.setTOTALITEMNUM(BigInteger.valueOf(getLines().size()));
+			super.setORDERSUMMARY(sum);
+		}
 		return null;
 	}
 
@@ -294,15 +314,6 @@ public class Order extends ORDER implements CoreOrder {
 	@Override
 	public IAmount getLineNetTotal() {
 		return super.getORDERSUMMARY()==null ? null : Amount.create(getORDERSUMMARY().getTOTALAMOUNT());
-//		if(ot instanceof ORDER) {
-//			return ((ORDER)ot).getORDERSUMMARY()==null ? null 
-//				: Amount.create(((ORDER)ot).getORDERSUMMARY().getTOTALAMOUNT());
-//		}
-//		if(ot instanceof ORDERRESPONSE) {
-//			return ((ORDERRESPONSE)ot).getORDERRESPONSESUMMARY()==null ? null 
-//				: Amount.create(((ORDERRESPONSE)ot).getORDERRESPONSESUMMARY().getTOTALAMOUNT());
-//		}
-//		return null;
 	}
 
 	@Override
@@ -370,27 +381,28 @@ public class Order extends ORDER implements CoreOrder {
 	}
 	@Override
 	public void addLine(OrderLine line) {
-//		this.supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add((SupplyChainTradeLineItem)line);
-		// TODO Auto-generated method stub
-		
+		if(super.getORDERITEMLIST()==null) {		
+			super.setORDERITEMLIST(new ORDERITEMLIST());
+		}
+		super.getORDERITEMLIST().getORDERITEM().add((OrderItem)line);
 	}
 
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		return Party.create().createAddress(countryCode, postalCode, city);
 	}
 
 	@Override
 	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		return Party.create().createContactInfo(contactName, contactTel, contactMail);
 	}
 
 	@Override
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
+		return Party.create(name, tradingName, address, contact);
 	}
 
 	// 767: BG-14 0..1 DELIVERY DATE
@@ -404,6 +416,7 @@ public class Order extends ORDER implements CoreOrder {
 	}
 	@Override // factory
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
 		return DeliveryDate.create(start, end);
 	}	
 	// BG-14 0..1 DELIVERY PERIOD
@@ -426,16 +439,14 @@ public class Order extends ORDER implements CoreOrder {
 		return orderInfo.getDocumentCurrency();
 	}
 
+	// 344: BT-10 0..1 Buyer reference
 	@Override
 	public void setBuyerReference(String reference) {
-		// TODO Auto-generated method stub
-		
+		orderInfo.setBuyerReference(reference);
 	}
-
 	@Override
 	public String getBuyerReferenceValue() {
-		// TODO Auto-generated method stub
-		return null;
+		return orderInfo.getBuyerReferenceValue();
 	}
 
 	@Override
@@ -462,15 +473,14 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
+	// 942: BT-19 0..1 Buyer accounting reference
 	@Override
 	public void setBuyerAccountingReference(Reference textReference) {
-		// TODO Auto-generated method stub
-		
+		// siehe item.ACCOUNTING_INFO
+		// ACCOUNTING_INFO.Cost category id hat type e {cost_center,project,work_order}
 	}
-
 	@Override
 	public Reference getBuyerAccountingReference() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -787,40 +797,33 @@ public class Order extends ORDER implements CoreOrder {
 
 	@Override
 	public PaymentMeansEnum getPaymentMeansEnum() {
-		// TODO Auto-generated method stub
+		// TODO PAYMENT_TERM.type == unece ==>
+		// 4279  Payment terms type code qualifier
+		// Aber PaymentMeansEnum ist aus UNTDID 4461
 		return null;
 	}
-
 	@Override
 	public void setPaymentMeansEnum(PaymentMeansEnum code) {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public String getPaymentMeansText() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	@Override
 	public void setPaymentMeansText(String text) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
-
 	@Override
 	public void addPaymentTerm(String description) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
-
 	@Override
 	public void setPaymentTerms(List<String> paymentTerms) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
-
 	@Override
 	public List<String> getPaymentTerms() {
 		// TODO Auto-generated method stub

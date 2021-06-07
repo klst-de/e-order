@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.DtCURRENCIES;
+import org.bmecat.bmecat._2005.TypePARTYID;
 import org.opentrans.xmlschema._2.ORDERINFO;
 import org.opentrans.xmlschema._2.ORDERPARTIESREFERENCE;
 import org.opentrans.xmlschema._2.PARTIES;
@@ -184,7 +185,18 @@ Beispiele:
 //		return res.isEmpty() ? null : res.get(0).getDocumentReference().getName();
 //	}
 //
-	// BG-4 + 1..1 SELLER @see BG4_Seller
+	// 344: BT-10 0..1 Buyer reference
+	// Die Referenz wird vom Käufer festgelegt, vom Verkäufer aber im Beleg angegeben
+	void setBuyerReference(String reference) {
+		if(reference==null) return;
+		super.getORDERPARTIESREFERENCE().setBUYERIDREF(new PartyID(reference));
+	}
+	String getBuyerReferenceValue() {
+		TypePARTYID id = super.getORDERPARTIESREFERENCE().getBUYERIDREF();
+		return id==null ? null : id.getValue();
+	}
+	
+	// 345: BG-4 1..1 SELLER @see BG4_Seller
 	@Override
 	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
 		BusinessParty party = Party.create(name, null, address, contact);
@@ -225,7 +237,7 @@ Beispiele:
 		return Party.getParty(super.getPARTIES().getPARTY(), PartyRole.supplier);
 	}
 	
-	// BG-7 + 1..1 BUYER @see BG7_Buyer
+	// 390: BG-7 1..1 BUYER @see BG7_Buyer
 	@Override
 	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		setBuyer(Party.create(name, null, address, contact));

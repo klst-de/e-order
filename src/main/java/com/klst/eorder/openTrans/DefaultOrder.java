@@ -51,12 +51,35 @@ ORDERINFO						ORDERRESPONSEINFO				ORDERCHANGEINFO
  */
 public interface DefaultOrder extends CoreOrder {
 
+/*	// aus https://openbook.rheinwerk-verlag.de/java8/01_002.html#u1.2.7
+	// Consumer, der Daten annimmt und dann verbraucht (konsumiert).
+	// Implementiere einen Consumer-Wrapper, 
+	// der die Ausführungszeit eines anderen Konsumenten loggt:
+	public static <T> Consumer<T> measuringConsumer(Consumer<T> block) {
+		return t -> {
+			long start = System.nanoTime();
+			block.accept(t);  // <== aus interface Consumer<T>
+			long duration = System.nanoTime() - start;
+//	      Logger.getAnonymousLogger().info( "Ausführungszeit (ns): " + duration );
+		};
+	}
+	// Folgender Aufruf zeigt die Nutzung:
+	// wrap ist auch Consumer
+	static void nutzung() {
+		Consumer<Void> wrap = measuringConsumer( Void -> {
+			// der Block, der gemessen wird
+			System.out.println( "Test" ); 
+		});
+		wrap.accept( null );
+	}
+	
 	@Override
 	default CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+ */
+	
 	@Override
 	default List<OrderNote> getOrderNotes() {
 		// TODO Auto-generated method stub
@@ -141,20 +164,14 @@ public interface DefaultOrder extends CoreOrder {
 
 	@Override
 	default void setDeliveryPeriod(IPeriod period) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	default IPeriod getDeliveryPeriod() {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 	@Override
 	default IPeriod createPeriod(Timestamp start, Timestamp end) {
-		// TODO Auto-generated method stub
-		return null;
+		return DeliveryDate.create(start, end);
 	}
 
 	@Override
@@ -348,14 +365,12 @@ public interface DefaultOrder extends CoreOrder {
 
 	@Override
 	default PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		// TODO Auto-generated method stub
-		return null;
+		return Party.create().createAddress(countryCode, postalCode, city);
 	}
 
 	@Override
 	default ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
-		// TODO Auto-generated method stub
-		return null;
+		return Party.create().createContactInfo(contactName, contactTel, contactMail);
 	}
 
 	@Override

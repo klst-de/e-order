@@ -18,7 +18,6 @@ import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.impl.UnitPriceAmount;
-import com.klst.eorder.openTrans.reflection.Mapper;
 
 public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrderLine {
 

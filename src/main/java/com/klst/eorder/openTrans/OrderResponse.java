@@ -14,16 +14,15 @@ import org.opentrans.xmlschema._2.ORDERRESPONSESUMMARY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
-import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.BG22_DocumentTotals;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
+import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.impl.UnitPriceAmount;
 
 /* in super:
@@ -37,15 +36,16 @@ protected String version;
 */
 public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 
-	@Override  // implements BusinessPartyFactory
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
-		return Party.create(name, tradingName, address, contact);
-	}
-	
-	@Override // implements PostalAddressFactory
-	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		return Party.create().createAddress(countryCode, postalCode, city);
-	}
+//	@Override  // implements BusinessPartyFactory
+//	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
+//		return Party.create(name, tradingName, address, contact);
+//		return Party.create(name, tradingName, address, contact);
+//	}
+//	
+//	@Override // implements PostalAddressFactory
+//	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+//		return Party.create().createAddress(countryCode, postalCode, city);
+//	}
 
 	@Override // implements CoreOrderFactory
 	public CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
@@ -107,6 +107,39 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		return orderInfo.getId();
 	}
 
+	// 11: BT-3 The Document TypeCode
+	@Override
+	public DocumentNameCode getDocumentCode() {
+		return DocumentNameCode.OrderResponse;
+	}
+
+	/* 14: Document issue date, BT-2  Date (mandatory) 
+	 * Das Datum, an dem der Beleg ausgestellt wurde.
+	 */
+	@Override
+	public void setIssueDate(Timestamp timestamp) {
+		orderInfo.setIssueDate(timestamp);
+	}
+	@Override
+	public Timestamp getIssueDateAsTimestamp() {
+		return orderInfo.getIssueDateAsTimestamp();
+	}
+	
+	// 21: BG-1 ORDER NOTE / REMARKS
+	@Override
+	public List<OrderNote> getOrderNotes() {
+		return Remarks.getNotes(orderInfo.getREMARKS());
+	}
+	@Override
+	public OrderNote createNote(String subjectCode, String content) {
+		return Remarks.create(subjectCode, content);
+	}
+	@Override
+	public void addNote(OrderNote note) {
+		orderInfo.getREMARKS().add((Remarks)note);
+	}
+
+	// 33: BG-25 1..n ORDER LINE
 	@Override
 	public List<OrderLine> getLines() {
 		List<ORDERRESPONSEITEM> lines = super.getORDERRESPONSEITEMLIST().getORDERRESPONSEITEM();
@@ -129,31 +162,17 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		super.getORDERRESPONSEITEMLIST().getORDERRESPONSEITEM().add((OrderResponseItem)line);
 	}
 
-	// 11: BT-3 The Document TypeCode
+	// 344: BT-10 0..1 Buyer reference
 	@Override
-	public DocumentNameCode getDocumentCode() {
-		return DocumentNameCode.OrderResponse;
-	}
-
-	/* 14: Document issue date, BT-2  Date (mandatory) 
-	 * Das Datum, an dem der Beleg ausgestellt wurde.
-	 */
-	@Override
-	public void setIssueDate(Timestamp timestamp) {
-		orderInfo.setIssueDate(timestamp);
+	public void setBuyerReference(String reference) {
+		orderInfo.setBuyerReference(reference);
 	}
 	@Override
-	public Timestamp getIssueDateAsTimestamp() {
-		return orderInfo.getIssueDateAsTimestamp();
+	public String getBuyerReferenceValue() {
+		return orderInfo.getBuyerReferenceValue();
 	}
 	
 	// 345: BG-4 1..1 SELLER @see BG4_Seller
-//	@Override
-//	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
-//			String companyLegalForm) {
-//		// TODO Auto-generated method stub	
-////		orderInfo.setSeller(name, address, contact, companyLegalForm);
-//	}
 	@Override
 	public void setSeller(BusinessParty party) {
 		orderInfo.setSeller(party);
@@ -164,11 +183,6 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	}
 
 	// 390: BG-7 1..1 BUYER @see BG7_Buyer
-//	@Override
-//	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-//		// TODO Auto-generated method stub	
-////		orderInfo.setBuyer(name, address, contact);
-//	}
 	@Override
 	public void setBuyer(BusinessParty party) {
 		orderInfo.setBuyer(party);
@@ -178,10 +192,6 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		return orderInfo.getBuyer();
 	}
 
-//	@Override
-//	public void setShipToParty(String name, PostalAddress address, ContactInfo contact) {
-//		// TODO Auto-generated method stub	
-//	}
 	@Override
 	public void setShipTo(BusinessParty party) {
 		orderInfo.setShipTo(party);
@@ -191,10 +201,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		return orderInfo.getShipTo();
 	}
 
-//	@Override
-//	public void setBillTo(String name, PostalAddress address, ContactInfo contact) {
-//		// TODO Auto-generated method stub		
-//	}
+	// 833: 0..1 INVOICEE PARTY / The "BILL TO"
 	@Override
 	public void setBillTo(BusinessParty party) {
 		orderInfo.setBillTo(party);
@@ -213,10 +220,10 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	public Timestamp getDeliveryDateAsTimestamp() {
 		return orderInfo.getDeliveryDateAsTimestamp();
 	}
-	@Override // factory
-	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-		return DeliveryDate.create(start, end);
-	}	
+//	@Override // factory
+//	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+//		return DeliveryDate.create(start, end);
+//	}	
 	// 770: BG-14 0..1 DELIVERY PERIOD
 	@Override
 	public void setDeliveryPeriod(IPeriod period) {
@@ -239,15 +246,14 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 
 	// 927: BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112
 	// in ORDERSUMMARY gibt es nur protected BigDecimal totalamount
-	// aber TODO required = true : protected BigInteger totalitemnum
+	// aber required = true : protected BigInteger totalitemnum
 	@Override
 	public BG22_DocumentTotals createTotals(IAmount lineNet, IAmount taxExclusive, IAmount taxInclusive) {
-		// TODO class xxx extends ORDERSUMMARY implements BG22_DocumentTotals
 		if(super.getORDERRESPONSESUMMARY()==null) {
 			ORDERRESPONSESUMMARY ors = new ORDERRESPONSESUMMARY();
-//		    protected BigInteger totalitemnum; TODO required = true
+//		    protected BigInteger totalitemnum; required = true
 //		    protected BigDecimal totalamount;
-//		    protected ALLOWORCHARGESFIX alloworchargesfix;
+//		    protected ALLOWORCHARGESFIX alloworchargesfix;  ???? TODO
 			ors.setTOTALAMOUNT(lineNet.getValue());
 			ors.setTOTALITEMNUM(BigInteger.valueOf(getLines().size()));
 			super.setORDERRESPONSESUMMARY(ors);

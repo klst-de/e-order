@@ -656,13 +656,9 @@ public interface DefaultOrderLine extends OrderLine {
 
 	@Override
 	default void setPartialDeliveryIndicator(boolean indicator) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	default boolean isPartialDeliveryAllowed() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

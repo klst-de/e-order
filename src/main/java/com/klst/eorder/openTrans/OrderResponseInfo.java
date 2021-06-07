@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.DtCURRENCIES;
+import org.bmecat.bmecat._2005.TypePARTYID;
 import org.opentrans.xmlschema._2.ORDERPARTIESREFERENCE;
 import org.opentrans.xmlschema._2.ORDERRESPONSEINFO;
 import org.opentrans.xmlschema._2.PARTIES;
@@ -90,6 +91,18 @@ public class OrderResponseInfo extends ORDERRESPONSEINFO {
 		}
 		// DELIVERYDATE ist Zeitraum
 		return DeliveryDate.create(getDELIVERYDATE());
+	}
+	
+	// 344: BT-10 0..1 Buyer reference
+	// PS: Seller reference ist nicht in API!
+	// Die Referenz wird vom Käufer festgelegt, vom Verkäufer aber im Beleg angegeben
+	void setBuyerReference(String reference) {
+		if(reference==null) return;
+		super.getORDERPARTIESREFERENCE().setBUYERIDREF(new PartyID(reference));
+	}
+	String getBuyerReferenceValue() {
+		TypePARTYID id = super.getORDERPARTIESREFERENCE().getBUYERIDREF();
+		return id==null ? null : id.getValue();
 	}
 	
 	// 345: BG-4 1..1 SELLER @see BG4_Seller

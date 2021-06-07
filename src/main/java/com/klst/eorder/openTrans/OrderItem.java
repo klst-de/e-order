@@ -29,7 +29,6 @@ import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.ID;
-import com.klst.eorder.impl.ReferencedDocument;
 import com.klst.eorder.impl.TradeProductInstance;
 import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.eorder.openTrans.reflection.Mapper;
