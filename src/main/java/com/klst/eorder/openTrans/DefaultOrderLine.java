@@ -311,11 +311,44 @@ public interface DefaultOrderLine extends OrderLine {
 		return null;
 	}
 
+/*
+// funktional:
+	Function<Object, String> getLineItemID = (Object s) -> {
+		if(s instanceof ORDERITEM) {
+			return ((ORDERITEM)s).getLINEITEMID();
+		}
+		if(s instanceof ORDERRESPONSEITEM) {
+			return ((ORDERRESPONSEITEM)s).getLINEITEMID();
+		}
+		return null;
+	};
+	@Override
+	default String getId() {
+		return getLineItemID.apply(this);
+	}
+
+// konventionell:
+	@Override
+	default String getId() {
+		if(this instanceof ORDERITEM) {
+			return ((ORDERITEM)this).getLINEITEMID();
+		}
+		if(this instanceof ORDERRESPONSEITEM) {
+			return ((ORDERRESPONSEITEM)this).getLINEITEMID();
+		}
+		return null;
+	}
+	
+// gewählte implementierungsstrategie: 
+	alle Methoden leer vorbelegt, bzw liefern null (getter),
+	notwendige implementierungen in den subklassen
+	 
+ */	
 	@Override
 	default String getId() {
 		return null;
 	}
-
+	
 	@Override
 	default void setStatus(String status) {
 		// TODO Auto-generated method stub
