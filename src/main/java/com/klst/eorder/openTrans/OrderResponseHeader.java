@@ -3,7 +3,6 @@ package com.klst.eorder.openTrans;
 import org.opentrans.xmlschema._2.ORDERRESPONSEHEADER;
 
 import com.klst.ebXml.reflection.SCopyCtor;
-import com.klst.eorder.api.CoreOrder;
 
 public class OrderResponseHeader extends ORDERRESPONSEHEADER {
 

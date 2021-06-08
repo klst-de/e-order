@@ -5,6 +5,13 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 
+import org.bmecat.bmecat._2005.FNAME;
+import org.bmecat.bmecat._2005.FVALUE;
+import org.opentrans.xmlschema._2.FEATURE;
+import org.opentrans.xmlschema._2.ORDERITEM;
+import org.opentrans.xmlschema._2.ORDERRESPONSEITEM;
+import org.opentrans.xmlschema._2.PRODUCTFEATURES;
+
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
@@ -18,6 +25,7 @@ import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.TradeProductInstance;
+import com.klst.eorder.impl.UnitPriceAmount;
 
 /* Vergleich fields in
 class ORDERITEMLIST {
@@ -27,10 +35,10 @@ class ORDERCHANGEITEMLIST:
 ==> sind gleich. Also nur Vergleich fields in
 
 ORDERRESPONSEITEM ist Untermenge von ORDERITEM, denn:
-ORDERITEM						ORDERRESPONSEITEM
- String partialshipmentallowed; fehlt
- SOURCINGINFO sourcinginfo;     fehlt ...
- List<CUSTOMERORDERREFERENCE> customerorderreference;
+ORDERITEM													ORDERRESPONSEITEM
+ String partialshipmentallowed; 							fehlt
+ SOURCINGINFO sourcinginfo;     							fehlt
+ List<CUSTOMERORDERREFERENCE> customerorderreference;       fehlt ...
  ACCOUNTINGINFO accountinginfo;
  TRANSPORT transport;
  List<INTERNATIONALRESTRICTIONS> internationalrestrictions;
@@ -39,52 +47,57 @@ public interface DefaultOrderLine extends OrderLine {
 
 	@Override
 	default OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount,
-			String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		// TODO Auto-generated method stub
+			String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		if(this instanceof ORDERITEM) {
+			return OrderItem.create(id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
+		}
+		if(this instanceof ORDERRESPONSEITEM) {
+			return OrderResponseItem.create(id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
+		}
 		return null;
 	}
 
 	@Override
 	default OrderNote createNote(String subjectCode, String content) {
-		// TODO Auto-generated method stub
-		return null;
+		return Remarks.create(subjectCode, content);
 	}
 
-	@Override
-	default void addReferencedProductDocument(String code, SupportingDocument supportigDocument) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	default List<SupportingDocument> getReferencedProductDocuments() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	/*
+	 * ADDITIONAL REFERENCED PRODUCT DOCUMENT (Order-X-No: 79-86)
+	 * ADDITIONAL REFERENCED DOCUMENT (Order-X-No: 141-149)
+	 * <p>
+	 * An additional document referenced in line trade agreement.
+	 * <p>
+	 * Cardinality: 	0..n
+	 * 
+	 * Der Unterschied zwischen 79ff und 141ff ist der param lineId, der nur für 141ff definiert ist.
+	 * Somit die Implementierung in OrderItem CUSTOMER_ORDER_REFERENCE / (Kundenauftragsbezug)
+	 * die von ADDITIONAL REFERENCED DOCUMENT, die param uri, content, mimeCode, filename sind nicht in OT abbildbar
+	 */
 	@Override
 	default SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
 			Timestamp ts, String uri) {
-		// TODO Auto-generated method stub
-		return null;
+		return CustomerOrderReference.create(docRefId, lineId, description, ts);
 	}
-
 	@Override
 	default SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
 			Timestamp ts, byte[] content, String mimeCode, String filename) {
-		// TODO Auto-generated method stub
+		return CustomerOrderReference.create(docRefId, lineId, description, ts);
+	}
+	@Override
+	default void addReferencedDocument(SupportingDocument supportigDocument) {
+	}
+	@Override
+	default List<SupportingDocument> getReferencedDocuments() {
 		return null;
 	}
 
+	// 79ff
 	@Override
-	default void addReferencedDocument(SupportingDocument supportigDocument) {
-		// TODO Auto-generated method stub
-		
+	default void addReferencedProductDocument(String code, SupportingDocument supportigDocument) {
 	}
-
 	@Override
-	default List<SupportingDocument> getReferencedDocuments() {
-		// TODO Auto-generated method stub
+	default List<SupportingDocument> getReferencedProductDocuments() {
 		return null;
 	}
 
@@ -150,8 +163,7 @@ public interface DefaultOrderLine extends OrderLine {
 
 	@Override
 	default IPeriod createPeriod(Timestamp start, Timestamp end) {
-		// TODO Auto-generated method stub
-		return null;
+		return DeliveryDate.create(start, end);
 	}
 
 	@Override
@@ -299,6 +311,39 @@ public interface DefaultOrderLine extends OrderLine {
 		return null;
 	}
 
+	default FEATURE createFeature(String name, String value) {
+		FEATURE feature = new FEATURE();
+		
+		FNAME fname = new FNAME();
+		fname.setValue(name);
+		feature.getFNAME().add(fname);
+		
+		FVALUE fvalue = new FVALUE();
+		fvalue.setValue(value);
+		feature.getFVALUE().add(fvalue);
+		
+		return feature;
+	}
+
+	default Properties getItemAttributes(PRODUCTFEATURES features) {
+		if(features==null) return null;
+		List<FEATURE> feature = features.getFEATURE();
+		Properties result = new Properties();
+		feature.forEach(f -> {
+			if(f.getFNAME().isEmpty()) { // eindeutiger Name des Merkmals
+				// nix tun
+			} else {
+				// FVALUE : Ausprägung(en) des referenzierten Merkmals
+				if(f.getFVALUE().isEmpty()) {
+					// in OT steht was von VARIANTS, dann aber doch nicht
+				} else {
+					result.put(f.getFNAME().get(0).getValue(), f.getFVALUE().get(0).getValue());
+				}
+			}
+		});
+		return result;
+	}
+
 	@Override
 	default void addItemAttribute(String name, String value) {
 		// TODO Auto-generated method stub
@@ -341,7 +386,7 @@ public interface DefaultOrderLine extends OrderLine {
 	
 // gewählte implementierungsstrategie: 
 	alle Methoden leer vorbelegt, bzw liefern null (getter),
-	notwendige implementierungen in den subklassen
+	notwendige implementierungen in den subklassen OrderItem bzw. OrderResponseItem
 	 
  */	
 	@Override
@@ -387,8 +432,7 @@ public interface DefaultOrderLine extends OrderLine {
 
 	@Override
 	default Identifier createStandardIdentifier(String globalID, String schemeID) {
-		// TODO Auto-generated method stub
-		return null;
+		return Productid.create().createStandardIdentifier(globalID, schemeID);
 	}
 
 	@Override

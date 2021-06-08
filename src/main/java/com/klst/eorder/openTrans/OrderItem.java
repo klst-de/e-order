@@ -12,8 +12,8 @@ import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.COSTCATEGORYID;
 import org.opentrans.xmlschema._2.CUSTOMERORDERREFERENCE;
-import org.opentrans.xmlschema._2.FEATURE;
 import org.opentrans.xmlschema._2.ORDERITEM;
+import org.opentrans.xmlschema._2.PRODUCTFEATURES;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
@@ -27,7 +27,6 @@ import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.ISupplyChainEvent;
-import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
 import com.klst.eorder.impl.ID;
@@ -36,22 +35,18 @@ import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.eorder.openTrans.reflection.Mapper;
 
 /**
- * 33: BG-25 1..n ORDER LINE
+ * 33-342: BG-25 1..n ORDER LINE
  * <p>
  * A group of business terms providing information on individual order line.
  * <p>
  * Similar to EN16931 business group BG-25
  */
-public class OrderItem extends ORDERITEM implements OrderLine {
+public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 
-	@Override
-	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
-		return create(id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
-	}
+	private static final Logger LOG = Logger.getLogger(OrderItem.class.getName());
 
 	static OrderItem create(String id, IQuantity quantity, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
-		OrderItem orderLine =  new OrderItem(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent);
-		return orderLine;
+		return new OrderItem(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent);
 	}
 
 	// copy factory
@@ -63,8 +58,6 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 			return new OrderItem(object); 
 		}
 	}
-
-	private static final Logger LOG = Logger.getLogger(OrderItem.class.getName());
 
 	Productid productid;
 	Productpricefix productpricefix;
@@ -129,73 +122,26 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 //		return super.getLINEITEMID();
 	}
 
-	// 210: BT-129 1..1 bestellte Menge / The quantity, at line level, requested for this trade delivery.
-	// 211: Unit of measure Code for Requested quantity BT-129+BT-130
-	void setQuantity(IQuantity quantity) { 
-		super.setORDERUNIT(quantity.getUnitCode()); // required
-		super.setQUANTITY(quantity.getValue()); // required		
-	}
-	@Override
-	public IQuantity getQuantity() {
-		return Quantity.create(super.getORDERUNIT(), super.getQUANTITY());
-	}
-
-	/* 335: BT-131 1..1 Nettobetrag der Rechnungsposition / PRICE_LINE_AMOUNT
-	 * Höhe des Preises für die Positionszeile. 
-	 * Der Wert ergibt sich im Regelfall aus der Multiplikation von PRICE_AMOUNT und QUANTITY, 
-	 * muss aber explizit aufgeführt werden. 
-	 * Der PRICE_LINE_AMOUNT kann sich auch aus PRICE_AMOUNT und PRICE_UNIT_VALUE ergeben, 
-	 * wenn der Preis nicht an die Bestelleinheit gekoppelt ist. Siehe auch PRICE_BASE_FIX.
-	 */
-	void setLineTotalAmount(IAmount amount) {
-		super.setPRICELINEAMOUNT(amount.getValue());
-	}
-	@Override
-	public IAmount getLineTotalAmount() {
-		return super.getPRICELINEAMOUNT()==null ? null : Amount.create(getPRICELINEAMOUNT());
-	}
-
-	@Override
-	public String getStatus() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void setStatus(String status) {
-		LOG.warning(WARN_ORDERLINEID + "ignore status:'"+status+"'.");
-	}
-	
-	// 37: BT-127 0..1/n Freitext zur Rechnungsposition : ram:IncludedNote
+	// 37: BT-127 0..1/n Freitext zur Rechnungsposition
 	@Override // getter
 	public List<OrderNote> getNotes() {
 		return Remarks.getNotes(super.getREMARKS());
 	}
-	@Override
-	public OrderNote createNote(String subjectCode, String content) {
-		return Remarks.create(subjectCode, content);
-	}
+//	@Override
+//	public OrderNote createNote(String subjectCode, String content) {
+//		return Remarks.create(subjectCode, content);
+//	}
 	@Override
 	public void addNote(OrderNote note) {
 		super.getREMARKS().add((Remarks)note);
 	}
 	
-	// 42: 0..1 PRODUCT_ID.SUPPLIER_PID ??????
-	@Override
-	public void setProductID(String id) {
-		// TODO Auto-generated method stub	
-	}
-	@Override
-	public String getProductID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	// 43: BG-31.BT-157 0..n Item (Trade Product) Global ID
 	// 44:                   Item (Trade Product) Global ID Scheme ID
-	@Override
-	public Identifier createStandardIdentifier(String globalID, String schemeID) {
-		return productid.createStandardIdentifier(globalID, schemeID);
-	}
+//	@Override
+//	public Identifier createStandardIdentifier(String globalID, String schemeID) {
+//		return productid.createStandardIdentifier(globalID, schemeID);
+//	}
 	@Override
 	public void addStandardIdentifier(Identifier id) {
 		productid.addStandardIdentifier(id);
@@ -248,6 +194,7 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	}
 	
 	// 51: 0..1 Item (Trade Product) Batch ID (lot ID)
+	// Eindeutige Identifikation der Charge aus der das Produkt stammt.
 	// TODO Unterschied zu 66: Item (Trade Product) Instances Batch ID
 	@Override
 	public void setBatchID(String id) {
@@ -263,9 +210,21 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 	// 53: 0..1 SpecifiedTradeProduct.modelName
 
 	// 54: BG-32 0..n ITEM ATTRIBUTES
+	/* PRODUCTFEATURES enthält List<FEATURE> feature:
+	 *  Produktmerkmal FEATURE Informationen über ein Produktmerkmal 
+	 */
 	@Override
 	public void addItemAttribute(String name, String value) {
-		// TODO 
+		if(name==null) return;
+		
+		PRODUCTFEATURES pf = getPRODUCTFEATURES();
+		if(pf==null) {
+			pf = new PRODUCTFEATURES();
+			setPRODUCTFEATURES(pf);
+		}
+		
+		pf.getFEATURE().add(createFeature(name, value));
+		
 //		PRODUCTFEATURES pf = super.getPRODUCTFEATURES()
 //			    "referencefeaturesystemname",
 //			    "referencefeaturegroupid",
@@ -296,29 +255,128 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 
  */
 	}
-	/* PRODUCTFEATURES enthält List<FEATURE> feature:
-	 * Produktmerkmal FEATURE Informationen über ein Produktmerkmal 
-	 */
 	@Override
 	public Properties getItemAttributes() {
-		List<FEATURE> feature = super.getPRODUCTFEATURES()==null ? null : super.getPRODUCTFEATURES().getFEATURE();
-//		List<ProductCharacteristicType> productCharacteristics = specifiedTradeProduct.getApplicableProductCharacteristic();
-		Properties result = new Properties();
-		feature.forEach(f -> {
-			if(f.getFNAME().isEmpty()) { // eindeutiger Name des Merkmals
-				// nix tun
-			} else {
-				// FVALUE : Ausprägung(en) des referenzierten Merkmals
-				if(f.getFVALUE().isEmpty()) {
-					// in OT steht was von VARIANTS, dann aber doch nicht
-				} else {
-					result.put(f.getFNAME().get(0).getValue(), f.getFVALUE().get(0).getValue());
-				}
-			}
-//			result.put(pc.getDescription().get(0).getValue(), pc.getValue().get(0).getValue());			
-		});
-		return result;
+		return getItemAttributes(super.getPRODUCTFEATURES());
 	}
+
+	// 77,78: BG-31.BT-159 0..1 Item country of origin / nicht in opentrans, ===> "countryoforigin" als ARTIKELATTRIBUTE
+	private static final String COUNTRY_OF_ORIGIN = "countryoforigin";
+	@Override
+	public void setCountryOfOrigin(String code) {
+		addItemAttribute(COUNTRY_OF_ORIGIN, code);
+	}
+	@Override
+	public String getCountryOfOrigin() {
+		Properties attributes = getItemAttributes();
+		if(attributes==null) return null;
+		return (String) attributes.get(COUNTRY_OF_ORIGIN);
+	}
+
+	// 107: LINE TRADE AGREEMENT
+	// 178: (Net Price)
+	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount / PRODUCTPRICEFIX.priceamount
+	@Override
+	public IAmount getUnitPriceAmount() {
+		return productpricefix.getUnitPriceAmount();
+	}
+	private void setUnitPriceAmount(IAmount unitPriceAmount) {
+		productpricefix.setUnitPriceAmount(unitPriceAmount);
+	}
+
+	// 180+181: BG-29.BT-150 + BG-29.BT-149 0..1 / PRODUCTPRICEFIX.pricequantity
+	@Override
+	public IQuantity getUnitPriceQuantity() {
+		if(super.getPRODUCTPRICEFIX()==null) return null;
+		return productpricefix.getUnitPriceQuantity();
+	}
+	@Override
+	public void setUnitPriceQuantity(IQuantity basisQuantity) {
+		productpricefix.setUnitPriceQuantity(basisQuantity);
+	}
+
+	// 210: BT-129 1..1 bestellte Menge / The quantity, at line level, requested for this trade delivery.
+	// 211: Unit of measure Code for Requested quantity BT-129+BT-130
+	void setQuantity(IQuantity quantity) { 
+		super.setORDERUNIT(quantity.getUnitCode()); // required
+		super.setQUANTITY(quantity.getValue()); // required		
+	}
+	@Override
+	public IQuantity getQuantity() {
+		return Quantity.create(super.getORDERUNIT(), super.getQUANTITY());
+	}
+
+	//---------------- BG-26 0..1 BG-26.BT-134 + BG-26.BT-135
+	// 291..393 + 294..296
+	// 304..306 + 305..307
+//	@Override // factory
+//	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+//		return DeliveryDate.create(start, end);
+//	}	
+	@Override
+	public void setDeliveryPeriod(IPeriod period) {
+		super.setDELIVERYDATE((DeliveryDate)period);
+	}
+	@Override
+	public void setDeliveryDate(Timestamp timestamp) {
+		setDeliveryPeriod(DeliveryDate.create(timestamp, timestamp));
+	}
+	@Override
+	public Timestamp getDeliveryDateAsTimestamp() {
+		if(super.getDELIVERYDATE()==null) return null;
+		if(getDELIVERYDATE().getDELIVERYSTARTDATE().equals(getDELIVERYDATE().getDELIVERYENDDATE())) {
+			// DELIVERYDATE ist Zeitpunkt
+			return DateTimeFormats.dtDATETIMEToTs(getDELIVERYDATE().getDELIVERYSTARTDATE()); 
+		}
+		return null;
+	}
+	@Override
+	public IPeriod getDeliveryPeriod() {
+		if(super.getDELIVERYDATE()==null) return null;
+		if(getDELIVERYDATE().getDELIVERYSTARTDATE().equals(getDELIVERYDATE().getDELIVERYENDDATE())) {
+			// DELIVERYDATE ist Zeitpunkt
+			return null;
+		}
+		// DELIVERYDATE ist Zeitraum
+		return DeliveryDate.create(getDELIVERYDATE());
+	}
+
+	/* 335: BT-131 1..1 Nettobetrag der Rechnungsposition / PRICE_LINE_AMOUNT
+	 * Höhe des Preises für die Positionszeile. 
+	 * Der Wert ergibt sich im Regelfall aus der Multiplikation von PRICE_AMOUNT und QUANTITY, 
+	 * muss aber explizit aufgeführt werden. 
+	 * Der PRICE_LINE_AMOUNT kann sich auch aus PRICE_AMOUNT und PRICE_UNIT_VALUE ergeben, 
+	 * wenn der Preis nicht an die Bestelleinheit gekoppelt ist. Siehe auch PRICE_BASE_FIX.
+	 */
+	void setLineTotalAmount(IAmount amount) {
+		super.setPRICELINEAMOUNT(amount.getValue());
+	}
+	@Override
+	public IAmount getLineTotalAmount() {
+		return super.getPRICELINEAMOUNT()==null ? null : Amount.create(getPRICELINEAMOUNT());
+	}
+
+	@Override
+	public String getStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setStatus(String status) {
+		LOG.warning(WARN_ORDERLINEID + "ignore status:'"+status+"'.");
+	}
+	
+	// 42: 0..1 PRODUCT_ID.SUPPLIER_PID ??????
+	@Override
+	public void setProductID(String id) {
+		// TODO Auto-generated method stub	
+	}
+	@Override
+	public String getProductID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 	// 60: BG-31.BT-158 0..n Item classification identifier designatedProductClassification
 	/* ProductClassificationType CodeType classCode (value, listID, listVersionID)
@@ -400,51 +458,13 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 		return null;
 	}
 
-	// 77,78: BG-31.BT-159 0..1 Item country of origin / nicht in opentrans, ===> "countryoforigin" als ARTIKELATTRIBUTE
-	private static final String COUNTRY_OF_ORIGIN = "countryoforigin";
-	@Override
-	public void setCountryOfOrigin(String code) {
-		addItemAttribute(COUNTRY_OF_ORIGIN, code);
-	}
-	@Override
-	public String getCountryOfOrigin() {
-		Properties attributes = getItemAttributes();
-		return (String) attributes.get(COUNTRY_OF_ORIGIN);
-	}
-
-	// 107: LINE TRADE AGREEMENT
-	// 178: (Net Price)
-	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount / PRODUCTPRICEFIX.priceamount
-	@Override
-	public IAmount getUnitPriceAmount() {
-		// delegieren:
-		return productpricefix.getUnitPriceAmount();
-	}
-	private void setUnitPriceAmount(IAmount unitPriceAmount) {
-		productpricefix.setUnitPriceAmount(unitPriceAmount);
-	}
-
-	// 180+181: BG-29.BT-150 + BG-29.BT-149 0..1 / PRODUCTPRICEFIX.pricequantity
-	@Override
-	public IQuantity getUnitPriceQuantity() {
-		if(super.getPRODUCTPRICEFIX()==null) return null;
-		// delegieren:
-		return productpricefix.getUnitPriceQuantity();
-	}
-	@Override
-	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-//		Mapper.set(getPRODUCTPRICEFIX(), "pricequantity", basisQuantity); // BUG
-		productpricefix.setUnitPriceQuantity(basisQuantity);
-	}
-	
 //	158 SCT_LINE_TA COMFORT	  (Gross Price)
 //	159 SCT_LINE_TA COMFORT	  Gross Price
 //	160 SCT_LINE_TA COMFORT	  Gross Price Base quantity
 //	161 SCT_LINE_TA COMFORT	  Gross Price Unit Code for base quantity
-	// 158: BG-29.BT-148 0..1 Item gross price
+	// 158: BG-29.BT-148 0..1 Item gross price / Bruttopreis (nicht in OT)
 	@Override
 	public IAmount getGrossPrice() {
-		// delegieren:
 		return productpricefix.getGrossPrice();
 	}
 	@Override
@@ -534,64 +554,6 @@ public class OrderItem extends ORDERITEM implements OrderLine {
 		return cc==null ? null : cc.getValue();
 	}
 
-//---------------- BG-26 0..1 BG-26.BT-134 + BG-26.BT-135
-	// 291..393 + 294..296
-	// 304..306 + 305..307
-	@Override // factory
-	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-		return DeliveryDate.create(start, end);
-	}	
-	@Override
-	public void setDeliveryPeriod(IPeriod period) {
-		super.setDELIVERYDATE((DeliveryDate)period);
-	}
-	@Override
-	public void setDeliveryDate(Timestamp timestamp) {
-		setDeliveryPeriod(DeliveryDate.create(timestamp, timestamp));
-	}
-	@Override
-	public Timestamp getDeliveryDateAsTimestamp() {
-		if(super.getDELIVERYDATE()==null) return null;
-		if(getDELIVERYDATE().getDELIVERYSTARTDATE().equals(getDELIVERYDATE().getDELIVERYENDDATE())) {
-			// DELIVERYDATE ist Zeitpunkt
-			return DateTimeFormats.dtDATETIMEToTs(getDELIVERYDATE().getDELIVERYSTARTDATE()); 
-		}
-		return null;
-	}
-	@Override
-	public IPeriod getDeliveryPeriod() {
-		if(super.getDELIVERYDATE()==null) return null;
-		if(getDELIVERYDATE().getDELIVERYSTARTDATE().equals(getDELIVERYDATE().getDELIVERYENDDATE())) {
-			// DELIVERYDATE ist Zeitpunkt
-			return null;
-		}
-		// DELIVERYDATE ist Zeitraum
-		return DeliveryDate.create(getDELIVERYDATE());
-	}
-
-/*
-                    <ram:SpecifiedTradeAllowanceCharge>
-                         <ram:ChargeIndicator>
-                              <udt:Indicator>false</udt:Indicator>
-                         </ram:ChargeIndicator>
-                         <ram:CalculationPercent>10.00</ram:CalculationPercent>
-                         <ram:BasisAmount>60.00</ram:BasisAmount>
-                         <ram:ActualAmount>6.00</ram:ActualAmount>
-                         <ram:ReasonCode>64</ram:ReasonCode>
-                         <ram:Reason>SPECIAL AGREEMENT</ram:Reason>
-                    </ram:SpecifiedTradeAllowanceCharge>
-                    <ram:SpecifiedTradeAllowanceCharge>
-                         <ram:ChargeIndicator>
-                              <udt:Indicator>true</udt:Indicator>
-                         </ram:ChargeIndicator>
-                         <ram:CalculationPercent>10.00</ram:CalculationPercent>
-                         <ram:BasisAmount>60.00</ram:BasisAmount>
-                         <ram:ActualAmount>6.00</ram:ActualAmount>
-                         <ram:ReasonCode>64</ram:ReasonCode>
-                         <ram:Reason>FREIGHT SERVICES</ram:Reason>
-                    </ram:SpecifiedTradeAllowanceCharge>
-
- */
 	/*
 	 * BG-27 0..n LINE ALLOWANCES
 	 * BG-28 0..n LINE CHARGES
@@ -744,17 +706,17 @@ Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die 
 		return res;
 	}
 
-	@Override
-	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
-			Timestamp ts, String uri) {
-		return CustomerOrderReference.create(docRefId, lineId, description, ts);
-	}
-
-	@Override
-	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
-			Timestamp ts, byte[] content, String mimeCode, String filename) {
-		return CustomerOrderReference.create(docRefId, lineId, description, ts);
-	}
+//	@Override
+//	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
+//			Timestamp ts, String uri) {
+//		return CustomerOrderReference.create(docRefId, lineId, description, ts);
+//	}
+//
+//	@Override
+//	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
+//			Timestamp ts, byte[] content, String mimeCode, String filename) {
+//		return CustomerOrderReference.create(docRefId, lineId, description, ts);
+//	}
 
 	@Override
 	public void addReferencedDocument(SupportingDocument supportigDocument) {

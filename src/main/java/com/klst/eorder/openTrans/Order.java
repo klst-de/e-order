@@ -7,12 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import org.bmecat.bmecat._2005.DtLANG;
 import org.bmecat.bmecat._2005.LANGUAGE;
+import org.opentrans.xmlschema._2.ACCOUNT;
+import org.opentrans.xmlschema._2.CARD;
 import org.opentrans.xmlschema._2.ORDER;
 import org.opentrans.xmlschema._2.ORDERITEM;
 import org.opentrans.xmlschema._2.ORDERITEMLIST;
 import org.opentrans.xmlschema._2.ORDERSUMMARY;
+import org.opentrans.xmlschema._2.PAYMENTTERMS;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
@@ -799,9 +804,30 @@ public class Order extends ORDER implements CoreOrder {
 
 	@Override
 	public PaymentMeansEnum getPaymentMeansEnum() {
+/* TODO PAYMENT in ORDERINFO
+Im Element PAYMENT werden Informationen zur Zahlungsweise zusammengefasst. 
+Es muss genau eine Zahlungsweise verwendet werden. 
+Soll keine Zahlungsinformation übertragen werden (z.B. weil diese in einem Rahmenvertrag hinterlegt ist), so wird das Element nicht verwendet.
+
+ class PAYMENT:
+     CARD card; // Verwendung für Credit Cards, Purchase Cards etc. ==> BankCard
+     List<ACCOUNT> account; // Bankverbindung
+     String debit; - dtBOOLEAN : TRUE oder true oder True ==> DebitTransfer / Gutschriftsverfahren
+     String check;                                        ==> Cheque
+     String cash;                                         ==> InCash
+     String centralregulation;
+     PAYMENTTERMS paymentterms:
+	    "paymentterm",
+	    "timeforpayment",
+	    "valuedate"
+	    
+	    
++ 926: Payment Terms Description
+
+ */
 		// TODO PAYMENT_TERM.type == unece ==>
 		// 4279  Payment terms type code qualifier
-		// Aber PaymentMeansEnum ist aus UNTDID 4461
+		// Aber PaymentMeansEnum ist aus UNTDID 4461: Cheque, Bank card, ...
 		return null;
 	}
 	@Override

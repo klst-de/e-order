@@ -169,7 +169,15 @@ public class PLD_257444 extends Constants {
 			assertEquals(issueDate, sdList.get(0).getDateAsTimestamp());
 			assertEquals(e.sddr.getName(), sd.getDocumentReference().getName());
 			assertEquals(e.sdlr.getName(), sd.getLineReference().getName());
-			assertEquals(e.sdts, sd.getDateAsTimestamp());		
+			assertEquals(e.sdts, sd.getDateAsTimestamp());
+			
+			// extra asserts:
+			LOG.info("BatchID:"+l.getBatchID()                 // 51
+				+ " , CountryOfOrigin:"+l.getCountryOfOrigin() // 79
+				);
+			if(l.getCountryOfOrigin()!=null) {
+				assertEquals("PL", l.getCountryOfOrigin());
+			}
 		}
 		
 		BusinessParty seller = co.getSeller(); // 345
@@ -368,16 +376,16 @@ public class PLD_257444 extends Constants {
 		
 		line = new ExpectedLine();
 		line.id = "2";
-		line.sai = "D4816931";
-		line.sid = new ID("7601577560732", EAN);
-		line.bai = "916850027";
-		line.name = "BLISTOM16MSATEX";
-		line.desc = "Bst EX d/e MS M16 6-pans 25pcs, Bouch. de f. laiton";
 		line.qty = new Quantity(C62, new BigDecimal(25));
 		line.upa = new UnitPriceAmount(new BigDecimal(60.69));
 		line.upq = new Quantity(null, new BigDecimal(100));
 		line.lna = new Amount(line.upa.getValue().multiply(line.qty.getValue()).divide(line.upq.getValue()));
+		line.name = "BLISTOM16MSATEX";
+		line.desc = "Bst EX d/e MS M16 6-pans 25pcs, Bouch. de f. laiton";
 		line.pdi = OrderLine.YES;
+		line.sid = new ID("7601577560732", EAN);
+		line.sai = "D4816931";
+		line.bai = "916850027";
 		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
 		line.sddr = new ID(ORDER_ID);
 		line.sdlr = new ID(line.id);
@@ -457,6 +465,26 @@ public class PLD_257444 extends Constants {
 //		line1.createSupportigDocument("PLEX-141269", line.sdlr, null, line.sdts, null);
 		line1.addReferencedDocument(ORDER_ID, line.sdlr, null, line.sdts, null);
 		or.addLine(line1);
+
+		line = expected().get(1);
+		OrderLine line2 = or.createOrderLine("2"       // order line number
+		  , new Quantity(C62, new BigDecimal(25))
+		  , line.lna                                   // line net amount
+		  , line.upa                                   // unit price
+		  , line.name                                  // itemName
+		  );
+		line2.addStandardIdentifier(line.sid.getContent(), line.sid.getSchemeIdentifier()); // 43+44
+		line2.setSellerAssignedID(line.sai);           // 45
+		line2.setBuyerAssignedID(line.bai);            // 46
+		line2.setDescription(line.desc);               // 50
+		line2.setBatchID("BatchID-TEST");              // 51
+		line2.setCountryOfOrigin("PL");                // 78
+		line2.setUnitPriceQuantity(line.upq);          // 180+181 (optional) price base quantity
+		line2.setPartialDeliveryIndicator(line.pdi);   // 208
+		line2.setDeliveryDate(line.delivery);          // 298
+		line2.setTaxCategory(line.tcc);                // 315
+		line2.addReferencedDocument(ORDER_ID, line.sdlr, null, line.sdts, null);
+		or.addLine(line2);
 
 		PostalAddressExt sellerAddress = (PostalAddressExt) or.createAddress("FR", "54152", "Citoyene");
 		sellerAddress.setAddressLine1(expectedSeller().al1);

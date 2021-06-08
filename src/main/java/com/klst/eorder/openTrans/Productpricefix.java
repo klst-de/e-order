@@ -186,16 +186,13 @@ public class ALLOWORCHARGESFIX {
 		super.setPRICEAMOUNT(unitPriceAmount.getValue());
 	}
 	
-	// BG-29.BT-148 0..1 GrossPrice
+	// BG-29.BT-148 0..1 GrossPrice / Bruttopreis (nicht in OT)
 	@Override
 	public IAmount getGrossPrice() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public void setGrossPrice(IAmount grossPrice) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	// BG-29.BT-149 0..1 base quantity, UnitPriceQuantity

@@ -155,6 +155,7 @@ public class Productid extends PRODUCTID implements BG31_ItemInformation {
 	public Identifier createStandardIdentifier(String globalID, String schemeID) {
 		return new INTERNATIONAL_PID(globalID, schemeID);
 	}
+	
 	@Override
 	public void addStandardIdentifier(Identifier id) {
 		super.getINTERNATIONALPID().add((INTERNATIONAL_PID)id);

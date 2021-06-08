@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.opentrans.xmlschema._2.ORDERRESPONSEITEM;
+import org.opentrans.xmlschema._2.PRODUCTFEATURES;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
@@ -18,10 +19,17 @@ import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.impl.UnitPriceAmount;
 
+/**
+ * 33-342: BG-25 1..n ORDER LINE
+ * <p>
+ * A group of business terms providing information on individual order line.
+ * <p>
+ * Similar to EN16931 business group BG-25
+ */
 public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrderLine {
 
 	private static final Logger LOG = Logger.getLogger(OrderResponseItem.class.getName());
-	
+
 	static OrderResponseItem create(String id, IQuantity quantity, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
 		return new OrderResponseItem(id, quantity, lineTotalAmount, priceAmount, itemName, taxCat, percent);
 	}
@@ -64,7 +72,7 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 		setItemName(itemName);
 		if(taxCat!=null) setTaxCategoryAndRate(taxCat, percent);
 	}
-
+	
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		
@@ -88,15 +96,15 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 		return super.getLINEITEMID();
 	}
 
-	// 37: BT-127 0..1/n Freitext zur Rechnungsposition : ram:IncludedNote
+	// 37: BT-127 0..1/n Freitext zur Rechnungsposition
 	@Override // getter
 	public List<OrderNote> getNotes() {
 		return Remarks.getNotes(super.getREMARKS());
 	}
-	@Override
-	public OrderNote createNote(String subjectCode, String content) {
-		return Remarks.create(subjectCode, content);
-	}
+//	@Override
+//	public OrderNote createNote(String subjectCode, String content) {
+//		return Remarks.create(subjectCode, content);
+//	}
 	@Override
 	public void addNote(OrderNote note) {
 		super.getREMARKS().add((Remarks)note);
@@ -104,10 +112,10 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	
 	// 43: BG-31.BT-157 0..n Item (Trade Product) Global ID
 	// 44:                   Item (Trade Product) Global ID Scheme ID
-	@Override
-	public Identifier createStandardIdentifier(String globalID, String schemeID) {
-		return productid.createStandardIdentifier(globalID, schemeID);
-	}
+//	@Override
+//	public Identifier createStandardIdentifier(String globalID, String schemeID) {
+//		return productid.createStandardIdentifier(globalID, schemeID);
+//	}
 	@Override
 	public void addStandardIdentifier(Identifier id) {
 		productid.addStandardIdentifier(id);
@@ -155,6 +163,43 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	public String getDescription() {
 		return productid.getDescription();
 	}
+	
+	// 51: 0..1 Item (Trade Product) Batch ID (lot ID)
+	// Eindeutige Identifikation der Charge aus der das Produkt stammt.
+	// TODO Unterschied zu 66: Item (Trade Product) Instances Batch ID
+	@Override
+	public void setBatchID(String id) {
+		productid.getLOTNUMBER().add(id);
+	}
+	@Override
+	public String getBatchID() {
+		return productid.getLOTNUMBER().isEmpty() ? null 
+			: productid.getLOTNUMBER().get(0);
+	}
+
+	// 52: 0..1 SpecifiedTradeProduct.brandName
+	// 53: 0..1 SpecifiedTradeProduct.modelName
+
+	// 54: BG-32 0..n ITEM ATTRIBUTES
+	/* PRODUCTFEATURES enthält List<FEATURE> feature:
+	 *  Produktmerkmal FEATURE Informationen über ein Produktmerkmal 
+	 */
+	@Override
+	public void addItemAttribute(String name, String value) {
+		if(name==null) return;
+		
+		PRODUCTFEATURES pf = getPRODUCTFEATURES();
+		if(pf==null) {
+			pf = new PRODUCTFEATURES();
+			setPRODUCTFEATURES(pf);
+		}
+		
+		pf.getFEATURE().add(createFeature(name, value));
+	}
+	@Override
+	public Properties getItemAttributes() {
+		return getItemAttributes(super.getPRODUCTFEATURES());
+	}
 
 	// 77,78: BG-31.BT-159 0..1 Item country of origin / nicht in opentrans, ===> "countryoforigin" als ARTIKELATTRIBUTE
 	private static final String COUNTRY_OF_ORIGIN = "countryoforigin";
@@ -165,6 +210,7 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	@Override
 	public String getCountryOfOrigin() {
 		Properties attributes = getItemAttributes();
+		if(attributes==null) return null;
 		return (String) attributes.get(COUNTRY_OF_ORIGIN);
 	}
 
@@ -173,7 +219,6 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount / PRODUCTPRICEFIX.priceamount
 	@Override
 	public IAmount getUnitPriceAmount() {
-		// delegieren:
 		return productpricefix.getUnitPriceAmount();
 	}
 	private void setUnitPriceAmount(IAmount unitPriceAmount) {
@@ -184,12 +229,10 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	@Override
 	public IQuantity getUnitPriceQuantity() {
 		if(super.getPRODUCTPRICEFIX()==null) return null;
-		// delegieren:
 		return productpricefix.getUnitPriceQuantity();
 	}
 	@Override
 	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-//		Mapper.set(getPRODUCTPRICEFIX(), "pricequantity", basisQuantity); // BUG
 		productpricefix.setUnitPriceQuantity(basisQuantity);
 	}
 
@@ -207,10 +250,10 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	//---------------- BG-26 0..1 BG-26.BT-134 + BG-26.BT-135
 	// 291..393 + 294..296
 	// 304..306 + 305..307
-	@Override // factory
-	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-		return DeliveryDate.create(start, end);
-	}	
+//	@Override // factory
+//	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+//		return DeliveryDate.create(start, end);
+//	}	
 	@Override
 	public void setDeliveryPeriod(IPeriod period) {
 		super.setDELIVERYDATE((DeliveryDate)period);
