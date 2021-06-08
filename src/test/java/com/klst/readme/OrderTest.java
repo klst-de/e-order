@@ -219,7 +219,7 @@ public class OrderTest {
 		allowance.setReasoncode("64");
 		allowance.setReasonText("SPECIAL AGREEMENT");
 		allowance.setTaxType(TaxTypeCode.VAT);
-		allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
+		allowance.setTaxCategoryCode(TaxCategoryCode.STANDARD_RATE);
 		allowance.setTaxPercentage(new BigDecimal(20));
 		order.addAllowanceCharge(allowance);
 		
@@ -247,7 +247,7 @@ public class OrderTest {
 				  , new Amount(EUR, new BigDecimal(60.00))				// line net amount
 				  , new UnitPriceAmount(EUR, new BigDecimal(10.00))	    // price
 				  , "Zeitschrift [...]"									// itemName
-				  , TaxCategoryCode.StandardRate, new BigDecimal(7)     // VAT category code, rate 7%
+				  , TaxCategoryCode.STANDARD_RATE, new BigDecimal(7)     // VAT category code, rate 7%
 				  );
 		line.addNote("AAI", "Content of Note");
 		line.setUnitPriceQuantity(new Quantity("C62", new BigDecimal(1))); // (optional) price base quantity
@@ -355,7 +355,7 @@ public class OrderTest {
 				, new Amount(new BigDecimal(100.00))
 				, new UnitPriceAmount(new BigDecimal(10.00))
 				, "Product Name"
-				, TaxCategoryCode.StandardRate, new BigDecimal(16)
+				, TaxCategoryCode.STANDARD_RATE, new BigDecimal(16)
 				);
 
 		transformer = cioTransformer;
