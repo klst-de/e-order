@@ -201,7 +201,7 @@ public class OpenTransOrderReadTest extends Constants {
 		line.sid = new ID("7611577104836", EAN);
 		line.sai = "G4525220";
 		line.bai = "907216725";
-		line.tcc = TaxCategoryCode.ExemptFromTax;
+		line.tcc = TaxCategoryCode.EXEMPTION;
 		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
 		line.sddr = new ID(ORDER_ID);
 		line.sdlr = new ID(line.id);
@@ -579,7 +579,7 @@ public class OpenTransOrderReadTest extends Constants {
 
 		// BG-30 1..1 UMSATZSTEUERINFORMATIONEN
 		// BG-30.BT-151 1..1 Code der Umsatzsteuerkategorie
-		assertEquals(TaxCategoryCode.StandardRate, line.getTaxCategory());
+		assertEquals(TaxCategoryCode.STANDARD_RATE, line.getTaxCategory());
 		// BG-30.BT-152 0..1 item VAT rate
 		LOG.info("TaxRate:"+line.getTaxRate());
 

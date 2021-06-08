@@ -157,10 +157,10 @@ public class PLD_257444 extends Constants {
 			assertEquals(e.pdi, l.isPartialDeliveryAllowed());
 			assertEquals(e.delivery, l.getDeliveryDateAsTimestamp());
 			assertEquals(e.tcc, l.getTaxCategory());
-			List<SupportingDocument> sdList = l.getReferencedProductDocuments();
+			List<SupportingDocument> sdList = l.getReferencedDocuments();
 			assertFalse(sdList.isEmpty());
 			SupportingDocument sd = sdList.get(0);
-			LOG.info("CUSTOMER_ORDER_REFERENCE:"+l.getReferencedProductDocuments()
+			LOG.info("CUSTOMER_ORDER_REFERENCE:"+l.getReferencedDocuments()
 				+ sdList.get(0).getLineReference()
 				+ sdList.get(0).getDateAsTimestamp()
 			);
@@ -367,7 +367,7 @@ public class PLD_257444 extends Constants {
 		line.sid = new ID("7611577104836", EAN);
 		line.sai = "G4525220";
 		line.bai = "907216725";
-		line.tcc = TaxCategoryCode.ExemptFromTax;
+		line.tcc = TaxCategoryCode.EXEMPTION;	
 		line.delivery = Timestamp.valueOf("2020-01-30"+_HMS);
 		line.sddr = new ID(ORDER_ID);
 		line.sdlr = new ID(line.id);
@@ -446,6 +446,7 @@ public class PLD_257444 extends Constants {
 		  , line.lna                                   // line net amount
 		  , line.upa                                   // unit price
 		  , line.name                                  // itemName
+		  , TaxCategoryCode.EXEMPTION, BigDecimal.ZERO
 		  );
 		line1.addStandardIdentifier(line.sid.getContent(), line.sid.getSchemeIdentifier()); // 43+44
 		line1.setSellerAssignedID(line.sai);           // 45
@@ -454,7 +455,8 @@ public class PLD_257444 extends Constants {
 		line1.setUnitPriceQuantity(line.upq);          // 180+181 (optional) price base quantity
 		line1.setPartialDeliveryIndicator(OrderLine.YES); // 208
 		line1.setDeliveryDate(line.delivery);             // 298
-		line1.setTaxCategory(line.tcc);                   // 315
+//		line1.setTaxCategory(line.tcc);                   // 315
+		line1.setTaxCategoryAndRate(TaxCategoryCode.EXEMPTION, BigDecimal.ZERO); // 315+317
 /*
 			<CUSTOMER_ORDER_REFERENCE>
 				<ORDER_ID>PLEX-141269</ORDER_ID>
@@ -479,11 +481,13 @@ public class PLD_257444 extends Constants {
 		line2.setDescription(line.desc);               // 50
 		line2.setBatchID("BatchID-TEST");              // 51
 		line2.setCountryOfOrigin("PL");                // 78
+		line2.addReferencedDocument(ORDER_ID, line.sdlr
+				, "refDoc 2 Descr.", line.sdts, null); // 141
 		line2.setUnitPriceQuantity(line.upq);          // 180+181 (optional) price base quantity
 		line2.setPartialDeliveryIndicator(line.pdi);   // 208
 		line2.setDeliveryDate(line.delivery);          // 298
 		line2.setTaxCategory(line.tcc);                // 315
-		line2.addReferencedDocument(ORDER_ID, line.sdlr, null, line.sdts, null);
+		line2.setBuyerAccountingReference("BuyerAcct");// 340
 		or.addLine(line2);
 
 		PostalAddressExt sellerAddress = (PostalAddressExt) or.createAddress("FR", "54152", "Citoyene");

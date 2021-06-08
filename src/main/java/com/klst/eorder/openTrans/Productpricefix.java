@@ -233,30 +233,47 @@ public class ALLOWORCHARGESFIX {
 	gängigen internationalen Begriffen erfolgen (z.B. Mehrwertsteuer = VAT).
  */
 	
-	// BG-30.BT-151 1..1 item VAT category code
+	// 315: BG-30.BT-151 1..1 item VAT category code
 	@Override
-	public void setTaxCategory(TaxCategoryCode codeEnum) {
-		if(codeEnum==null) return;
-		// public List<TAXDETAILSFIX> getTAXDETAILSFIX()
-		// TODO ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate);
-		TAXDETAILSFIX tdf = new TAXDETAILSFIX();
+	public void setTaxCategory(TaxCategoryCode taxCategoryCode) {
+		setTaxCategoryAndRate(taxCategoryCode, null);
+	}
+	// 317: BG-30.BT-152 0..1 item VAT rate
+	@Override
+	public void setTaxRate(BigDecimal taxRate) {
+		// taxRate ohne TaxCategoryCode hat wenig Sinn
+	}
+	@Override
+	public void setTaxCategoryAndRate(TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
+		if(taxCategoryCode==null) return;
+
+		// nur eine Steuerart VAT:
+		if(getTAXDETAILSFIX().isEmpty()) {
+			getTAXDETAILSFIX().add(new TAXDETAILSFIX());
+		}
+		TAXDETAILSFIX tdf = getTAXDETAILSFIX().get(0);
+		
 		tdf.setTAXTYPE("vat"); // default
-		switch(codeEnum) {
-		case StandardRate :
-			tdf.setTAXCATEGORY("standard_rate");
-			break;
-		case ExemptFromTax :
-			tdf.setTAXCATEGORY("exemption");
+
+		switch(taxCategoryCode) {
+		case STANDARD_RATE :
+		case REDUCED_RATE :
+		case ZERO_RATE :
+		case EXEMPTION :
+			tdf.setTAXCATEGORY(taxCategoryCode.toString().toLowerCase());
+			tdf.setTAX(taxRate);
 			break;
 		default:
-			LOG.warning("not defined for TaxCategoryCode:"+codeEnum);
+			LOG.warning("no OpenTrans TAX_CATEGORY exists for "+taxCategoryCode);
+			tdf.setTAXCATEGORY(taxCategoryCode.toString());
+			tdf.setTAX(taxRate);
 		}
-		super.getTAXDETAILSFIX().add(tdf);
-	}
+	}	
 	
 	private TAXDETAILSFIX getVatDatails() {
 		List<TAXDETAILSFIX> taxDatails = super.getTAXDETAILSFIX();
 		if(taxDatails.isEmpty()) return null; // defensiv
+		
 		TAXDETAILSFIX vatDatails = null;
 		for(int i=0; i<taxDatails.size(); i++) {
 			TAXDETAILSFIX td = taxDatails.get(i);
@@ -293,8 +310,8 @@ mindestens 1 Zeichen und darf höchstens 80 Zeichen betragen.
 
 	 */
 	private static final Map<String, TaxCategoryCode> MAP_OT_TAXCATEGORY = Stream.of(
-		    new AbstractMap.SimpleImmutableEntry<>("standard_rate", TaxCategoryCode.StandardRate),
-		    new AbstractMap.SimpleImmutableEntry<>("exemption", TaxCategoryCode.ExemptFromTax)
+		    new AbstractMap.SimpleImmutableEntry<>("standard_rate", TaxCategoryCode.STANDARD_RATE),
+		    new AbstractMap.SimpleImmutableEntry<>("exemption", TaxCategoryCode.EXEMPTION)
 		).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	@Override
 	public TaxCategoryCode getTaxCategory() {
@@ -302,22 +319,17 @@ mindestens 1 Zeichen und darf höchstens 80 Zeichen betragen.
 		return vatDatails==null ? null : MAP_OT_TAXCATEGORY.get(vatDatails.getTAXCATEGORY());
 	}
 	
-	// BG-30.BT-152 0..1 item VAT rate
-	@Override
-	public void setTaxRate(BigDecimal taxRate) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	/* TAX:
 	 * Faktor für Steuer, der für diesen Preis gilt
 	 * Beispiel: "0.16", entspricht 16%
 	 */
+	// 317: BG-30.BT-152 0..1 item VAT rate
 	@Override
 	public BigDecimal getTaxRate() {
 		TAXDETAILSFIX vatDatails = getVatDatails();
 		return vatDatails.getTAX();
 	}
+	
 	@Override
 	public AllowancesAndCharges getPriceDiscount() {
 		// TODO Auto-generated method stub
@@ -325,8 +337,7 @@ mindestens 1 Zeichen und darf höchstens 80 Zeichen betragen.
 	}
 	@Override
 	public void setPriceDiscount(AllowancesAndCharges allowance) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
 	@Override
 	public AllowancesAndCharges getPriceCharge() {

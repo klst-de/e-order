@@ -10,8 +10,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
+import org.bmecat.bmecat._2005.ACCOUNTINGINFO;
 import org.bmecat.bmecat._2005.COSTCATEGORYID;
-import org.opentrans.xmlschema._2.CUSTOMERORDERREFERENCE;
 import org.opentrans.xmlschema._2.ORDERITEM;
 import org.opentrans.xmlschema._2.PRODUCTFEATURES;
 
@@ -21,7 +21,6 @@ import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
-import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AllowancesAndCharges;
@@ -29,10 +28,8 @@ import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.ISupplyChainEvent;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.api.SupportingDocument;
-import com.klst.eorder.impl.ID;
 import com.klst.eorder.impl.TradeProductInstance;
 import com.klst.eorder.impl.UnitPriceAmount;
-import com.klst.eorder.openTrans.reflection.Mapper;
 
 /**
  * 33-342: BG-25 1..n ORDER LINE
@@ -127,10 +124,6 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 	public List<OrderNote> getNotes() {
 		return Remarks.getNotes(super.getREMARKS());
 	}
-//	@Override
-//	public OrderNote createNote(String subjectCode, String content) {
-//		return Remarks.create(subjectCode, content);
-//	}
 	@Override
 	public void addNote(OrderNote note) {
 		super.getREMARKS().add((Remarks)note);
@@ -138,10 +131,6 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 	
 	// 43: BG-31.BT-157 0..n Item (Trade Product) Global ID
 	// 44:                   Item (Trade Product) Global ID Scheme ID
-//	@Override
-//	public Identifier createStandardIdentifier(String globalID, String schemeID) {
-//		return productid.createStandardIdentifier(globalID, schemeID);
-//	}
 	@Override
 	public void addStandardIdentifier(Identifier id) {
 		productid.addStandardIdentifier(id);
@@ -309,10 +298,6 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 	//---------------- BG-26 0..1 BG-26.BT-134 + BG-26.BT-135
 	// 291..393 + 294..296
 	// 304..306 + 305..307
-//	@Override // factory
-//	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-//		return DeliveryDate.create(start, end);
-//	}	
 	@Override
 	public void setDeliveryPeriod(IPeriod period) {
 		super.setDELIVERYDATE((DeliveryDate)period);
@@ -341,6 +326,32 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 		return DeliveryDate.create(getDELIVERYDATE());
 	}
 
+	// 315: BG-30.BT-151 1..1 item VAT category code
+	@Override
+	public void setTaxCategory(TaxCategoryCode code) {
+		productpricefix.setTaxCategory(code);
+	}
+	@Override
+	public TaxCategoryCode getTaxCategory() {
+		return productpricefix.getTaxCategory();
+	}
+
+	// 317: BG-30.BT-152 0..1 item VAT rate
+	@Override
+	public void setTaxRate(BigDecimal taxRate) {
+		productpricefix.setTaxRate(taxRate);
+	}
+	@Override
+	public BigDecimal getTaxRate() {
+		return productpricefix.getTaxRate();
+	}
+
+	// 315+317:
+	@Override
+	public void setTaxCategoryAndRate(TaxCategoryCode code, BigDecimal taxRate) {
+		productpricefix.setTaxCategoryAndRate(code, taxRate);
+	}
+
 	/* 335: BT-131 1..1 Nettobetrag der Rechnungsposition / PRICE_LINE_AMOUNT
 	 * Höhe des Preises für die Positionszeile. 
 	 * Der Wert ergibt sich im Regelfall aus der Multiplikation von PRICE_AMOUNT und QUANTITY, 
@@ -355,6 +366,78 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 	public IAmount getLineTotalAmount() {
 		return super.getPRICELINEAMOUNT()==null ? null : Amount.create(getPRICELINEAMOUNT());
 	}
+
+// ---------------------------------------------------------------
+	/* SupportingDocument
+		- at document line level:
+		- 141ff: 0..n ADDITIONAL REFERENCED DOCUMENT in SpecifiedLineTradeAgreement
+
+CUSTOMER_ORDER_REFERENCE / (Kundenauftragsbezug)
+Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die Position bezieht.
+
+	<ORDER_ITEM> ...
+	<CUSTOMER_ORDER_REFERENCE>
+		<ORDER_ID>PLEX-141269</ORDER_ID>
+		<LINE_ITEM_ID>1</LINE_ITEM_ID>
+		<ORDER_DATE>2020-01-22</ORDER_DATE>
+	</CUSTOMER_ORDER_REFERENCE>
+
+*/
+	@Override
+	public void addReferencedDocument(SupportingDocument supportigDocument) {
+		super.getCUSTOMERORDERREFERENCE().add((CustomerOrderReference)supportigDocument);		
+	}
+	@Override
+	public List<SupportingDocument> getReferencedDocuments() {
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
+		super.getCUSTOMERORDERREFERENCE().forEach(cor -> {
+			res.add( CustomerOrderReference.create(cor) );
+		});
+		return res;
+	}
+	
+	// 208: 0..1
+	static final String TRUE = Boolean.TRUE.toString().toUpperCase();
+	// funktonal:
+	private Predicate<String> isTRUE = indicator -> {
+		return indicator!=null && indicator.equals(TRUE);
+	};
+	@Override
+	public boolean isPartialDeliveryAllowed() {
+		return isTRUE.test(super.getPARTIALSHIPMENTALLOWED());
+	}
+	@Override
+	public void setPartialDeliveryIndicator(boolean indicator) {
+		if(indicator) {
+			setPARTIALSHIPMENTALLOWED(TRUE);
+		}
+	}
+
+	// 340: BT-133 0..1 line Buyer accounting reference
+	/* ACCOUNTING_INFO (Kontierungsinformation) namespace: BMECAT
+	 * In diesem Element werden Informationen über die Kontierung erfasst, 
+	 * die beim einkaufenden Unternehmen durch den Auftrag anfallen. Zu diesen Informationen gehören 
+	 *  die Nummer der zu belastenden Kostenstelle oder des zu belastenden Projekts oder des zu belastenden Werkauftrags
+	 *  die Kostenart 
+	 *  sowie das eigentliche Konto. 
+	 * Die Kontierungsinformationen werden vom einkaufenden Unternehmen angegeben, damit der Lieferant sie auf der 
+	 * Rechnung angeben kann und so wiederum die Rechnungsprüfung beim einkaufenden Unternehmen erleichtert wird.
+	 */
+	public void setBuyerAccountingReference(String text) {
+		ACCOUNTINGINFO accInfo = new ACCOUNTINGINFO();
+		COSTCATEGORYID ccId = new COSTCATEGORYID(); // required
+//		ccId.setType("cost_center"); // cost_center, project, work_order
+		ccId.setValue(text);
+		accInfo.setCOSTCATEGORYID(ccId);
+		super.setACCOUNTINGINFO(accInfo);
+	}
+	public String getBuyerAccountingReference() {
+		COSTCATEGORYID cc = super.getACCOUNTINGINFO()==null ? null : getACCOUNTINGINFO().getCOSTCATEGORYID();
+		return cc==null ? null : cc.getValue();
+	}
+
+// ---------------------------------------------------------------
+
 
 	@Override
 	public String getStatus() {
@@ -458,21 +541,12 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 		return null;
 	}
 
-//	158 SCT_LINE_TA COMFORT	  (Gross Price)
+// 158: BG-29.BT-148 0..1 Item gross price / Bruttopreis (nicht in OT)
 //	159 SCT_LINE_TA COMFORT	  Gross Price
 //	160 SCT_LINE_TA COMFORT	  Gross Price Base quantity
 //	161 SCT_LINE_TA COMFORT	  Gross Price Unit Code for base quantity
-	// 158: BG-29.BT-148 0..1 Item gross price / Bruttopreis (nicht in OT)
-	@Override
-	public IAmount getGrossPrice() {
-		return productpricefix.getGrossPrice();
-	}
-	@Override
-	public void setGrossPrice(IAmount grossPrice) {
-		productpricefix.setGrossPrice(grossPrice);
-	}
 
-	// 162: BG-29.BT-147 0..1 PriceDiscount
+// 162: BG-29.BT-147 0..1 PriceDiscount
 	@Override
 	public AllowancesAndCharges getPriceDiscount() {
 		// delegieren:
@@ -484,7 +558,7 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 	}
 
 	
-	// BG.25.BT-128 0..1 Objektkennung // (OBJECT IDENTIFIER FOR INVOICE LINE) Zeile 154
+	// BG.25.BT-128 0..1 Objektkennung // (OBJECT IDENTIFIER FOR INVOICE LINE)
 /*
                     <ram:AdditionalReferencedDocument>
                          <ram:IssuerAssignedID>ADD_REF_DOC_ID</ram:IssuerAssignedID>
@@ -534,29 +608,9 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 //		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
 	}
 
-	// BT-133 0..1 line Buyer accounting reference : ram:ReceivableSpecifiedTradeAccountingAccount
-	public void setBuyerAccountingReference(String text) {
-		Mapper.newFieldInstance(this, "accountinginfo", text);
-		Mapper.set(getACCOUNTINGINFO(), "costcategoryid", text);
-// TODO testen
-	}
-	/* ACCOUNTING_INFO (Kontierungsinformation) namespace: BMECAT
-	 * In diesem Element werden Informationen über die Kontierung erfasst, 
-	 * die beim einkaufenden Unternehmen durch den Auftrag anfallen. Zu diesen Informationen gehören 
-	 *  die Nummer der zu belastenden Kostenstelle oder des zu belastenden Projekts oder des zu belastenden Werkauftrags
-	 *  die Kostenart 
-	 *  sowie das eigentliche Konto. 
-	 * Die Kontierungsinformationen werden vom einkaufenden Unternehmen angegeben, damit der Lieferant sie auf der 
-	 * Rechnung angeben kann und so wiederum die Rechnungsprüfung beim einkaufenden Unternehmen erleichtert wird.
-	 */
-	public String getBuyerAccountingReference() {
-		COSTCATEGORYID cc = super.getACCOUNTINGINFO()==null ? null : getACCOUNTINGINFO().getCOSTCATEGORYID();
-		return cc==null ? null : cc.getValue();
-	}
-
 	/*
-	 * BG-27 0..n LINE ALLOWANCES
-	 * BG-28 0..n LINE CHARGES
+	 * 318: BG-27 0..n LINE ALLOWANCES
+	 * 326: BG-28 0..n LINE CHARGES
 	 * 
 	 * 
 	 * TODO in PRODUCTPRICEFIX :   List<ALLOWORCHARGE> alloworcharge
@@ -594,143 +648,10 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 //		});
 //		return res;
 	}
-
 	
-	// BG-30.BT-151 1..1 item VAT category code
-	@Override
-	public void setTaxCategory(TaxCategoryCode codeEnum) {
-		productpricefix.setTaxCategory(codeEnum);
-	}
-	@Override
-	public TaxCategoryCode getTaxCategory() {
-		return productpricefix.getTaxCategory();
-	}
-
-	// BG-30.BT-152 0..1 item VAT rate
-	@Override
-	public void setTaxRate(BigDecimal taxRate) {
-		productpricefix.setTaxRate(taxRate);
-	}
-	@Override
-	public BigDecimal getTaxRate() {
-		// delegieren:
-		return productpricefix.getTaxRate();
-	}
 
 
 	// --------------------------- CIO only:
-	// 208: 0..1
-	static final String TRUE = Boolean.TRUE.toString().toUpperCase();
-	// funktonal:
-	private Predicate<String> isTRUE = indicator -> {
-		return indicator!=null && indicator.equals(TRUE);
-	};
-	@Override
-	public boolean isPartialDeliveryAllowed() {
-		return isTRUE.test(super.getPARTIALSHIPMENTALLOWED());
-	}
-	@Override
-	public void setPartialDeliveryIndicator(boolean indicator) {
-		if(indicator) {
-			setPARTIALSHIPMENTALLOWED(TRUE);
-		}
-	}
-
-	@Override
-	public void addReferencedProductDocument(String code, SupportingDocument supportigDocument) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* SupportingDocument
-	   - at document line level:
--  79ff: 0..n ADDITIONAL REFERENCED PRODUCT DOCUMENT in SpecifiedTradeProduct
-- 141ff: 0..n ADDITIONAL REFERENCED DOCUMENT in SpecifiedLineTradeAgreement
-- 154: BG.25.BT-128 0..1 line object identifier
-
-CUSTOMER_ORDER_REFERENCE / (Kundenauftragsbezug)
-Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die Position bezieht.
-<ORDER_ITEM> ...
-<CUSTOMER_ORDER_REFERENCE>
-	<ORDER_ID>PLEX-141269</ORDER_ID>
-	<LINE_ITEM_ID>1</LINE_ITEM_ID>
-	<ORDER_DATE>2020-01-22</ORDER_DATE>
-</CUSTOMER_ORDER_REFERENCE>
-
-	class INTERNATIONAL_PID extends INTERNATIONALPID implements Identifier {
-                                                                Reference
-*/
-	class SimpleId implements Reference {
-
-		private String content;
-		
-		SimpleId(String content, String type) {
-			setContent(content);
-			setSchemeIdentifier(type);
-		}
-
-		@Override
-		public void setContent(String content) {
-			this.content = content;
-		}
-
-		@Override
-		public String getContent() {
-			return content;
-		}
-
-		@Override
-		public void setSchemeIdentifier(String id) {
-		}
-
-		@Override
-		public String getSchemeIdentifier() {
-			return null;
-		}
-		
-	}
-	@Override
-	public List<SupportingDocument> getReferencedProductDocuments() {
-		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
-		List<CUSTOMERORDERREFERENCE> list = super.getCUSTOMERORDERREFERENCE();
-		list.forEach(cor -> {
-			String docRefId = cor.getORDERID();
-//			Reference lineId = new SimpleId(cor.getLINEITEMID(), null);
-			Reference lineId = new ID(cor.getLINEITEMID());
-			Timestamp ts = DateTimeFormats.dtDATETIMEToTs(cor.getORDERDATE());
-//			List<ORDERDESCR> description = TODO cor.getORDERDESCR();
-			String description = null;
-//			TypePARTYID cor.getCUSTOMERIDREF()
-			res.add(createSupportigDocument(docRefId, lineId, description, ts, null));
-		});
-		return res;
-	}
-
-//	@Override
-//	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
-//			Timestamp ts, String uri) {
-//		return CustomerOrderReference.create(docRefId, lineId, description, ts);
-//	}
-//
-//	@Override
-//	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description,
-//			Timestamp ts, byte[] content, String mimeCode, String filename) {
-//		return CustomerOrderReference.create(docRefId, lineId, description, ts);
-//	}
-
-	@Override
-	public void addReferencedDocument(SupportingDocument supportigDocument) {
-		super.getCUSTOMERORDERREFERENCE().add((CustomerOrderReference)supportigDocument);		
-	}
-
-	@Override
-	public List<SupportingDocument> getReferencedDocuments() {
-		List<SupportingDocument> res = new ArrayList<SupportingDocument>();
-		super.getCUSTOMERORDERREFERENCE().forEach(cor -> {
-			res.add( CustomerOrderReference.create(cor) );
-		});
-		return res;
-	}
 
 	@Override
 	public void setPickupDate(Timestamp timestamp) {

@@ -101,10 +101,6 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	public List<OrderNote> getNotes() {
 		return Remarks.getNotes(super.getREMARKS());
 	}
-//	@Override
-//	public OrderNote createNote(String subjectCode, String content) {
-//		return Remarks.create(subjectCode, content);
-//	}
 	@Override
 	public void addNote(OrderNote note) {
 		super.getREMARKS().add((Remarks)note);
@@ -112,10 +108,6 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	
 	// 43: BG-31.BT-157 0..n Item (Trade Product) Global ID
 	// 44:                   Item (Trade Product) Global ID Scheme ID
-//	@Override
-//	public Identifier createStandardIdentifier(String globalID, String schemeID) {
-//		return productid.createStandardIdentifier(globalID, schemeID);
-//	}
 	@Override
 	public void addStandardIdentifier(Identifier id) {
 		productid.addStandardIdentifier(id);
@@ -145,6 +137,9 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 		return productid.getBuyerAssignedID();
 	}
 
+	// 47: 0..1 SpecifiedTradeProduct.industryAssignedID
+	// 48: 0..1 SpecifiedTradeProduct.modelID
+	
 	// 49: BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) {
 		productid.setItemName(text);
@@ -250,10 +245,6 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	//---------------- BG-26 0..1 BG-26.BT-134 + BG-26.BT-135
 	// 291..393 + 294..296
 	// 304..306 + 305..307
-//	@Override // factory
-//	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-//		return DeliveryDate.create(start, end);
-//	}	
 	@Override
 	public void setDeliveryPeriod(IPeriod period) {
 		super.setDELIVERYDATE((DeliveryDate)period);
@@ -280,6 +271,32 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 		}
 		// DELIVERYDATE ist Zeitraum
 		return DeliveryDate.create(getDELIVERYDATE());
+	}
+
+	// 315: BG-30.BT-151 1..1 item VAT category code
+	@Override
+	public void setTaxCategory(TaxCategoryCode code) {
+		productpricefix.setTaxCategory(code);
+	}
+	@Override
+	public TaxCategoryCode getTaxCategory() {
+		return productpricefix.getTaxCategory();
+	}
+
+	// 317: BG-30.BT-152 0..1 item VAT rate
+	@Override
+	public void setTaxRate(BigDecimal taxRate) {
+		productpricefix.setTaxRate(taxRate);
+	}
+	@Override
+	public BigDecimal getTaxRate() {
+		return productpricefix.getTaxRate();
+	}
+
+	// 315+317:
+	@Override
+	public void setTaxCategoryAndRate(TaxCategoryCode code, BigDecimal taxRate) {
+		productpricefix.setTaxCategoryAndRate(code, taxRate);
 	}
 
 	/* 335: BT-131 1..1 Nettobetrag der Rechnungsposition / PRICE_LINE_AMOUNT

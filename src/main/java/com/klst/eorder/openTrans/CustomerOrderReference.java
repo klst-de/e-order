@@ -10,7 +10,6 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.eorder.api.SupportingDocument;
-import com.klst.eorder.impl.ID;
 
 /* CUSTOMERORDERREFERENCE:
     protected String orderid;               ==> docRefId
@@ -91,7 +90,7 @@ public class CustomerOrderReference extends CUSTOMERORDERREFERENCE implements Su
 	@Override
 	public Reference getDocumentReference() {
 		if(super.getORDERID()==null) return null;
-		return new ID(getORDERID());
+		return new SimpleId(getORDERID());
 	}
 
 	@Override
@@ -102,7 +101,7 @@ public class CustomerOrderReference extends CUSTOMERORDERREFERENCE implements Su
 	@Override
 	public Reference getLineReference() {
 		if(super.getLINEITEMID()==null) return null;
-		return new ID(getLINEITEMID());
+		return new SimpleId(getLINEITEMID());
 	}
 
 	@Override
