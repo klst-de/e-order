@@ -559,6 +559,9 @@ public class PLD_257444 extends Constants {
 		, new Amount(new BigDecimal(1259.65)) // total amount without VAT, aka Tax Basis
 		, null);
 		
+		// ?????? Abschlag auf Belegebene
+		or.addAllowance(new Amount(new BigDecimal(2.99)), null, null);
+		
 		transformer = otTransformer;
 		object = (Order)or;
 //		marshal(null);

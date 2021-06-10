@@ -7,17 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlElement;
-
 import org.bmecat.bmecat._2005.DtLANG;
 import org.bmecat.bmecat._2005.LANGUAGE;
-import org.opentrans.xmlschema._2.ACCOUNT;
-import org.opentrans.xmlschema._2.CARD;
 import org.opentrans.xmlschema._2.ORDER;
 import org.opentrans.xmlschema._2.ORDERITEM;
 import org.opentrans.xmlschema._2.ORDERITEMLIST;
 import org.opentrans.xmlschema._2.ORDERSUMMARY;
-import org.opentrans.xmlschema._2.PAYMENTTERMS;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
@@ -67,9 +62,17 @@ import com.klst.eorder.impl.UnitPriceAmount;
 	protected CATALOGREFERENCE catalogreference;
  
  */
-public class Order extends ORDER implements CoreOrder {
+public class Order extends ORDER implements DefaultOrder {
 
 	private static final Logger LOG = Logger.getLogger(Order.class.getName());
+
+	@Override // implements CoreOrderFactory
+	public CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
+		return create(profile, processType, code);
+	}
+	Order create(String profile, String processType, DocumentNameCode code) {
+		return new Order(profile, processType, code);
+	}
 
 	// factory
 	public static Order create() {
@@ -84,19 +87,12 @@ public class Order extends ORDER implements CoreOrder {
 			return new Order(object); 
 		}
 	}
-	
-	@Override
-	public CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
-		return new Order(profile, processType, code);
-	}
 
 	OrderHeader orderHeader;
 	OrderInfo orderInfo;
 
 	// ctor public, damit dynamisches cast im Test möglich ist
 	public Order(ORDER doc) {
-//		LOG.info("Type:"+doc.getType());
-//		LOG.info("Version:"+doc.getVersion());
 		SCopyCtor.getInstance().invokeCopy(this, doc);
 		
 		orderHeader = OrderHeader.create(super.getORDERHEADER(), this);
@@ -108,7 +104,6 @@ public class Order extends ORDER implements CoreOrder {
 		// profile, aka Customization, BG-2.BT-24
 		// processType, BG-2.BT-23
 		// documentNameCode, BT-3 get liefert Order
-		super();
 		LOG.info("Version:"+super.getVersion());
 		setVersion("2.1"); // required
 		// Attribut 'type' muss in Element 'ORDER' vorkommen
@@ -129,12 +124,17 @@ public class Order extends ORDER implements CoreOrder {
 		return orderInfo.getId();
 	}
 
+	// 11: BT-3 The Document TypeCode
+	@Override
+	public DocumentNameCode getDocumentCode() {
+		return DocumentNameCode.Order;
+	}
+
 	/* 14: Document issue date, BT-2  Date (mandatory) 
 	 * Das Datum, an dem der Beleg ausgestellt wurde.
 	 */
 	@Override
 	public void setIssueDate(Timestamp timestamp) {
-		// in <ORDER_INFO> : <ORDER_DATE>2009-05-13T06:20:00+01:00</ORDER_DATE>
 		orderInfo.setIssueDate(timestamp);
 	}
 	@Override
@@ -142,55 +142,50 @@ public class Order extends ORDER implements CoreOrder {
 		return orderInfo.getIssueDateAsTimestamp();
 	}
 
-	// 11: BT-3 The Document TypeCode
-	@Override
-	public DocumentNameCode getDocumentCode() {
-		return DocumentNameCode.Order;
-	}
-
-
-	// 21: BG-1
+	// 21: BG-1 ORDER NOTE / REMARKS
 	@Override
 	public List<OrderNote> getOrderNotes() {
-		// in ORDER_INFO : <REMARKS type="customType">a</REMARKS>
-		// REMARKS extends TypeMLSTRING64000 extends DtMLSTRING mit value + lang
-		// REMARKS. String type <== subjectCode
-		// dh. OrderNote durch Remarks implementieren
-		// delegieren:
 		return Remarks.getNotes(orderInfo.getREMARKS());
 	}
 	@Override
-	public OrderNote createNote(String subjectCode, String content) {
-		return Remarks.create(subjectCode, content);
-	}
-	@Override
 	public void addNote(OrderNote note) {
-		// delegieren:
 		orderInfo.getREMARKS().add((Remarks)note);
 	}
 
+	// 33: BG-25 1..n ORDER LINE
 	@Override
-	public String getProcessType() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<OrderLine> getLines() {
+		List<ORDERITEM> lines = super.getORDERITEMLIST().getORDERITEM();
+		List<OrderLine> resultLines = new ArrayList<OrderLine>(lines.size());
+		lines.forEach(line -> {
+			resultLines.add(OrderItem.create(line, this));
+		});
+		return resultLines;
+	}
+	@Override
+	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount,
+			String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
+		return OrderItem.create(id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
+	}
+	@Override
+	public void addLine(OrderLine line) {
+		if(super.getORDERITEMLIST()==null) {		
+			super.setORDERITEMLIST(new ORDERITEMLIST());
+		}
+		super.getORDERITEMLIST().getORDERITEM().add((OrderItem)line);
 	}
 
+	// 344: BT-10 0..1 Buyer reference
 	@Override
-	public String getCustomization() {
-		// TODO Auto-generated method stub
-		return null;
+	public void setBuyerReference(String reference) {
+		orderInfo.setBuyerReference(reference);
+	}
+	@Override
+	public String getBuyerReferenceValue() {
+		return orderInfo.getBuyerReferenceValue();
 	}
 
 	// 345: BG-4 1..1 SELLER @see BG4_Seller
-	@Override
-	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
-			String companyLegalForm) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		BusinessParty party = Party.create(name, null, address, contact);
-		party.setCompanyId(companyId);
-		party.setCompanyLegalForm(companyLegalForm);
-		setSeller(party);
-	}
 	@Override
 	public void setSeller(BusinessParty party) {
 		orderInfo.setSeller(party);
@@ -202,11 +197,6 @@ public class Order extends ORDER implements CoreOrder {
 
 	// 390: BG-7 1..1 BUYER @see BG7_Buyer
 	@Override
-	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		setBuyer(createParty(name, null, address, contact));
-	}
-	@Override
 	public void setBuyer(BusinessParty party) {
 		orderInfo.setBuyer(party);
 	}
@@ -215,11 +205,7 @@ public class Order extends ORDER implements CoreOrder {
 		return orderInfo.getBuyer();
 	}
 
-	@Override
-	public void setShipTo(String name, PostalAddress address, ContactInfo contact) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		setShipTo(createParty(name, null, address, contact));
-	}
+	// 643: SHIP TO PARTY
 	@Override
 	public void setShipTo(BusinessParty party) {
 		orderInfo.setShipTo(party);
@@ -229,11 +215,7 @@ public class Order extends ORDER implements CoreOrder {
 		return orderInfo.getShipTo();
 	}
 
-	@Override
-	public void setShipFrom(String name, PostalAddress address, ContactInfo contact) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		setShipFrom(createParty(name, null, address, contact));
-	}
+	// 725: SHIP FROM PARTY
 	@Override
 	public void setShipFrom(BusinessParty party) {
 		// TODO Auto-generated method stub	
@@ -244,27 +226,36 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
-	// 833: 0..1 INVOICEE PARTY / The "BILL TO"
+	// 767: BG-14 0..1 DELIVERY DATE
 	@Override
-	public void setBillTo(String name, PostalAddress address, ContactInfo contact) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		setBillTo(createParty(name, null, address, contact));
+	public void setDeliveryDate(Timestamp timestamp) {
+		orderInfo.setDeliveryDate(timestamp);
 	}
 	@Override
-	public void setBillTo(BusinessParty party) {
-		orderInfo.setBillTo(party);
+	public Timestamp getDeliveryDateAsTimestamp() {
+		return orderInfo.getDeliveryDateAsTimestamp();
+	}
+	// 770: BG-14 0..1 DELIVERY PERIOD
+	@Override
+	public void setDeliveryPeriod(IPeriod period) {
+		orderInfo.setDeliveryPeriod((DeliveryDate)period);
 	}
 	@Override
-	public BusinessParty getBillTo() {
-		return orderInfo.getBillTo();
+	public IPeriod getDeliveryPeriod() {
+		return orderInfo.getDeliveryPeriod();
 	}
-	
+
+	// 790: BT-5 1..1 Document currency code
+	@Override
+	public void setDocumentCurrency(String isoCurrencyCode) {
+		orderInfo.setDocumentCurrency(isoCurrencyCode);
+	}
+	@Override
+	public String getDocumentCurrency() {
+		return orderInfo.getDocumentCurrency();
+	}
+
 	// 792: 0..1 INVOICER PARTY
-	@Override
-	public void setInvoicer(String name, PostalAddress address, ContactInfo contact) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		setInvoicer(createParty(name, null, address, contact));
-	}
 	@Override
 	public void setInvoicer(BusinessParty party) {
 		// TODO Auto-generated method stub	
@@ -275,28 +266,28 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
+	// 833: 0..1 INVOICEE PARTY / The "BILL TO"
+	@Override
+	public void setBillTo(BusinessParty party) {
+		orderInfo.setBillTo(party);
+	}
+	@Override
+	public BusinessParty getBillTo() {
+		return orderInfo.getBillTo();
+	}
+	
+	// 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+	// 903: BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		// TODO Auto-generated method stub
 		// in OT werden ALLOW_OR_CHARGES_FIX (Festgelegte Zu- oder Abschläge)
 		// benutzt in PRODUCT_PRICE_FIX auf Positionsebene
-		// und TIME_FOR_PAYMENT auf Belegebene
+		// und ORDER_INFO.PAYMENT_TERMS.TIME_FOR_PAYMENT auf Belegebene
+		orderInfo.addAllowanceCharge(allowanceOrCharge);
 	}
-
 	@Override
 	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -369,29 +360,6 @@ public class Order extends ORDER implements CoreOrder {
 		return null;
 	}
 
-	// 33: BG-25 1..n ORDER LINE
-	@Override
-	public List<OrderLine> getLines() {
-		List<ORDERITEM> lines = super.getORDERITEMLIST().getORDERITEM();
-		List<OrderLine> resultLines = new ArrayList<OrderLine>(lines.size());
-		lines.forEach(line -> {
-			resultLines.add(OrderItem.create(line, this));
-		});
-		return resultLines;
-	}
-	@Override
-	public OrderLine createOrderLine(String id, IQuantity quantity, IAmount lineTotalAmount, IAmount priceAmount,
-			String itemName, TaxCategoryCode taxCat, BigDecimal percent) {
-		return OrderItem.create(id, quantity, lineTotalAmount, (UnitPriceAmount)priceAmount, itemName, taxCat, percent);
-	}
-	@Override
-	public void addLine(OrderLine line) {
-		if(super.getORDERITEMLIST()==null) {		
-			super.setORDERITEMLIST(new ORDERITEMLIST());
-		}
-		super.getORDERITEMLIST().getORDERITEM().add((OrderItem)line);
-	}
-
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
 		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
@@ -408,50 +376,6 @@ public class Order extends ORDER implements CoreOrder {
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
 		return Party.create(name, tradingName, address, contact);
-	}
-
-	// 767: BG-14 0..1 DELIVERY DATE
-	@Override
-	public void setDeliveryDate(Timestamp timestamp) {
-		orderInfo.setDeliveryDate(timestamp);
-	}
-	@Override
-	public Timestamp getDeliveryDateAsTimestamp() {
-		return orderInfo.getDeliveryDateAsTimestamp();
-	}
-	@Override // factory
-	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		return DeliveryDate.create(start, end);
-	}	
-	// BG-14 0..1 DELIVERY PERIOD
-	@Override
-	public void setDeliveryPeriod(IPeriod period) {
-		orderInfo.setDeliveryPeriod((DeliveryDate)period);
-	}
-	@Override
-	public IPeriod getDeliveryPeriod() {
-		return orderInfo.getDeliveryPeriod();
-	}
-
-	// 790: BT-5 1..1 Document currency code
-	@Override
-	public void setDocumentCurrency(String isoCurrencyCode) {
-		orderInfo.setDocumentCurrency(isoCurrencyCode);
-	}
-	@Override
-	public String getDocumentCurrency() {
-		return orderInfo.getDocumentCurrency();
-	}
-
-	// 344: BT-10 0..1 Buyer reference
-	@Override
-	public void setBuyerReference(String reference) {
-		orderInfo.setBuyerReference(reference);
-	}
-	@Override
-	public String getBuyerReferenceValue() {
-		return orderInfo.getBuyerReferenceValue();
 	}
 
 	@Override

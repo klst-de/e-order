@@ -36,26 +36,17 @@ protected String version;
 */
 public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 
-//	@Override  // implements BusinessPartyFactory
-//	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
-//		return Party.create(name, tradingName, address, contact);
-//		return Party.create(name, tradingName, address, contact);
-//	}
-//	
-//	@Override // implements PostalAddressFactory
-//	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-//		return Party.create().createAddress(countryCode, postalCode, city);
-//	}
+	private static final Logger LOG = Logger.getLogger(OrderResponse.class.getName());
 
 	@Override // implements CoreOrderFactory
 	public CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
 		return create(profile, processType, code);
 	}
-
 	OrderResponse create(String profile, String processType, DocumentNameCode code) {
 		return new OrderResponse(profile, processType, code);
 	}
 
+	// factory
 	public static OrderResponse create() {
 		return create((ORDERRESPONSE)null);
 	}
@@ -69,14 +60,11 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		}
 	}
 
-	private static final Logger LOG = Logger.getLogger(OrderResponse.class.getName());
-
 	OrderResponseHeader orderHeader;
 	OrderResponseInfo orderInfo;
 
 	// ctor public, damit dynamisches cast im Test möglich ist
 	public OrderResponse(ORDERRESPONSE doc) {
-//		LOG.info("Version:"+doc.getVersion());
 		SCopyCtor.getInstance().invokeCopy(this, doc);
 		
 		orderHeader = OrderResponseHeader.create(super.getORDERRESPONSEHEADER());
@@ -87,7 +75,6 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		// profile, aka Customization, BG-2.BT-24
 		// processType, BG-2.BT-23
 		// documentNameCode, BT-3 get liefert Order
-		super();
 		LOG.info("Version:"+super.getVersion());
 		setVersion("2.1"); // required
 		orderHeader = OrderResponseHeader.create(super.getORDERRESPONSEHEADER());
@@ -100,7 +87,6 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	@Override
 	public void setId(String id) {
 		orderInfo.setId(id);
-//		orderHeader.setORDERRESPONSEINFO(orderInfo);
 	}
 	@Override
 	public String getId() {
@@ -124,15 +110,11 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	public Timestamp getIssueDateAsTimestamp() {
 		return orderInfo.getIssueDateAsTimestamp();
 	}
-	
+
 	// 21: BG-1 ORDER NOTE / REMARKS
 	@Override
 	public List<OrderNote> getOrderNotes() {
 		return Remarks.getNotes(orderInfo.getREMARKS());
-	}
-	@Override
-	public OrderNote createNote(String subjectCode, String content) {
-		return Remarks.create(subjectCode, content);
 	}
 	@Override
 	public void addNote(OrderNote note) {
@@ -171,7 +153,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	public String getBuyerReferenceValue() {
 		return orderInfo.getBuyerReferenceValue();
 	}
-	
+
 	// 345: BG-4 1..1 SELLER @see BG4_Seller
 	@Override
 	public void setSeller(BusinessParty party) {
@@ -192,6 +174,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		return orderInfo.getBuyer();
 	}
 
+	// 643: SHIP TO PARTY
 	@Override
 	public void setShipTo(BusinessParty party) {
 		orderInfo.setShipTo(party);
@@ -201,15 +184,7 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		return orderInfo.getShipTo();
 	}
 
-	// 833: 0..1 INVOICEE PARTY / The "BILL TO"
-	@Override
-	public void setBillTo(BusinessParty party) {
-		orderInfo.setBillTo(party);
-	}
-	@Override
-	public BusinessParty getBillTo() {
-		return orderInfo.getBillTo();
-	}
+	// 725: SHIP FROM PARTY
 
 	// 767: BG-14 0..1 DELIVERY DATE
 	@Override
@@ -220,10 +195,6 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	public Timestamp getDeliveryDateAsTimestamp() {
 		return orderInfo.getDeliveryDateAsTimestamp();
 	}
-//	@Override // factory
-//	public IPeriod createPeriod(Timestamp start, Timestamp end) {
-//		return DeliveryDate.create(start, end);
-//	}	
 	// 770: BG-14 0..1 DELIVERY PERIOD
 	@Override
 	public void setDeliveryPeriod(IPeriod period) {
@@ -242,6 +213,18 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	@Override
 	public String getDocumentCurrency() {
 		return orderInfo.getDocumentCurrency();
+	}
+
+	// 792: 0..1 INVOICER PARTY
+
+	// 833: 0..1 INVOICEE PARTY / The "BILL TO"
+	@Override
+	public void setBillTo(BusinessParty party) {
+		orderInfo.setBillTo(party);
+	}
+	@Override
+	public BusinessParty getBillTo() {
+		return orderInfo.getBillTo();
 	}
 
 	// 927: BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112

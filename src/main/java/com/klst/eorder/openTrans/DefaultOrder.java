@@ -82,20 +82,14 @@ public interface DefaultOrder extends CoreOrder {
 	
 	@Override
 	default List<OrderNote> getOrderNotes() {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 	@Override
 	default void addNote(OrderNote note) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	default OrderNote createNote(String subjectCode, String content) {
-		// TODO Auto-generated method stub
-		return null;
+		return Remarks.create(subjectCode, content);
 	}
 
 	@Override
@@ -111,8 +105,8 @@ public interface DefaultOrder extends CoreOrder {
 	}
 
 	@Override
-	default void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId,
-			String companyLegalForm) {
+	default void setSeller(String name, PostalAddress address, ContactInfo contact, 
+		String companyId, String companyLegalForm) {
 		BusinessParty party = Party.create(name, null, address, contact);
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
@@ -198,16 +192,15 @@ public interface DefaultOrder extends CoreOrder {
 		return null;
 	}
 
+	// 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
 	@Override
 	default AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		// TODO Auto-generated method stub
-		return null;
+		return AllowOrCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
-
+	// 903: BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
 	@Override
 	default AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		// TODO Auto-generated method stub
-		return null;
+		return AllowOrCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
 
 	@Override

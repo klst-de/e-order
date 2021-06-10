@@ -1,14 +1,21 @@
 package com.klst.eorder.openTrans;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.DtCURRENCIES;
 import org.bmecat.bmecat._2005.TypePARTYID;
+import org.opentrans.xmlschema._2.ALLOWORCHARGE;
+import org.opentrans.xmlschema._2.ALLOWORCHARGESFIX;
 import org.opentrans.xmlschema._2.ORDERINFO;
 import org.opentrans.xmlschema._2.ORDERPARTIESREFERENCE;
 import org.opentrans.xmlschema._2.PARTIES;
 import org.opentrans.xmlschema._2.PARTY;
+import org.opentrans.xmlschema._2.PAYMENT;
+import org.opentrans.xmlschema._2.PAYMENTTERMS;
+import org.opentrans.xmlschema._2.TIMEFORPAYMENT;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
@@ -16,6 +23,7 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
 import com.klst.eorder.openTrans.Party.PartyRole;
@@ -383,4 +391,66 @@ Beispiele:
 		return getCURRENCY().value();
 	}
 
+	void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		if(allowanceOrCharge==null) return; // defensiv
+		
+		// in ORDER_INFO.PAYMENT.PAYMENT_TERMS.TIME_FOR_PAYMENT auf Belegebene
+		// PAYMENT nicht in ORDERRESPONSEINFO
+		// aber in ORDERCHANGEINFO
+		if(super.getPAYMENT()==null) {
+			super.setPAYMENT(new PAYMENT());
+			super.getPAYMENT().setDEBIT(Boolean.TRUE.toString()); // default choice
+		}
+/*
+ *         &lt;choice>
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}CARD"/>
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}ACCOUNT" maxOccurs="unbounded"/>
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}DEBIT"/>
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}CHECK"/>
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}CASH"/>
+ *         &lt;/choice>		
+ */
+		if(super.getPAYMENT().getPAYMENTTERMS()==null) {
+			super.getPAYMENT().setPAYMENTTERMS(new PAYMENTTERMS());
+		}
+		
+	    // Liste festgelegter Zu- oder Abschläge die noch auf den Preis angewendet werden.
+		// siehe auch Productpricefix#addAllowanceCharge
+/*
+ *         &lt;choice>
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}PAYMENT_DATE"/>
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}DAYS"/>
+ *         &lt;/choice>
+ *         &lt;choice minOccurs="0">
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}DISCOUNT_FACTOR" minOccurs="0"/>
+ *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}ALLOW_OR_CHARGES_FIX" minOccurs="0"/>
+ *         &lt;/choice>
+
+ */
+		List<TIMEFORPAYMENT> tfpList = getPAYMENT().getPAYMENTTERMS().getTIMEFORPAYMENT();
+		TIMEFORPAYMENT tfp = new TIMEFORPAYMENT();
+		
+		ALLOWORCHARGESFIX acf = tfp.getALLOWORCHARGESFIX();
+		if(acf==null) {
+			acf = new ALLOWORCHARGESFIX();
+			tfp.setDAYS(BigInteger.ZERO);
+			tfp.setALLOWORCHARGESFIX(acf);
+		}
+		tfpList.add(tfp);
+		acf.getALLOWORCHARGE().add((ALLOWORCHARGE)allowanceOrCharge);
+
+/*
+public class TIMEFORPAYMENT:
+    protected String paymentdate;   Zeitpunkt an dem eine Zahlung durchgeführt werden soll
+    protected BigInteger days;      Zeitangabe in Tagen
+    protected Float discountfactor; Faktor zur Angabe des Skonto, Beispiel: Wert 0.3 entspricht 3% Skonto
+    protected ALLOWORCHARGESFIX alloworchargesfix; Liste festgelegter Zu- oder Abschläge die noch auf den Preis angewendet werden.
+
+ */
+	}
+	List<AllowancesAndCharges> getAllowancesAndCharges() {
+		if(super.getPAYMENT()==null) return null;
+		if(super.getPAYMENT().getPAYMENTTERMS()==null) return null;
+		return null; // TODO
+	}
 }
