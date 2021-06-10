@@ -723,16 +723,16 @@ public interface DefaultOrderLine extends OrderLine {
 		return null;
 	}
 
+	// 318: BG-27 0..n LINE ALLOWANCES
 	@Override
 	default AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		// TODO Auto-generated method stub
-		return null;
+		return AllowOrCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
-
+	
+	// 326: BG-28 0..n LINE CHARGES
 	@Override
 	default AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		// TODO Auto-generated method stub
-		return null;
+		return AllowOrCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.klst.eorder.openTrans;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.opentrans.xmlschema._2.ALLOWORCHARGE;
+import org.opentrans.xmlschema._2.ALLOWORCHARGESFIX;
 import org.opentrans.xmlschema._2.PRODUCTPRICEFIX;
 import org.opentrans.xmlschema._2.TAXDETAILSFIX;
 
@@ -36,7 +38,10 @@ BG-30.BT-152 0..1 item VAT rate
 
 BG-29.BT-146 : BigDecimal priceamount; , required = true
     protected ALLOWORCHARGESFIX alloworchargesfix;       ====> BG-27, BG-28
-    protected List<PRICEFLAG> priceflag;  // Dieses Element bestimmt, inwieweit Fracht-, Verpackungs- oder ähnliche Kosten in dem Artikelpreis enthalten sind.
+    protected List<PRICEFLAG> priceflag;  // Dieses Element bestimmt, inwieweit Fracht-, 
+             Verpackungs- oder ähnliche Kosten in dem Artikelpreis enthalten sind.
+              Bsp PRICEFLAG.type="incl_freight" TRUE :: Preis enthält Frachtkosten
+                                                         ====> nicht in CIO
     protected List<TAXDETAILSFIX> taxdetailsfix;         ====> BG-30 LINE VAT INFORMATION
     protected BigDecimal pricequantity;
 PRICEBASEFIX pricebasefix:
@@ -121,19 +126,14 @@ public class Productpricefix extends PRODUCTPRICEFIX implements BG29_PriceDetail
 
 	// copy ctor
 	private Productpricefix(PRODUCTPRICEFIX object) {
-		super();
-		if(object!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, object);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, object);
 	}
 	
 /* BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE ================================================= >>
 
 public class ALLOWORCHARGESFIX {
 
-    @XmlElement(name = "ALLOW_OR_CHARGE", required = true)
-    protected List<ALLOWORCHARGE> alloworcharge;
-    @XmlElement(name = "ALLOW_OR_CHARGES_TOTAL_AMOUNT")
+    protected List<ALLOWORCHARGE> alloworcharge; required
     protected Float alloworchargestotalamount;
 
 			<PRODUCT_PRICE_FIX>
@@ -150,8 +150,31 @@ public class ALLOWORCHARGESFIX {
 					</ALLOW_OR_CHARGE>
 
  */
-//	@Override
-	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+	void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		if(allowanceOrCharge==null) return; // defensiv
+		
+		ALLOWORCHARGESFIX acf = getALLOWORCHARGESFIX();
+		if(acf==null) {
+			acf = new ALLOWORCHARGESFIX();
+			setALLOWORCHARGESFIX(acf);
+		}
+		
+		acf.getALLOWORCHARGE().add((ALLOWORCHARGE)allowanceOrCharge);
+		// TODO optional, in order-x API nicht vorgesehen:
+		// berechnen und setzen Float alloworchargestotalamount
+/* dtFloat alloworchargestotalamount, Fließkommazahl in 64-bit nach IEEE Standard 754 Dezimaltrennzeichen ist der Punkt. 
+	Es ist kein Trennzeichen zum Abgrenzen von 1000er-Stellen erlaubt.
+	Beispiele:
+.314159265358979E+1
+15.4
+
+Summe über alle Zu- und Abschläge, die zu einem Geldbetrag führen.
+Bei der Berechnung werden diejenigen Zu- und Abschläge berücksichtigt, deren ALLOW_OR_CHARGE_VALUE einen Geldbetrag beinhalten 
+(aocmonetaryamount) oder sich über einen Prozentsatz (aocpercentagefactor) herleiten lassen
+
+ */
+	}
+	List<AllowancesAndCharges> getAllowancesAndCharges() {
 		if(super.getALLOWORCHARGESFIX()==null) return new ArrayList<AllowancesAndCharges>();
 		List<ALLOWORCHARGE> allowOrChargeList = super.getALLOWORCHARGESFIX().getALLOWORCHARGE();
 		List<AllowancesAndCharges> result = new ArrayList<AllowancesAndCharges>(allowOrChargeList.size());
@@ -162,7 +185,7 @@ public class ALLOWORCHARGESFIX {
 //			if("surcharge") ...		
 //			aoc.getALLOWORCHARGEVALUE(); mit
 //	Float   "aocpercentagefactor",        ==> Percentage
-//		    "aocmonetaryamount",          ==> AmountWithoutTax
+//	Float	"aocmonetaryamount",          ==> AmountWithoutTax
 //		    "aocorderunitscount",
 //		    "aocadditionalitems"
 //                                        
@@ -171,6 +194,33 @@ public class ALLOWORCHARGESFIX {
 		});		
 		return result;
 		
+	}
+
+	// 170: 0..1 Item price charge
+	/*
+	 * in OT wird kein Unterschied zwischen Zuschlägen (326: BG-28) und PriceCharge (170) gemacht
+	 */
+	@Override
+	public void setPriceCharge(AllowancesAndCharges charge) {
+		if(charge==null) return; // defensiv
+		
+		// Zuschlag je Einheit muss zuerst berechnet werden:
+		((ALLOWORCHARGE)charge).setALLOWORCHARGESEQUENCE(BigInteger.ZERO);
+		if(((ALLOWORCHARGE)charge).getALLOWORCHARGETYPE()==null) {
+			// Benutzerdefinierter Wert im Format: [\w\-\.]{1,30} :
+			((ALLOWORCHARGE)charge).setALLOWORCHARGETYPE("Item-price-charge");
+		}
+		
+		addAllowanceCharge(charge);
+	}
+	@Override
+	public AllowancesAndCharges getPriceCharge() {
+		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>();
+		List<AllowancesAndCharges> list = getAllowancesAndCharges();
+		list.forEach(aoc -> {		
+			if( BigInteger.ZERO.equals(((ALLOWORCHARGE)aoc).getALLOWORCHARGESEQUENCE()) ) res.add(aoc);
+		});
+		return res.isEmpty() ? null : res.get(0);
 	}
 
 /* BG-29 1..1 PRICE DETAILS =============================================================== >>
@@ -182,17 +232,57 @@ public class ALLOWORCHARGESFIX {
 		return Amount.create(super.getPRICEAMOUNT());
 	}
 	void setUnitPriceAmount(IAmount unitPriceAmount) {
-//		Mapper.set(this, "priceamount", unitPriceAmount); BUG TODO
-		super.setPRICEAMOUNT(unitPriceAmount.getValue());
+		super.setPRICEAMOUNT(unitPriceAmount.getValue()); // required
 	}
 	
-	// BG-29.BT-148 0..1 GrossPrice / Bruttopreis (nicht in OT)
+	// 162: BG-29.BT-147 0..1 PriceDiscount / Rabatt je Einheit
+	/* (aus EN 16931-1:2020-12): PriceDiscount BG-29.BT-147 dient zur Berechnung des Nettopreises (UnitPriceAmount BG-29.BT-146)
+	 * Der Nettopreis ist mandatory : Nettopreis = Bruttopreis - Rabatt
+	 * Bruttopreis und Rabatt sind optional. Diese beiden dienen nur der Information.
+	 * 
+	 * in OT wird kein Unterschied zwischen Abschlägen (318: BG-27) und Rabatt/PriceDiscount gemacht,
+	 * und zwischen Zuschlägen (326: BG-28) und PriceCharge (170).
+	 */
 	@Override
-	public IAmount getGrossPrice() {
-		return null;
+	public void setPriceDiscount(AllowancesAndCharges priceDiscount) {
+		if(priceDiscount==null) return; // defensiv
+		
+		// Rabatt je Einheit muss zuerst berechnet werden:
+		((ALLOWORCHARGE)priceDiscount).setALLOWORCHARGESEQUENCE(BigInteger.ZERO);
+		if(((ALLOWORCHARGE)priceDiscount).getALLOWORCHARGETYPE()==null) {
+			((ALLOWORCHARGE)priceDiscount).setALLOWORCHARGETYPE(AllowOrCharge.RABATE);
+		}
+		
+		addAllowanceCharge(priceDiscount);
 	}
 	@Override
+	public AllowancesAndCharges getPriceDiscount() {
+		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>();
+		List<AllowancesAndCharges> list = getAllowancesAndCharges();
+		list.forEach(aoc -> {
+			if( AllowOrCharge.isRabate((ALLOWORCHARGE)aoc) ) res.add(aoc);
+		});
+		return res.isEmpty() ? null : res.get(0);
+	}
+	
+
+	// BG-29.BT-148 0..1 GrossPrice 
+	/* Bruttopreis (nicht in OT), aber es lässt sich berechnen,
+	 *  wenn Rabatt existiert: Bruttopreis = Nettopreis + Rabatt
+	 */
+	@Override
 	public void setGrossPrice(IAmount grossPrice) {
+	}
+	@Override
+	public IAmount getGrossPrice() {
+//		return null;
+		// Berechnung:
+		AllowancesAndCharges priceDiscount = getPriceDiscount();
+		if(priceDiscount==null) return null;
+		IAmount discount = priceDiscount.getAmountWithoutTax();
+		if(discount==null) return null;
+		LOG.config("compute: UnitPriceAmount+Discount="+getUnitPriceAmount() + " + " + discount);
+		return Amount.create(getUnitPriceAmount().getValue().add(discount.getValue()));
 	}
 
 	// BG-29.BT-149 0..1 base quantity, UnitPriceQuantity
@@ -208,7 +298,6 @@ public class ALLOWORCHARGESFIX {
 	}
 	@Override
 	public void setUnitPriceQuantity(IQuantity basisQuantity) {
-//		Mapper.set(this, "pricequantity", basisQuantity); // BUG
 		super.setPRICEQUANTITY(basisQuantity.getValue());
 	}
 	
@@ -313,6 +402,7 @@ mindestens 1 Zeichen und darf höchstens 80 Zeichen betragen.
 		    new AbstractMap.SimpleImmutableEntry<>("standard_rate", TaxCategoryCode.STANDARD_RATE),
 		    new AbstractMap.SimpleImmutableEntry<>("exemption", TaxCategoryCode.EXEMPTION)
 		).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	
 	@Override
 	public TaxCategoryCode getTaxCategory() {
 		TAXDETAILSFIX vatDatails = getVatDatails();
@@ -329,26 +419,5 @@ mindestens 1 Zeichen und darf höchstens 80 Zeichen betragen.
 		TAXDETAILSFIX vatDatails = getVatDatails();
 		return vatDatails.getTAX();
 	}
-	
-	@Override
-	public AllowancesAndCharges getPriceDiscount() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void setPriceDiscount(AllowancesAndCharges allowance) {
-		// TODO Auto-generated method stub	
-	}
-	@Override
-	public AllowancesAndCharges getPriceCharge() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void setPriceCharge(AllowancesAndCharges charge) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 
 }

@@ -27,6 +27,7 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AbstactTransformer;
+import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.CoreOrder;
 import com.klst.eorder.api.OrderLine;
 import com.klst.eorder.api.SupportingDocument;
@@ -487,6 +488,24 @@ public class PLD_257444 extends Constants {
 		line2.setPartialDeliveryIndicator(line.pdi);   // 208
 		line2.setDeliveryDate(line.delivery);          // 298
 		line2.setTaxCategory(line.tcc);                // 315
+		
+		// ALLOWANCES + CHARGES
+		line2.addAllowance(null,                       // 318: Abschlag
+			line.lna, new BigDecimal(5));              //      5% auf lna
+		LOG.info("Abschlag:"+line2.getAllowancesAndCharges().get(0));
+		line2.setPriceDiscount(                        // 162: Preisabschlag/Rabatt
+			line2.createAllowance(new Amount(new BigDecimal(0.5)), null, null));
+		LOG.info("Brutto="+line2.getGrossPrice() + " - Rabatt = " + line.upa);
+		                                               // 170: Item price charge
+		line2.setPriceCharge(line2.createAllowance(new Amount(new BigDecimal(0.5)), null, null));
+		AllowancesAndCharges charge = line2.createCharge(       // 326: Zuschlag
+				new Amount(new BigDecimal(2.5)) ,               // 2.50€ fix
+				null, null);
+		LOG.info("Zuschlag:"+charge);
+		charge.setReasonText("Grund für Zuschlag");
+		charge.setReasoncode("charge");
+		line2.addAllowanceCharge(charge);
+		
 		line2.setBuyerAccountingReference("BuyerAcct");// 340
 		or.addLine(line2);
 

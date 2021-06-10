@@ -51,7 +51,6 @@ import com.klst.eorder.impl.TradeContact;
 import com.klst.eorder.impl.UnitPriceAmount;
 import com.klst.marshaller.CioTransformer;
 import com.klst.marshaller.OpenTransOrderTransformer;
-import com.klst.marshaller.OpenTransTransformer;
 import com.klst.test.CommonUtils;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -458,10 +457,10 @@ public class OpenTransOrderReadTest extends Constants {
 //			<LINE_ITEM_ID>1</LINE_ITEM_ID>
 //			<ORDER_DATE>2020-01-22</ORDER_DATE>
 //		</CUSTOMER_ORDER_REFERENCE>
-			List<SupportingDocument> sdList = l.getReferencedProductDocuments();
+			List<SupportingDocument> sdList = l.getReferencedDocuments();
 			assertFalse(sdList.isEmpty());
 			SupportingDocument sd = sdList.get(0);
-			LOG.info("CUSTOMER_ORDER_REFERENCE:"+l.getReferencedProductDocuments()
+			LOG.info("CUSTOMER_ORDER_REFERENCE:"+l.getReferencedDocuments()
 			+ sdList.get(0).getLineReference()
 			+ sdList.get(0).getDateAsTimestamp()
 			);

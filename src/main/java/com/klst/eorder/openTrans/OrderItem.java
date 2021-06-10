@@ -262,7 +262,35 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 		return (String) attributes.get(COUNTRY_OF_ORIGIN);
 	}
 
-	// 107: LINE TRADE AGREEMENT
+	// LINE TRADE AGREEMENT
+
+	// 158: BG-29.BT-148 0..1 Item gross price / Bruttopreis (nicht in OT)
+	// 159: BG-29.BT-148 0..1 Item gross price (wird berechnet, wenn Rabatt/PriceDiscount vorhanden)
+	@Override
+	public IAmount getGrossPrice() {
+		return productpricefix.getGrossPrice();
+	}
+
+	// 162: BG-29.BT-147 0..1 PriceDiscount
+	@Override
+	public void setPriceDiscount(AllowancesAndCharges discount) {
+		productpricefix.setPriceDiscount(discount);
+	}
+	@Override
+	public AllowancesAndCharges getPriceDiscount() {
+		return productpricefix.getPriceDiscount();
+	}
+	
+	// 170: 0..1 Item price charge
+	@Override
+	public void setPriceCharge(AllowancesAndCharges charge) {
+		productpricefix.setPriceCharge(charge);
+	}
+	@Override
+	public AllowancesAndCharges getPriceCharge() {
+		return productpricefix.getPriceCharge();
+	}
+
 	// 178: (Net Price)
 	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount / PRODUCTPRICEFIX.priceamount
 	@Override
@@ -271,6 +299,17 @@ public class OrderItem extends ORDERITEM implements DefaultOrderLine {
 	}
 	private void setUnitPriceAmount(IAmount unitPriceAmount) {
 		productpricefix.setUnitPriceAmount(unitPriceAmount);
+	}
+
+	// 318: BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
+	// 326: BG-28 0..n LINE CHARGES / ZUSCHLÄGE
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		productpricefix.addAllowanceCharge(allowanceOrCharge);
+	}
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		return productpricefix.getAllowancesAndCharges();
 	}
 
 	// 180+181: BG-29.BT-150 + BG-29.BT-149 0..1 / PRODUCTPRICEFIX.pricequantity
@@ -541,21 +580,7 @@ Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die 
 		return null;
 	}
 
-// 158: BG-29.BT-148 0..1 Item gross price / Bruttopreis (nicht in OT)
-//	159 SCT_LINE_TA COMFORT	  Gross Price
-//	160 SCT_LINE_TA COMFORT	  Gross Price Base quantity
-//	161 SCT_LINE_TA COMFORT	  Gross Price Unit Code for base quantity
-
-// 162: BG-29.BT-147 0..1 PriceDiscount
-	@Override
-	public AllowancesAndCharges getPriceDiscount() {
-		// delegieren:
-		return productpricefix.getPriceDiscount();
-	}
-	@Override
-	public void setPriceDiscount(AllowancesAndCharges discount) {
-		productpricefix.setPriceDiscount(discount);
-	}
+	
 
 	
 	// BG.25.BT-128 0..1 Objektkennung // (OBJECT IDENTIFIER FOR INVOICE LINE)
@@ -608,47 +633,6 @@ Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die 
 //		return referencedDocument==null ? null : new ID(referencedDocument.getLineID()).getName();		
 	}
 
-	/*
-	 * 318: BG-27 0..n LINE ALLOWANCES
-	 * 326: BG-28 0..n LINE CHARGES
-	 * 
-	 * 
-	 * TODO in PRODUCTPRICEFIX :   List<ALLOWORCHARGE> alloworcharge
-	 */
-	@Override
-	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		return AllowOrCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
-	}
-	@Override
-	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		return AllowOrCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
-	}
-
-	@Override
-	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
-//		if(allowanceOrCharge==null) return; // optional
-//		super.getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
-	}
-
-	// BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
-	// BG-28 0..n LINE CHARGES / ZUSCHLÄGE
-	@Override
-	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-		return productpricefix.getAllowancesAndCharges();
-/* TODO
-			<PRODUCT_PRICE_FIX>
-				<bmecat:PRICE_AMOUNT>0.0</bmecat:PRICE_AMOUNT>
-				<ALLOW_OR_CHARGES_FIX>
-
- */
-//		List<TradeAllowanceChargeType> allowanceChargeList = super.getSpecifiedLineTradeSettlement()==null ? null : getSpecifiedLineTradeSettlement().getSpecifiedTradeAllowanceCharge();
-//		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
-//		allowanceChargeList.forEach(allowanceOrCharge -> {
-//			res.add(TradeAllowanceCharge.create(allowanceOrCharge));
-//		});
-//		return res;
-	}
-	
 
 
 	// --------------------------- CIO only:
@@ -711,18 +695,6 @@ Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die 
 	public ISupplyChainEvent createSupplyChainEvent(IQuantity quantity, IPeriod period) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public AllowancesAndCharges getPriceCharge() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setPriceCharge(AllowancesAndCharges charge) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

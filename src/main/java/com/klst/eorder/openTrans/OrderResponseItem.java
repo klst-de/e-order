@@ -16,6 +16,7 @@ import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.impl.UnitPriceAmount;
 
@@ -209,7 +210,35 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 		return (String) attributes.get(COUNTRY_OF_ORIGIN);
 	}
 
-	// 107: LINE TRADE AGREEMENT
+	// LINE TRADE AGREEMENT
+
+	// 158: BG-29.BT-148 0..1 Item gross price / Bruttopreis (nicht in OT)
+	// 159: BG-29.BT-148 0..1 Item gross price (wird berechnet, wenn Rabatt/PriceDiscount vorhanden)
+	@Override
+	public IAmount getGrossPrice() {
+		return productpricefix.getGrossPrice();
+	}
+
+	// 162: BG-29.BT-147 0..1 PriceDiscount
+	@Override
+	public void setPriceDiscount(AllowancesAndCharges discount) {
+		productpricefix.setPriceDiscount(discount);
+	}
+	@Override
+	public AllowancesAndCharges getPriceDiscount() {
+		return productpricefix.getPriceDiscount();
+	}
+	
+	// 170: 0..1 Item price charge
+	@Override
+	public void setPriceCharge(AllowancesAndCharges charge) {
+		productpricefix.setPriceCharge(charge);
+	}
+	@Override
+	public AllowancesAndCharges getPriceCharge() {
+		return productpricefix.getPriceCharge();
+	}
+
 	// 178: (Net Price)
 	// 179: BG-29.BT-146 1..1 Item net price aka UnitPriceAmount / PRODUCTPRICEFIX.priceamount
 	@Override
@@ -218,6 +247,17 @@ public class OrderResponseItem extends ORDERRESPONSEITEM implements DefaultOrder
 	}
 	private void setUnitPriceAmount(IAmount unitPriceAmount) {
 		productpricefix.setUnitPriceAmount(unitPriceAmount);
+	}
+
+	// 318: BG-27 0..n LINE ALLOWANCES / ABSCHLÄGE
+	// 326: BG-28 0..n LINE CHARGES / ZUSCHLÄGE
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		productpricefix.addAllowanceCharge(allowanceOrCharge);
+	}
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		return productpricefix.getAllowancesAndCharges();
 	}
 
 	// 180+181: BG-29.BT-150 + BG-29.BT-149 0..1 / PRODUCTPRICEFIX.pricequantity

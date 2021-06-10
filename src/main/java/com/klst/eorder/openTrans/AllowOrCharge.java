@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import org.opentrans.xmlschema._2.ALLOWORCHARGE;
 import org.opentrans.xmlschema._2.ALLOWORCHARGEDESCR;
+import org.opentrans.xmlschema._2.ALLOWORCHARGEVALUE;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
@@ -15,12 +16,29 @@ import com.klst.eorder.api.ITaxCategory;
 import com.klst.eorder.openTrans.reflection.Mapper;
 
 /* implements BG-27 LINE ALLOWANCES, BG-28 LINE CHARGES
- * 
+
+    protected BigInteger alloworchargesequence;
+    protected List<ALLOWORCHARGENAME> alloworchargename;       NOT USED
+     // Kurzname des Zu- oder Abschlages (z.B. Fracht, Verpackung, ...)
+    protected String alloworchargetype;                    ==> Reasoncode
+    protected List<ALLOWORCHARGEDESCR> alloworchargedescr; ==> ReasonText
+    protected ALLOWORCHARGEVALUE alloworchargevalue;       ==> AmountWithoutTax+percentage
+     protected Float aocpercentagefactor;                  ==> percentage
+     protected Float aocmonetaryamount;                    ==> AmountWithoutTax
+     protected AOCORDERUNITSCOUNT aocorderunitscount; // Dreingabe oder eine Draufgabe
+     protected String aocadditionalitems;             // Angabe, welche Produkte zusätzlich zur Bestellung mitgeliefert werden.
+    protected Float alloworchargebase;                     ==> AssessmentBase
+    protected String type;                           required el of{"allowance","surcharge"}
+
  */
 public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges {
 
+	private static final String NO_TRADETAX_ELEMENT = "No TradeTax.";
+	private static final Logger LOG = Logger.getLogger(AllowOrCharge.class.getName());
+
 	@Override
 	public ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		LOG.warning(NO_TRADETAX_ELEMENT);
 		return null;
 //		return TradeTax.create(taxType, taxCode, taxRate);
 	}
@@ -33,9 +51,6 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
-
-	private static final String NO_TRADETAX_ELEMENT = "No TradeTax. Expected one element.";
-	private static final Logger LOG = Logger.getLogger(AllowOrCharge.class.getName());
 
 	static AllowOrCharge create(boolean chargeIndicator, IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return new AllowOrCharge(chargeIndicator, amount, baseAmount, percentage);
@@ -54,7 +69,6 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 	}
 	
 	private AllowOrCharge(boolean chargeIndicator, IAmount amount, IAmount baseAmount, BigDecimal percentage) {
-		super();
 		setChargeIndicator(chargeIndicator);
 		setAmountWithoutTax(amount);
 		setAssessmentBase(baseAmount);
@@ -62,24 +76,19 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 	}
 	// copy ctor
 	private AllowOrCharge(ALLOWORCHARGE doc) {
-		super();
-		if(doc!=null) {
-			SCopyCtor.getInstance().invokeCopy(this, doc);
-		}
+		SCopyCtor.getInstance().invokeCopy(this, doc);
 	}
 
 	public static final String ALLOWANCE = "allowance";
 	public static final String CHARGE = "surcharge";
 	@Override
 	public void setChargeIndicator(boolean isCharge) {
-		super.setALLOWORCHARGETYPE(isCharge ? CHARGE : ALLOWANCE);
+		super.setType(isCharge ? CHARGE : ALLOWANCE);
 	}
-
 	@Override
 	public boolean isAllowance() {
 		return super.getType().equals(ALLOWANCE);
 	}
-
 	@Override
 	public boolean isCharge() {
 		return super.getType().equals(CHARGE);
@@ -87,45 +96,44 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 
 	@Override
 	public void setTaxCategoryCode(String code) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setTaxPercentage(BigDecimal taxRate) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	public BigDecimal getTaxPercentage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setTaxType(String type) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	public String getTaxType() {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	private void setAmountAndPercentage(IAmount amount, BigDecimal percentage) {
+		if(amount==null && percentage==null) return;
+		ALLOWORCHARGEVALUE acf = getALLOWORCHARGEVALUE();
+		if(acf==null) {
+			acf = new ALLOWORCHARGEVALUE();
+			setALLOWORCHARGEVALUE(acf);
+		}
+		if(amount!=null) getALLOWORCHARGEVALUE().setAOCMONETARYAMOUNT(amount.getValue().floatValue());
+		if(percentage!=null) getALLOWORCHARGEVALUE().setAOCPERCENTAGEFACTOR(percentage.floatValue());
 	}
 
 	// BG-27.BT-136 1..1 Betrag des Abschlags , in OT 0..1
 	@Override
 	public void setAmountWithoutTax(IAmount amount) {
-		Mapper.newFieldInstance(this, "alloworchargevalue", amount);
-		Mapper.set(getALLOWORCHARGEVALUE(), "aocmonetaryamount", amount.getValue().floatValue());
+		if(amount==null) return;
+		setAmountAndPercentage(amount, null);
 	}
 
 	@Override
@@ -139,7 +147,8 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 	// BG-27.BT-137 0..1 Grundbetrag des Abschlags
 	@Override
 	public void setAssessmentBase(IAmount amount) {
-		Mapper.set(this, "alloworchargebase", amount.getValue().floatValue());
+		if(amount==null) return;
+		super.setALLOWORCHARGEBASE(amount.getValue().floatValue());
 	}
 
 	@Override
@@ -150,8 +159,8 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 	// BG-27.BT-138 0..1 prozentualer Abschlag
 	@Override
 	public void setPercentage(BigDecimal percentage) {
-		Mapper.newFieldInstance(this, "alloworchargevalue", percentage);
-		Mapper.set(getALLOWORCHARGEVALUE(), "aocpercentagefactor", percentage.floatValue());	
+		if(percentage==null) return;
+		setAmountAndPercentage(null, percentage);
 	}
 
 	@Override
@@ -162,6 +171,7 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 	}
 
 	// BG-27.BT-139 0..1 Grund für den Abschlag
+	// Order-X-No: 898, 913, 325, 333, 169(Item price discount Reason)
 	@Override
 	public void setReasonText(String text) {
 		Mapper.add(super.getALLOWORCHARGEDESCR(), new ALLOWORCHARGEDESCR(), text);
@@ -173,14 +183,24 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 		return getALLOWORCHARGEDESCR().get(0).getValue();
 	}
 
-	// BG-27.BT-140 0..1 Code für den Grund aus UNTDID 5189 Codeliste
+	static final String RABATE = "rebate";
+	static boolean isRabate(ALLOWORCHARGE aoc) {
+		return RABATE.equals(aoc.getALLOWORCHARGETYPE());
+	}
+	
+	// 169: BG-27.BT-140 0..1 Code für den Grund aus UNTDID 5189 Codeliste in CIO, "rebate" in OT
+	// 324: Abschlag pro Position                           5189 Allowance or charge identification code
+	// 176: Zuschlag pro Einheit  / Item price charge 
+	// 332: Zuschlag pro Position / CHARGE                  7161 Special service description code
 	/*
 	 * Zu- oder Abschlagstyp ALLOW_OR_CHARGE_TYPE
 	 * Typisierung, um welche Art von Zu- oder Abschlag es sich handelt (z.B. Fracht, Porto und Verpackung, ...).
+	 * Benutzerdefinierter Wert/Code oder abroad,administration, ... ,
+	 *  project_bonus,overpackaging,rebate,recycling,small_order,special_work_times,toll
 	 */
 	@Override
 	public void setReasoncode(String code) {
-		Mapper.set(this, "alloworchargetype", code);		
+		super.setALLOWORCHARGETYPE(code);
 	}
 	@Override
 	public String getReasoncode() {
