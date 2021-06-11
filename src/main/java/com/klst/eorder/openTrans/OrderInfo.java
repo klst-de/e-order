@@ -14,7 +14,6 @@ import org.opentrans.xmlschema._2.ORDERINFO;
 import org.opentrans.xmlschema._2.ORDERPARTIESREFERENCE;
 import org.opentrans.xmlschema._2.PARTIES;
 import org.opentrans.xmlschema._2.PARTY;
-import org.opentrans.xmlschema._2.PAYMENT;
 import org.opentrans.xmlschema._2.PAYMENTTERMS;
 import org.opentrans.xmlschema._2.TIMEFORPAYMENT;
 
@@ -449,6 +448,24 @@ public class TIMEFORPAYMENT:
 		if(super.getPAYMENT()==null) return null;
 		if(super.getPAYMENT().getPAYMENTTERMS()==null) return null;
 		return null; // TODO
+	}
+	
+	// 875: BG-16.BT-81 PAYMENT INSTRUCTIONS PaymentMeans
+	PaymentMeansEnum getPaymentMeansEnum() {
+		Payment payment = getPayment();
+		if(payment==null) return null;
+		
+		return payment.getPaymentMeansEnum();
+	}
+	void setPaymentMeansEnum(PaymentMeansEnum code) {
+		if(code==null) return;
+		Payment payment = getPayment();
+		if(payment==null) {
+			payment = Payment.create(code, null);
+			super.setPAYMENT(payment);
+		} else {
+			LOG.warning("Payment is just set to "+payment.getPaymentMeansEnum() + " - ignored:"+code);
+		}
 	}
 	
 	// 925: BT-20 PAYMENT TERMS / Zahlungsmodalitäten

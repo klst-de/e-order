@@ -101,8 +101,8 @@ public class Order extends ORDER implements DefaultOrder {
 		// profile, aka Customization, BG-2.BT-24
 		// processType, BG-2.BT-23
 		// documentNameCode, BT-3 get liefert Order
-		LOG.info("Version:"+super.getVersion());
-		setVersion("2.1"); // required
+		LOG.config("Version="+super.getVersion() + " set to "+OPENPRANS_VERSION);
+		setVersion(OPENPRANS_VERSION); // required
 		// Attribut 'type' muss in Element 'ORDER' vorkommen
 		super.setType("standard"); // andere: express , release , consignment
 		orderHeader = OrderHeader.create(super.getORDERHEADER(), this);
@@ -232,6 +232,20 @@ public class Order extends ORDER implements DefaultOrder {
 		return orderHeader.getOrderDate();
 	}
 
+	// 534: 0..1 QUOTATION REFERENCE
+	@Override
+	public void setQuotationReference(String docRefId, Timestamp timestamp) {
+		orderHeader.setQuotationReference(docRefId, timestamp);
+	}
+	@Override
+	public String getQuotationReference() {
+		return orderHeader.getQuotationReference();
+	}
+	@Override
+	public Timestamp getQuotationDate() {
+		return orderHeader.getQuotationDate();
+	}
+
 	// 539: BT-12 0..1 Contract reference / (Referenz auf Rahmenvertrag)
 	// Die Vertragsreferenz sollte im Kontext der spezifischen Handelsbeziehung 
 	// und für einen definierten Zeitraum einmalig vergeben sein
@@ -317,6 +331,44 @@ public class Order extends ORDER implements DefaultOrder {
 	@Override
 	public BusinessParty getBillTo() {
 		return orderInfo.getBillTo();
+	}
+
+	// 875: BG-16.BT-81 PAYMENT INSTRUCTIONS PaymentMeans
+	// PaymentMeansEnum ist aus UNTDID 4461: Cheque, Bank card, ...
+	@Override
+	public void setPaymentMeansEnum(PaymentMeansEnum code) {
+		orderInfo.setPaymentMeansEnum(code);
+	}
+	@Override
+	public PaymentMeansEnum getPaymentMeansEnum() {
+		return orderInfo.getPaymentMeansEnum();
+	}
+	// 876: BG-16.BT-82 PAYMENT INSTRUCTIONS PaymentMeans as text
+//	@Override
+//	public String getPaymentMeansText() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//	@Override
+//	public void setPaymentMeansText(String text) {
+//		// TODO Auto-generated method stub	
+//	}
+	
+	// 925: BT-20 PAYMENT TERMS / Zahlungsmodalitäten
+	// in CIO nur description
+	// in OT.Order in ORDER_INFO.PAYMENT.PAYMENT_TERMS: List<PAYMENTTERM>
+	// mit type="unece" + value aus UN/ECE 4279  Payment terms type code qualifier
+	@Override
+	public void addPaymentTerm(String description) {
+		orderInfo.addPaymentTerm(description);
+	}
+	@Override
+	public void setPaymentTerms(List<String> paymentTerms) {
+		orderInfo.setPaymentTerms(paymentTerms);
+	}
+	@Override
+	public List<String> getPaymentTerms() {
+		return orderInfo.getPaymentTerms();
 	}
 
 	// 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
@@ -628,22 +680,6 @@ public class Order extends ORDER implements DefaultOrder {
 		return null;
 	}
 
-	// 534: 0..1 QUOTATION REFERENCE, not in CII
-	@Override
-	public void setQuotationReference(String docRefId, Timestamp timestamp) {
-		// TODO Auto-generated method stub	
-	}
-	@Override
-	public String getQuotationReference() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Timestamp getQuotationDate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	// 544: 0..1 REQUISITION REFERENCE, not in CII
 	@Override
 	public void setRequisitionReference(String id, Timestamp timestamp) {
@@ -695,66 +731,6 @@ public class Order extends ORDER implements DefaultOrder {
 	public Identifier getInvoicedObjectIdentifier() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public PaymentMeansEnum getPaymentMeansEnum() {
-/* TODO PAYMENT in ORDERINFO
-Im Element PAYMENT werden Informationen zur Zahlungsweise zusammengefasst. 
-Es muss genau eine Zahlungsweise verwendet werden. 
-Soll keine Zahlungsinformation übertragen werden (z.B. weil diese in einem Rahmenvertrag hinterlegt ist), so wird das Element nicht verwendet.
-
- class PAYMENT:
-     CARD card; // Verwendung für Credit Cards, Purchase Cards etc. ==> BankCard
-     List<ACCOUNT> account; // Bankverbindung
-     String debit; - dtBOOLEAN : TRUE oder true oder True ==> DebitTransfer / Gutschriftsverfahren
-     String check;                                        ==> Cheque
-     String cash;                                         ==> InCash
-     String centralregulation;
-     PAYMENTTERMS paymentterms:
-	    "paymentterm",
-	    "timeforpayment",
-	    "valuedate"
-	    
-	    
-+ 926: Payment Terms Description / Zahlungsmodalitäten
-
- */
-		// TODO PAYMENT_TERM.type == unece ==>
-		// 4279  Payment terms type code qualifier
-		// Aber PaymentMeansEnum ist aus UNTDID 4461: Cheque, Bank card, ...
-		return null;
-	}
-	@Override
-	public void setPaymentMeansEnum(PaymentMeansEnum code) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public String getPaymentMeansText() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void setPaymentMeansText(String text) {
-		// TODO Auto-generated method stub	
-	}
-	
-	// 925: BT-20 PAYMENT TERMS / Zahlungsmodalitäten
-	// in CIO nur description
-	// in OT.Order in ORDER_INFO.PAYMENT.PAYMENT_TERMS: List<PAYMENTTERM>
-	// mit type="unece" + value aus UN/ECE 4279  Payment terms type code qualifier
-	@Override
-	public void addPaymentTerm(String description) {
-		orderInfo.addPaymentTerm(description);
-	}
-	@Override
-	public void setPaymentTerms(List<String> paymentTerms) {
-		orderInfo.setPaymentTerms(paymentTerms);
-	}
-	@Override
-	public List<String> getPaymentTerms() {
-		return orderInfo.getPaymentTerms();
 	}
 
 }

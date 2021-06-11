@@ -24,7 +24,7 @@ public class OpenTransOrderTransformer extends OpenTransTransformer {
 	// CONTENT_SUPERTYPE_NAME aka class name
 	// CONTENT_TYPE_NAME aka class name, dh CONTENT_TYPE_NAME extends CONTENT_SUPERTYPE_NAME
 	private static final String CONTENT_SUPERTYPE_NAME = CONTENT_PATH+".ORDER"; 
-	public static final String CONTENT_TYPE_NAME = "com.klst.eorder.openTrans.GenericOrder"; 
+	public static final String CONTENT_TYPE_NAME = "com.klst.eorder.openTrans.Order"; 
 	
 	private OpenTransOrderTransformer() {
 		super(CONTENT_PATH, SINGLETON);

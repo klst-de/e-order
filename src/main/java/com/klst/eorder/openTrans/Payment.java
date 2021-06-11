@@ -58,28 +58,41 @@ public class Payment extends PAYMENT {
 	// siehe BG-16.BT-81 Code für die Zahlungsart
 	private Payment(PaymentMeansEnum paymentChoice, List<String> paymentTerms) {
 		switch(paymentChoice) {
-		case BankCard : // CARD TODO
+		case BankCard : // CARD TODO ???, "CARD_NUM", required aber nicht in API
 			break;
 		case CreditTransfer : // ACCOUNT		
 		case SEPACreditTransfer :	
-//			 ACCOUNT, Bankverbindung, SEPA-Überweisung, TODO
+//			 ACCOUNT, Bankverbindung, SEPA-Überweisung, TODO ???, "BANK_ACCOUNT", required aber nicht in API
 			break;
 		case DebitTransfer : // DebitTransfer, Gutschriftsverfahren
-			super.setDEBIT(Boolean.TRUE.toString());
+			super.setDEBIT(DefaultOrder.TRUE);
 			break;
 		case Cheque : // CHECK, Scheckzahlung
-			super.setCHECK(Boolean.TRUE.toString());
+			super.setCHECK(DefaultOrder.TRUE);
 			break;
 		case InCash : // CASH, Barzahlung
-			super.setCHECK(Boolean.TRUE.toString());
+			super.setCASH(DefaultOrder.TRUE);
 			break;
 		default:
 			LOG.warning("default paymentChoice is DEBIT. "+paymentChoice+ " is ignored");
-			super.setDEBIT(Boolean.TRUE.toString()); // default choice
+			super.setDEBIT(Boolean.TRUE.toString()); // default choice "true" (kleingeschrieben)
 		}
 		addPaymentTerms(paymentTerms);
 	}
 
+	PaymentMeansEnum getPaymentMeansEnum() {
+		if( DefaultOrder.isTRUE.test(super.getCHECK()) ) {
+			return PaymentMeansEnum.Cheque;
+		};
+		if( DefaultOrder.isTRUE.test(super.getCASH()) ) {
+			return PaymentMeansEnum.InCash;
+		};
+		if( DefaultOrder.isTRUE.test(super.getDEBIT()) ) {
+			return PaymentMeansEnum.DebitTransfer;
+		};
+		// TODO
+		return null;
+	}
 /* in PAYMENTTERMS:
     protected List<PAYMENTTERM> paymentterm; // Die Angabe kann gemäß UN/ECE oder unternehmensspezifisch erfolgen
      PAYMENTTERM.type="unece"; .value="2" // 4279  Payment terms type code qualifier,  2 == End of month

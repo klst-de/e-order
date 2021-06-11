@@ -25,6 +25,7 @@ import org.junit.Test;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.api.AllowancesAndCharges;
@@ -559,10 +560,14 @@ public class PLD_257444 extends Constants {
 		, new Amount(new BigDecimal(1259.65)) // total amount without VAT, aka Tax Basis
 		, null);
 		
+		or.setQuotationReference("QuotationReference", Timestamp.valueOf("2020-01-02"+_HMS)); // 534
+		or.setPaymentMeansEnum(PaymentMeansEnum.ClearingBetweenPartners);
 		// 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
 		or.addAllowance(new Amount(new BigDecimal(2.99)), null, null);
 		or.addPaymentTerm("innert 30 Tagen");  // 925: BT-20
 		or.addPaymentTerm("2");                // 925: BT-20, UNECE 4279 code 2 == End of month
+		or.setPaymentMeansEnum(PaymentMeansEnum.Cheque); // warn: ignored
+//		or.setPaymentMeansEnum(PaymentMeansEnum.BankCard);
 		
 		transformer = otTransformer;
 		object = (Order)or;

@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import org.opentrans.xmlschema._2.AGREEMENT;
 import org.opentrans.xmlschema._2.ORDERHEADER;
+import org.opentrans.xmlschema._2.SOURCINGINFO;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.untdid.DateTimeFormats;
@@ -50,7 +51,9 @@ GENERATION_DATE           : Zeitstempel der Erstellung des Geschäftsdokuments
 //		super.getCONTROLINFO();
 		/*
 (Beschaffungsinformationen)
-Im Element SOURCING_INFO werden Informationen über Beschaffungsaktivitäten zusammengefasst, die diesem Auftrag voraus gegangen sind. Wird das Element
+Im Element SOURCING_INFO werden Informationen über Beschaffungsaktivitäten zusammengefasst, 
+die diesem Auftrag voraus gegangen sind. 
+Wird das Element
 SOURCING_INFO verwendet, so muss mindestens eines der nachfolgenden Elemente angegeben werden:
 QUOTATION_ID      : Angebotssnummer des Lieferanten
 AGREEMENT         : Referenz auf Rahmenvertrag
@@ -60,6 +63,9 @@ CATALOG_REFERENCE : Referenz auf einen (elektronischen) Produktkatalog
 //	}
 
 	private void addAgreement(String agreementType, String id, Timestamp ts) {
+		if(super.getSOURCINGINFO()==null) {
+			setSOURCINGINFO(new SOURCINGINFO());
+		}
 		super.getSOURCINGINFO().getAGREEMENT().add(
 				SourcingInfoAgreement.create(agreementType, id, ts)
 				);

@@ -3,6 +3,7 @@ package com.klst.eorder.openTrans;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.bmecat.bmecat._2005.DtLANG;
 import org.bmecat.bmecat._2005.LANGUAGE;
@@ -76,13 +77,19 @@ public interface DefaultOrder extends CoreOrder {
 		wrap.accept( null );
 	}
 	
-	@Override
-	default CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
-		// TODO Auto-generated method stub
-		return null;
-	}
  */
-	
+	static final String OPENPRANS_VERSION = "2.1";
+	static final String TRUE = Boolean.TRUE.toString().toUpperCase();
+	// funktonal:
+	static Predicate<String> isTRUE = indicator -> {
+		return indicator!=null && indicator.toUpperCase().equals(TRUE);
+	};
+
+//	@Override // CoreOrderFactory
+//	default CoreOrder createOrder(String profile, String processType, DocumentNameCode code) {
+//		return null;
+//	}
+
 	@Override
 	default List<OrderNote> getOrderNotes() {
 		return null;
@@ -429,7 +436,6 @@ public interface DefaultOrder extends CoreOrder {
 	}
 
 	// 18: In OT ISO 639-2 alpha-3 code, in CIO/order-x ISO 639-1: de, en, es, ...
-	static final String TRUE = Boolean.TRUE.toString().toUpperCase();
 	default LANGUAGE createDefaultLanguage(String id) {
 		LANGUAGE language = new LANGUAGE();
 		// TODO bijektives mapping ISO 639-1 nach ISO 639-2 alpha-3, siehe ISO639.ods

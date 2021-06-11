@@ -76,8 +76,8 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		// profile, aka Customization, BG-2.BT-24
 		// processType, BG-2.BT-23
 		// documentNameCode, BT-3 get liefert Order
-		LOG.info("Version:"+super.getVersion());
-		setVersion("2.1"); // required
+		LOG.config("Version="+super.getVersion() + " set to "+OPENPRANS_VERSION);
+		setVersion(OPENPRANS_VERSION); // required
 		orderHeader = OrderResponseHeader.create(super.getORDERRESPONSEHEADER());
 		super.setORDERRESPONSEHEADER(orderHeader);
 		orderInfo = orderHeader.createOrderResponseInfo();

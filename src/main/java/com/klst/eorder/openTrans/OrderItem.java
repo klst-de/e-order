@@ -436,19 +436,15 @@ Referenzinformationen zum Auftrag des Kunden (des Einkäufers) auf den sich die 
 	}
 	
 	// 208: 0..1
-	static final String TRUE = Boolean.TRUE.toString().toUpperCase();
 	// funktonal:
-	private Predicate<String> isTRUE = indicator -> {
-		return indicator!=null && indicator.equals(TRUE);
-	};
 	@Override
 	public boolean isPartialDeliveryAllowed() {
-		return isTRUE.test(super.getPARTIALSHIPMENTALLOWED());
+		return DefaultOrder.isTRUE.test(super.getPARTIALSHIPMENTALLOWED());
 	}
 	@Override
 	public void setPartialDeliveryIndicator(boolean indicator) {
 		if(indicator) {
-			setPARTIALSHIPMENTALLOWED(TRUE);
+			setPARTIALSHIPMENTALLOWED(DefaultOrder.TRUE);
 		}
 	}
 
