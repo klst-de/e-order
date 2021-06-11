@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bmecat.bmecat._2005.LANGUAGE;
 import org.opentrans.xmlschema._2.ORDERRESPONSE;
 import org.opentrans.xmlschema._2.ORDERRESPONSEITEM;
 import org.opentrans.xmlschema._2.ORDERRESPONSEITEMLIST;
@@ -111,6 +112,21 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		return orderInfo.getIssueDateAsTimestamp();
 	}
 
+	// 18: In OT ISO 639-2 alpha-3 code, in CIO/order-x ISO 639-1: de, en, es, ...
+	@Override
+	public void addLanguage(String id) {
+		orderInfo.getLANGUAGE().add(createDefaultLanguage(id));
+	}
+	@Override
+	public List<String> getLanguage() {
+		List<String> res = new ArrayList<String>();
+		List<LANGUAGE> list = orderInfo.getLANGUAGE();
+		list.forEach(lang -> {
+			res.add(lang.getValue().value()); // DtLANG ist enum, Bsp ZUL("zul");
+		});
+		return res;
+	}
+
 	// 21: BG-1 ORDER NOTE / REMARKS
 	@Override
 	public List<OrderNote> getOrderNotes() {
@@ -174,6 +190,10 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 		return orderInfo.getBuyer();
 	}
 
+	// 524: BT-14 0..1 SALES ORDER REFERENCED DOCUMENT
+	// 539: BT-12 0..1 Contract reference / (Referenz auf Rahmenvertrag)
+	// nicht in ORDERRESPONSE, denn ORDERRESPONSE hat kein SOURCINGINFO
+
 	// 643: SHIP TO PARTY
 	@Override
 	public void setShipTo(BusinessParty party) {
@@ -226,6 +246,10 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	public BusinessParty getBillTo() {
 		return orderInfo.getBillTo();
 	}
+
+	// 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+	// 903: BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+	// nicht in ORDERRESPONSE, denn ORDERRESPONSEINFO hat kein PAYMENT
 
 	// 927: BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112
 	// in ORDERSUMMARY gibt es nur protected BigDecimal totalamount

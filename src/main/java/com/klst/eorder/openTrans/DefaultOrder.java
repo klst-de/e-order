@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.bmecat.bmecat._2005.DtLANG;
+import org.bmecat.bmecat._2005.LANGUAGE;
+
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
@@ -425,15 +428,20 @@ public interface DefaultOrder extends CoreOrder {
 		return null;
 	}
 
+	// 18: In OT ISO 639-2 alpha-3 code, in CIO/order-x ISO 639-1: de, en, es, ...
+	static final String TRUE = Boolean.TRUE.toString().toUpperCase();
+	default LANGUAGE createDefaultLanguage(String id) {
+		LANGUAGE language = new LANGUAGE();
+		// TODO bijektives mapping ISO 639-1 nach ISO 639-2 alpha-3, siehe ISO639.ods
+		language.setValue(DtLANG.fromValue(id));
+		language.setDefault(TRUE); // auch "true" wäre OK
+		return language;
+	}
 	@Override
 	default void addLanguage(String id) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	@Override
 	default List<String> getLanguage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bmecat.bmecat._2005.DtLANG;
 import org.bmecat.bmecat._2005.LANGUAGE;
 import org.opentrans.xmlschema._2.ORDER;
 import org.opentrans.xmlschema._2.ORDERITEM;
@@ -16,12 +15,10 @@ import org.opentrans.xmlschema._2.ORDERSUMMARY;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
-import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
-import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.MessageFunctionEnum;
@@ -142,6 +139,21 @@ public class Order extends ORDER implements DefaultOrder {
 		return orderInfo.getIssueDateAsTimestamp();
 	}
 
+	// 18: In OT ISO 639-2 alpha-3 code, in CIO/order-x ISO 639-1: de, en, es, ...
+	@Override
+	public void addLanguage(String id) {
+		orderInfo.getLANGUAGE().add(createDefaultLanguage(id));
+	}
+	@Override
+	public List<String> getLanguage() {
+		List<String> res = new ArrayList<String>();
+		List<LANGUAGE> list = orderInfo.getLANGUAGE();
+		list.forEach(lang -> {
+			res.add(lang.getValue().value()); // DtLANG ist enum, Bsp ZUL("zul");
+		});
+		return res;
+	}
+
 	// 21: BG-1 ORDER NOTE / REMARKS
 	@Override
 	public List<OrderNote> getOrderNotes() {
@@ -203,6 +215,37 @@ public class Order extends ORDER implements DefaultOrder {
 	@Override
 	public BusinessParty getBuyer() {
 		return orderInfo.getBuyer();
+	}
+
+	// 524: BT-14 0..1 SALES ORDER REFERENCED DOCUMENT
+	// eine vom Verkäufer ausgegebene Kennung für einen referenzierten Verkaufsauftrag
+	@Override
+	public void setOrderReference(String docRefId, Timestamp timestamp) {
+		orderHeader.setContractReference(docRefId, timestamp);
+	}
+	@Override
+	public String getOrderReference() {
+		return orderHeader.getContractReference();
+	}
+	@Override
+	public Timestamp getOrderDate() {
+		return orderHeader.getOrderDate();
+	}
+
+	// 539: BT-12 0..1 Contract reference / (Referenz auf Rahmenvertrag)
+	// Die Vertragsreferenz sollte im Kontext der spezifischen Handelsbeziehung 
+	// und für einen definierten Zeitraum einmalig vergeben sein
+	@Override
+	public void setContractReference(String docRefId, Timestamp timestamp) {
+		orderHeader.setContractReference(docRefId, timestamp);
+	}
+	@Override
+	public String getContractReference() {
+		return orderHeader.getContractReference();
+	}
+	@Override
+	public Timestamp getContractDate() {
+		return orderHeader.getContractDate();
 	}
 
 	// 643: SHIP TO PARTY
@@ -275,21 +318,16 @@ public class Order extends ORDER implements DefaultOrder {
 	public BusinessParty getBillTo() {
 		return orderInfo.getBillTo();
 	}
-	
+
 	// 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
 	// 903: BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
-		// TODO Auto-generated method stub
-		// in OT werden ALLOW_OR_CHARGES_FIX (Festgelegte Zu- oder Abschläge)
-		// benutzt in PRODUCT_PRICE_FIX auf Positionsebene
-		// und ORDER_INFO.PAYMENT_TERMS.TIME_FOR_PAYMENT auf Belegebene
 		orderInfo.addAllowanceCharge(allowanceOrCharge);
 	}
 	@Override
 	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-		// TODO Auto-generated method stub
-		return null;
+		return orderInfo.getAllowancesAndCharges();
 	}
 
 	// 927: BG-22 DOCUMENT TOTALS 1..1 - mandatory BT-106, BT-109, BT-112
@@ -305,78 +343,61 @@ public class Order extends ORDER implements DefaultOrder {
 		}
 		return null;
 	}
-
 	// 928: BG-22.BT-106 - 1..1/1..1
 	@Override
 	public IAmount getLineNetTotal() {
 		return super.getORDERSUMMARY()==null ? null : Amount.create(getORDERSUMMARY().getTOTALAMOUNT());
 	}
 
-	@Override
-	public IAmount getTotalTaxExclusive() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public IAmount getTotalTaxExclusive() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public IAmount getTotalTaxInclusive() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public void setAllowancesTotal(IAmount amount) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public IAmount getAllowancesTotal() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public void setChargesTotal(IAmount amount) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public IAmount getChargesTotal() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public void setTaxTotal(IAmount amount) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public IAmount getTaxTotal() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
-	@Override
-	public IAmount getTotalTaxInclusive() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void setAllowancesTotal(IAmount amount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public IAmount getAllowancesTotal() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setChargesTotal(IAmount amount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public IAmount getChargesTotal() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setTaxTotal(IAmount amount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public IAmount getTaxTotal() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		return Party.create().createAddress(countryCode, postalCode, city);
-	}
-
-	@Override
-	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		return Party.create().createContactInfo(contactName, contactTel, contactMail);
-	}
-
-	@Override
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
-		// TODO implements DefaultOrder (dort definiert), dann kann das hier weg	
-		return Party.create(name, tradingName, address, contact);
-	}
 
 	@Override
 	public void setProjectReference(String id, String name) {
@@ -405,7 +426,7 @@ public class Order extends ORDER implements DefaultOrder {
 	// 942: BT-19 0..1 Buyer accounting reference
 	@Override
 	public void setBuyerAccountingReference(Reference textReference) {
-		// siehe item.ACCOUNTING_INFO
+		// auf item Ebene siehe item.ACCOUNTING_INFO
 		// ACCOUNTING_INFO.Cost category id hat type e {cost_center,project,work_order}
 	}
 	@Override
@@ -541,25 +562,6 @@ public class Order extends ORDER implements DefaultOrder {
 		return false;
 	}
 
-	// 18: In OT ISO 639-2 alpha-3 code, in CIO/order-x ISO 639-1: de, en, es, ...
-	static final String TRUE = Boolean.TRUE.toString().toUpperCase();
-	@Override
-	public void addLanguage(String id) {
-		LANGUAGE language = new LANGUAGE();
-		language.setValue(DtLANG.fromValue(id));
-		language.setDefault(TRUE);
-		orderInfo.getLANGUAGE().add(language);
-	}
-	@Override
-	public List<String> getLanguage() {
-		List<String> res = new ArrayList<String>();
-		List<LANGUAGE> list = orderInfo.getLANGUAGE();
-		list.forEach(lang -> {
-			res.add(lang.getValue().value()); // DtLANG ist enum, Bsp ZUL("zul");
-		});
-		return res;
-	}
-
 	@Override
 	public void setPurpose(MessageFunctionEnum code) {
 		// TODO Auto-generated method stub
@@ -608,20 +610,6 @@ public class Order extends ORDER implements DefaultOrder {
 		return null;
 	}
 
-	// 524: BT-14 0..1 SALES ORDER REFERENCED DOCUMENT
-	// eine vom Verkäufer ausgegebene Kennung für einen referenzierten Verkaufsauftrag
-	@Override
-	public void setOrderReference(String docRefId, Timestamp timestamp) {
-		orderHeader.setContractReference(docRefId, timestamp);
-	}
-	@Override
-	public String getOrderReference() {
-		return orderHeader.getContractReference();
-	}
-	@Override
-	public Timestamp getOrderDate() {
-		return orderHeader.getOrderDate();
-	}
 
 	// 529: BT-13 0..1 Purchase order reference
 	// eine vom Käufer ausgegebene Kennung für eine referenzierte Bestellung
@@ -652,23 +640,6 @@ public class Order extends ORDER implements DefaultOrder {
 	}
 	@Override
 	public Timestamp getQuotationDate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	// 539: BT-12 0..1 Contract reference / (Referenz auf Rahmenvertrag)
-	// Die Vertragsreferenz sollte im Kontext der spezifischen Handelsbeziehung 
-	// und für einen definierten Zeitraum einmalig vergeben sein
-	@Override
-	public void setContractReference(String docRefId, Timestamp timestamp) {
-		orderHeader.setContractReference(docRefId, timestamp);
-	}
-	@Override
-	public String getContractReference() {
-		return orderHeader.getContractReference();
-	}
-	@Override
-	public Timestamp getContractDate() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -746,7 +717,7 @@ Soll keine Zahlungsinformation übertragen werden (z.B. weil diese in einem Rahm
 	    "valuedate"
 	    
 	    
-+ 926: Payment Terms Description
++ 926: Payment Terms Description / Zahlungsmodalitäten
 
  */
 		// TODO PAYMENT_TERM.type == unece ==>
@@ -768,18 +739,22 @@ Soll keine Zahlungsinformation übertragen werden (z.B. weil diese in einem Rahm
 	public void setPaymentMeansText(String text) {
 		// TODO Auto-generated method stub	
 	}
+	
+	// 925: BT-20 PAYMENT TERMS / Zahlungsmodalitäten
+	// in CIO nur description
+	// in OT.Order in ORDER_INFO.PAYMENT.PAYMENT_TERMS: List<PAYMENTTERM>
+	// mit type="unece" + value aus UN/ECE 4279  Payment terms type code qualifier
 	@Override
 	public void addPaymentTerm(String description) {
-		// TODO Auto-generated method stub		
+		orderInfo.addPaymentTerm(description);
 	}
 	@Override
 	public void setPaymentTerms(List<String> paymentTerms) {
-		// TODO Auto-generated method stub		
+		orderInfo.setPaymentTerms(paymentTerms);
 	}
 	@Override
 	public List<String> getPaymentTerms() {
-		// TODO Auto-generated method stub
-		return null;
+		return orderInfo.getPaymentTerms();
 	}
 
 }

@@ -2,6 +2,7 @@ package com.klst.eorder.openTrans;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -23,6 +24,7 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.BG4_Seller;
 import com.klst.eorder.api.BG7_Buyer;
@@ -391,27 +393,22 @@ Beispiele:
 		return getCURRENCY().value();
 	}
 
+	// 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+	// 903: BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
 	void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		if(allowanceOrCharge==null) return; // defensiv
 		
 		// in ORDER_INFO.PAYMENT.PAYMENT_TERMS.TIME_FOR_PAYMENT auf Belegebene
 		// PAYMENT nicht in ORDERRESPONSEINFO
 		// aber in ORDERCHANGEINFO
-		if(super.getPAYMENT()==null) {
-			super.setPAYMENT(new PAYMENT());
-			super.getPAYMENT().setDEBIT(Boolean.TRUE.toString()); // default choice
+		Payment payment = getPayment();
+		if(payment==null) {
+			payment = Payment.create(PaymentMeansEnum.DebitTransfer, null);
+			super.setPAYMENT(payment);
 		}
-/*
- *         &lt;choice>
- *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}CARD"/>
- *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}ACCOUNT" maxOccurs="unbounded"/>
- *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}DEBIT"/>
- *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}CHECK"/>
- *           &lt;element ref="{http://www.opentrans.org/XMLSchema/2.1}CASH"/>
- *         &lt;/choice>		
- */
-		if(super.getPAYMENT().getPAYMENTTERMS()==null) {
-			super.getPAYMENT().setPAYMENTTERMS(new PAYMENTTERMS());
+
+		if(payment.getPAYMENTTERMS()==null) {
+			payment.setPAYMENTTERMS(new PAYMENTTERMS());
 		}
 		
 	    // Liste festgelegter Zu- oder Abschläge die noch auf den Preis angewendet werden.
@@ -427,7 +424,7 @@ Beispiele:
  *         &lt;/choice>
 
  */
-		List<TIMEFORPAYMENT> tfpList = getPAYMENT().getPAYMENTTERMS().getTIMEFORPAYMENT();
+		List<TIMEFORPAYMENT> tfpList = payment.getPAYMENTTERMS().getTIMEFORPAYMENT();
 		TIMEFORPAYMENT tfp = new TIMEFORPAYMENT();
 		
 		ALLOWORCHARGESFIX acf = tfp.getALLOWORCHARGESFIX();
@@ -453,4 +450,37 @@ public class TIMEFORPAYMENT:
 		if(super.getPAYMENT().getPAYMENTTERMS()==null) return null;
 		return null; // TODO
 	}
+	
+	// 925: BT-20 PAYMENT TERMS / Zahlungsmodalitäten
+	// in CIO nur description
+	// in OT.Order in ORDER_INFO.PAYMENT.PAYMENT_TERMS: List<PAYMENTTERM>
+	// mit type="unece" + value aus UN/ECE 4279  Payment terms type code qualifier
+	void addPaymentTerm(String description) {
+		if(description==null) return;
+		List<String> paymentTerms = new ArrayList<String>();
+		paymentTerms.add(description);
+		setPaymentTerms(paymentTerms);
+	}
+	void setPaymentTerms(List<String> paymentTerms) {
+		if(paymentTerms==null) return;
+		Payment payment = getPayment();
+		if(payment==null) {
+			payment = Payment.create(paymentTerms);
+			super.setPAYMENT(payment);
+		} else {
+			payment.addPaymentTerms(paymentTerms);
+		}
+	}
+	List<String> getPaymentTerms() {
+		Payment payment = getPayment();
+		if(payment==null) return null;
+		
+		return payment.getPaymentTerms();
+	}
+
+	private Payment getPayment() {
+		if(super.getPAYMENT()==null) return null;
+		return Payment.create(getPAYMENT());
+	}
+
 }
