@@ -312,15 +312,14 @@ public class Order extends ORDER implements DefaultOrder {
 		return orderInfo.getDocumentCurrency();
 	}
 
-	// 792: 0..1 INVOICER PARTY
+	// 792: 0..1 INVOICER PARTY / invoice_issuer
 	@Override
 	public void setInvoicer(BusinessParty party) {
-		// TODO Auto-generated method stub	
+		orderInfo.setInvoicer(party);
 	}
 	@Override
 	public BusinessParty getInvoicer() {
-		// TODO Auto-generated method stub
-		return null;
+		return orderInfo.getInvoicer();
 	}
 
 	// 833: 0..1 INVOICEE PARTY / The "BILL TO"

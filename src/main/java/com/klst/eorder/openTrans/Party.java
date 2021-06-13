@@ -54,6 +54,7 @@ public class Party extends PARTY implements BusinessParty, BusinessPartyAddress,
 	public enum PartyRole {
 		supplier,          // BG4_Seller: Lieferant
 		buyer,             // BG7_Buyer: Einkaufende Organisation, einkaufendes Unternehmen
+		invoice_issuer,    // Rechnungssteller
 		invoice_recipient, // Rechnungsempfänger
 		delivery           // Anlieferort, Ort (Geschäftspartner) der Leistungserbringung bzw. Anlieferung
 //final_delivery Verweis auf die Adresse und den Kontakt für den Endempfänger.
