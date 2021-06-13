@@ -8,9 +8,9 @@ on: [push]
 
 jobs:
   check-bats-version:
-  	# Ubuntu 16.04 is being deprecated Ubuntu 16.04 and will be removed on 2021-09-20
-  	# ubuntu-18.04 
-  	# ubuntu-latest is Ubuntu 20.04 
+    # Ubuntu 16.04 is being deprecated Ubuntu 16.04 and will be removed on 2021-09-20
+    # ubuntu-18.04 
+    # ubuntu-latest is Ubuntu 20.04 
     runs-on: ubuntu-latest
     
     steps:
