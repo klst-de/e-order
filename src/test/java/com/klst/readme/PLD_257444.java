@@ -561,13 +561,18 @@ public class PLD_257444 extends Constants {
 		, null);
 		
 		or.setQuotationReference("QuotationReference", Timestamp.valueOf("2020-01-02"+_HMS)); // 534
-		or.setPaymentMeansEnum(PaymentMeansEnum.ClearingBetweenPartners);
+		or.setPaymentMeansEnum(PaymentMeansEnum.SEPACreditTransfer);
 		// 888: BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
 		or.addAllowance(new Amount(new BigDecimal(2.99)), null, null);
+		AllowancesAndCharges allow = or.createAllowance(new Amount(new BigDecimal(2.99)), null, null);
+		allow.setReasoncode("67"); // UNTDID 5189 Eingeschränkt
+		allow.setReasonText("UNTDID 5189:67 - Sample discount");
+		or.addAllowanceCharge(allow);
 		or.addPaymentTerm("innert 30 Tagen");  // 925: BT-20
 		or.addPaymentTerm("2");                // 925: BT-20, UNECE 4279 code 2 == End of month
 		or.setPaymentMeansEnum(PaymentMeansEnum.Cheque); // warn: ignored
 //		or.setPaymentMeansEnum(PaymentMeansEnum.BankCard);
+		LOG.info("AllowancesAndCharges:"+or.getAllowancesAndCharges());
 		
 		transformer = otTransformer;
 		object = (Order)or;

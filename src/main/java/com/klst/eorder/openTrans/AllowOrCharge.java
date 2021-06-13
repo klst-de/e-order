@@ -219,12 +219,12 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 		stringBuilder.append(", %rate:");            // BG-27.BT-138
 		stringBuilder.append(getPercentage()==null ? "null" : getPercentage());
 		
-		stringBuilder.append(", tax:");   // BT-102-0
-		stringBuilder.append(getTaxType()==null ? "null" : getTaxType());
-		stringBuilder.append("/");        // BT-102
-		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
-		stringBuilder.append(", tax%:");  // BT-103
-		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
+//		stringBuilder.append(", tax:");   // BT-102-0
+//		stringBuilder.append(getTaxType()==null ? "null" : getTaxType());
+//		stringBuilder.append("/");        // BT-102
+//		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
+//		stringBuilder.append(", tax%:");  // BT-103
+//		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
 		
 		stringBuilder.append(", Reasoncode:"); // BG-27.BT-140
 		stringBuilder.append(getReasoncode()==null ? "null" : getReasoncode());

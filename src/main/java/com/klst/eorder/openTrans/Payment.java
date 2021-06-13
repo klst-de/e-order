@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.opentrans.xmlschema._2.ACCOUNT;
+import org.opentrans.xmlschema._2.BANKACCOUNT;
+import org.opentrans.xmlschema._2.CARD;
 import org.opentrans.xmlschema._2.PAYMENT;
 import org.opentrans.xmlschema._2.PAYMENTTERM;
 import org.opentrans.xmlschema._2.PAYMENTTERMS;
@@ -58,11 +61,23 @@ public class Payment extends PAYMENT {
 	// siehe BG-16.BT-81 Code für die Zahlungsart
 	private Payment(PaymentMeansEnum paymentChoice, List<String> paymentTerms) {
 		switch(paymentChoice) {
-		case BankCard : // CARD TODO ???, "CARD_NUM", required aber nicht in API
+		case BankCard : // CARD props not in API
+			CARD card = new CARD();
+			card.setType("dummy");
+			card.setCARDNUM("0123456789");
+			card.setCARDEXPIRATIONDATE("2001-03");
+			card.setCARDHOLDERNAME("CARD_HOLDER_NAME");
+			super.setCARD(card);
 			break;
-		case CreditTransfer : // ACCOUNT		
+		case CreditTransfer : // ACCOUNT, Bankverbindung, SEPA-Überweisung, props not in API	
 		case SEPACreditTransfer :	
-//			 ACCOUNT, Bankverbindung, SEPA-Überweisung, TODO ???, "BANK_ACCOUNT", required aber nicht in API
+			ACCOUNT account = new ACCOUNT();
+			BANKACCOUNT ba = new BANKACCOUNT();
+			ba.setType("iban");
+			ba.setValue("0123456789");
+			account.setHOLDER("dummy");
+			account.setBANKACCOUNT(ba);
+			super.getACCOUNT().add(account);
 			break;
 		case DebitTransfer : // DebitTransfer, Gutschriftsverfahren
 			super.setDEBIT(DefaultOrder.TRUE);
@@ -89,6 +104,12 @@ public class Payment extends PAYMENT {
 		};
 		if( DefaultOrder.isTRUE.test(super.getDEBIT()) ) {
 			return PaymentMeansEnum.DebitTransfer;
+		};
+		if( super.getCARD()!=null ) {
+			return PaymentMeansEnum.BankCard;
+		};
+		if( super.getACCOUNT()!=null ) {
+			return PaymentMeansEnum.SEPACreditTransfer;
 		};
 		// TODO
 		return null;

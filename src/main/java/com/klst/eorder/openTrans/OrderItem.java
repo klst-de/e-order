@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import org.bmecat.bmecat._2005.ACCOUNTINGINFO;
