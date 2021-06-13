@@ -45,14 +45,14 @@ dependencies {
 dependencies {
 // compile configuration has been deprecated for dependency declaration!
 	// used in marshaller:
-	compile files('jaxb-runtime-2.3.3.jar')
+	api('org.glassfish.jaxb:jaxb-runtime:2.3.3')
 	compile files('istack-commons-runtime-3.0.11.jar')
 	compile files('e-doc-commons/lib/jaxb-runtime-2.3.3.jar')
 	compile files('e-doc-commons/lib/istack-commons-runtime-3.0.11.jar')
 // ... 
 	// used in ????
-	compile files('e-doc-commons/lib/javax.inject-1.jar')
-	compile files('e-doc-commons/lib/hamcrest-2.2.jar')
+	api('javax.inject:javax.inject:1')
+	testImplementation('org.hamcrest:hamcrest:2.2')
 	
     // This dependency is exported to consumers, that is to say found on their compile classpath.
 //    api 'javax.inject-1.jar'
@@ -62,7 +62,7 @@ dependencies {
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.13'
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
 //    testRuntime("org.junit.platform:junit-platform-runner:1.5.2")  
 }
 
