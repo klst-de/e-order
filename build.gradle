@@ -43,23 +43,20 @@ dependencies {
 
  */
 dependencies {
-// compile configuration has been deprecated for dependency declaration!
+    // This dependency is exported to consumers, that is to say found on their compile classpath.
 	// used in marshaller:
 	api('org.glassfish.jaxb:jaxb-runtime:2.3.3')
-	compile files('istack-commons-runtime-3.0.11.jar')
-	compile files('e-doc-commons/lib/jaxb-runtime-2.3.3.jar')
-	compile files('e-doc-commons/lib/istack-commons-runtime-3.0.11.jar')
+	// used in jaxb-runtime:
+	api('com.sun.istack:istack-commons-runtime:3.0.11')
+//	compile files('e-doc-commons/lib/jaxb-runtime-2.3.3.jar')
+//	compile files('e-doc-commons/lib/istack-commons-runtime-3.0.11.jar')
 // ... 
-	// used in ????
+	// wg. Singleton:
 	api('javax.inject:javax.inject:1')
-	testImplementation('org.hamcrest:hamcrest:2.2')
-	
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-//    api 'javax.inject-1.jar'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-//    implementation 'com.google.guava:guava:28.2-jre'
-
+	testImplementation('org.hamcrest:hamcrest:2.2')
+	
     // Use JUnit test framework
     testImplementation 'junit:junit:4.13'
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
