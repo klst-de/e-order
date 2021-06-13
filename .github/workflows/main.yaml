@@ -1,14 +1,35 @@
 # GitHub Actions: example workflow
-# see https://docs.github.com/en/actions/learn-github-actions/introduction-to-github-actions
+# see https://docs.github.com/en/actions/
 
 name: learn-github-actions
 
+# on: Controls when the action will run:
 on: [push]
+
 jobs:
   check-bats-version:
+  	# Ubuntu 16.04 is being deprecated Ubuntu 16.04 and will be removed on 2021-09-20
+  	# ubuntu-18.04 
+  	# ubuntu-latest is Ubuntu 20.04 
     runs-on: ubuntu-latest
+    
     steps:
+      # Checks-out repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
       - run: npm install -g bats
       - run: bats -v
+
+  # see: https://docs.github.com/en/actions/guides/building-and-testing-java-with-gradle
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Build with Gradle
+        run: ./gradlew build
