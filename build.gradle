@@ -1,0 +1,71 @@
+plugins {
+    // Apply the java-library plugin to add support for Java Library
+    id 'java-library' // Provides support for building a Java library. Also ein jar
+	id 'eclipse'
+}
+
+// --warning-mode=all // (all,fail,none,summary)
+
+compileJava.options.encoding = 'UTF-8'
+sourceSets.main.java.srcDirs += ['e-doc-commons/src/main/java']
+
+repositories {
+    // Use jcenter for resolving dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+	mavenCentral()
+	
+/*
+JCenter Maven repository / https://bintray.com/
+
+Bintray's JCenter is an up-to-date collection of all popular Maven OSS artifacts, 
+including artifacts published directly to Bintray.
+
+ */
+    jcenter()
+}
+
+/*
+ Abhängigkeiten in Gradle folgen dem gleichen Format wie Maven . Abhängigkeiten sind wie folgt aufgebaut:
+
+group:name:version
+
+compile 'org.springframework:spring-core:4.3.1.RELEASE'
+
+Eine alternative Syntax hierfür benennt jede Komponente der Abhängigkeit explizit wie folgt:
+
+compile group: 'org.springframework', name: 'spring-core', version: '4.3.1.RELEASE'
+
+ Manchmal haben Sie eine lokale JAR-Datei, die Sie Ihrem Gradle-Build als Abhängigkeit hinzufügen müssen. So können Sie das machen:
+
+dependencies {
+    compile files('path/local_dependency.jar')
+}
+
+ */
+dependencies {
+// compile configuration has been deprecated for dependency declaration!
+	// used in marshaller:
+	compile files('jaxb-runtime-2.3.3.jar')
+	compile files('istack-commons-runtime-3.0.11.jar')
+	compile files('e-doc-commons/lib/jaxb-runtime-2.3.3.jar')
+	compile files('e-doc-commons/lib/istack-commons-runtime-3.0.11.jar')
+// ... 
+	// used in ????
+	compile files('e-doc-commons/lib/javax.inject-1.jar')
+	compile files('e-doc-commons/lib/hamcrest-2.2.jar')
+	
+    // This dependency is exported to consumers, that is to say found on their compile classpath.
+//    api 'javax.inject-1.jar'
+
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+//    implementation 'com.google.guava:guava:28.2-jre'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.13'
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.1")
+//    testRuntime("org.junit.platform:junit-platform-runner:1.5.2")  
+}
+
+test {
+    useJUnitPlatform()
+}
