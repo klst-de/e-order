@@ -33,7 +33,7 @@ jobs:
 #        uses: actions/setup-java@v1.4.3
         uses: actions/setup-java@v2 # needs distribution
         with:
-          java-version: '1.8'
+          java-version: '8'
           java-package: jdk
           distribution: 'adopt'
           
