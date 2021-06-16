@@ -5,7 +5,7 @@ development of a jar to read and write [electronic orders](https://fnfe-mpe.org/
 
 [SCRDM](https://service.unece.org/trade/uncefact/publication/Supply%20Chain%20Management/CrossIndustrySCRDM/SCRDM/HTML/001.htm) contains Cross-Industry-Order (CIO), a xml syntax for e-order. Both CIO and Cross-Industry-Invoice are supply chain messages with similar structure:
 
-![](src/main/resources/image/CIOvsCII.PNG)
+![](src/main/doc/image/CIOvsCII.PNG)
 
 Similar because
 - CIO schema is based on SCRDM (128) D19A which was published in 2019

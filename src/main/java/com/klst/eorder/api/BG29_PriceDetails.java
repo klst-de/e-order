@@ -46,7 +46,8 @@ public interface BG29_PriceDetails {
 	/**
 	 * Item price charge
 	 * <p>
-	 * Only applies if the charge is provided per unit and if it is not included in the Item gross price, for instance for WEEE tax.
+	 * Only applies if the charge is provided per unit and if it is not included in the Item gross price, 
+	 * for instance for WEEE tax (Waste Electrical and Electronic Equipment).
 	 * <p>
 	 * Cardinality: 	0..1 (optional)
 	 * <br>Order-X-No: 	170
