@@ -15,7 +15,12 @@ plugins {
 
 // --warning-mode=all // (all,fail,none,summary), summary ist default - diese prop in ~/.gradle/gradle.properties
 
-compileJava.options.encoding = 'UTF-8' // sonst wird Cp1252 genutzt
+//compileJava.options.encoding = 'UTF-8' // sonst wird Cp1252 genutzt
+//compileTestJava.options.encoding = 'UTF-8'
+// oder:
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
 sourceSets.main.java.srcDirs += ['e-doc-commons/src/main/java']
 
 repositories {
