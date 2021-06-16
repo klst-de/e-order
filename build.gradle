@@ -15,13 +15,18 @@ plugins {
 
 // --warning-mode=all // (all,fail,none,summary), summary ist default - diese prop in ~/.gradle/gradle.properties
 
-//compileJava.options.encoding = 'UTF-8' // sonst wird Cp1252 genutzt
+// All extra properties must be defined through the "ext" namespace!
+// oder so:
+def JAR_BASENAME = "de.klst.orderx"
+//def JAR_VERSION  = "1.1.0"
+version = '1.1.0'
+
+//compileJava.options.encoding = 'UTF-8' // sonst wird auf WIN Cp1252 genutzt
 //compileTestJava.options.encoding = 'UTF-8'
-// oder:
+// oder besser:
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
-sourceSets.main.java.srcDirs += ['e-doc-commons/src/main/java']
 
 repositories {
     // declare any Maven/Ivy/file repository here:
@@ -34,6 +39,9 @@ repositories {
     
 		Bintray's JCenter is an up-to-date collection of all popular Maven OSS artifacts, 
 		including artifacts published directly to Bintray.
+		
+		JCenter macht dicht (ab April 2021 nur noch read only), siehe
+		https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
     
      */
     jcenter()
@@ -72,12 +80,77 @@ dependencies {
 	// wg. Singleton:
 	api('javax.inject:javax.inject:1')
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    // Bsp. This dependency is used internally, and not exposed to consumers on their own compile classpath.
 //    implementation 'com.google.guava:guava:29.0-jre'
 }
 
-/* 
-test {
-    useJUnitPlatform()
+//sourceSets.main.java.srcDirs += ['e-doc-commons/src/main/java']
+sourceSets {
+
+//	println "compileClasspath=$compileClasspath"
+	println "configurations=$configurations"
+	println "project=$project"
+	
+//	println "FileCollection=${Project.files(project)}"
+	println "it=$it"
+
+	sourceSets.each { srcSet ->
+        println "sourceSet ["+srcSet.name+"]"
+        print "-->Source directories: "+srcSet.allJava.srcDirs+"\n"
+        print "-->Output directories: "+srcSet.output.classesDirs.files+"\n"
+        print "-->Compile classpath:\n"
+        srcSet.compileClasspath.files.each { 
+            print "  "+it.path+"\n"
+        }
+        println ""
+        if(srcSet.name=="main") {
+        	srcSet.java.srcDirs += ['e-doc-commons/src/main/java']         	
+        }
+	}
 }
-*/
+
+/* archiveFileName	
+ If the name has not been explicitly set, the pattern for the name is: 
+ [archiveBaseName]-[archiveAppendix]-[archiveVersion]-[archiveClassifier].[archiveExtension]
+ Examples: de.klst.orderx-api-1.1.0.jar de.klst.orderx-impl-1.1.0.jar
+
+ excludes / includes // Set<String>, Default with java plugin: []
+ The set of exclude/includes patterns.
+
+Patterns may include:
+
+    '*' to match any number of characters
+    '?' to match any single character
+    '**' to match any number of directories or files 
+ */
+task apiJar(type: Jar) {
+    archiveBaseName = JAR_BASENAME
+    archiveAppendix = "api"
+//    archiveVersion = JAR_VERSION
+    includeEmptyDirs = false
+    from sourceSets.main.output
+	// include / exclude patterns are relative to the root(s)
+    includes = ["**/api/**"]
+}
+
+// TODO resources + "**/xsd/**"
+jar {
+    archiveBaseName = JAR_BASENAME
+    archiveAppendix = "impl"
+//    archiveVersion = JAR_VERSION
+    excludes = ["**/api/**"]
+	println "impl jar: source.each:"
+	// direkt nach clean wird hier nur MANIFEST.MF ausgegeben, daher doLast ...
+	doLast {
+		source.each { src ->
+	        println "["+src+"]"
+		}
+	}
+//	tasks.each { task ->
+//        println "["+task+"]"
+//	}
+}
+
+artifacts {
+    archives apiJar
+}
