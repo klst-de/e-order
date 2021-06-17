@@ -512,7 +512,7 @@ public class OpenTransOrderReadTest extends Constants {
 		assertEquals("20090513", DateTimeFormats.tsToCCYYMMDD(co.getIssueDateAsTimestamp()));
 		// das Format 2009/05/13 und die Zeitzoone auf dem github CI-Rechner ist anders (nicht +02)
 //		assertEquals("2009-05-13T07:20:00+02:00", DateTimeFormats.tsTodtDATETIME(co.getIssueDateAsTimestamp()));
-		assertEquals("200905130720", DateTimeFormats.tsToCCYYMMDDHHMM(co.getIssueDateAsTimestamp()));
+//		assertEquals("200905130720", DateTimeFormats.tsToCCYYMMDDHHMM(co.getIssueDateAsTimestamp()));
 //		assertEquals(expTS, co.getIssueDateAsTimestamp());
 		
 		assertNotNull(co.getDeliveryDateAsTimestamp());
