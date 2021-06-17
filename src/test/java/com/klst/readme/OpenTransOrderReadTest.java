@@ -503,10 +503,18 @@ public class OpenTransOrderReadTest extends Constants {
 // Das Format der Steuernummer beim Finanzamt variiert ab und an  von Bundesland zu Bundesland. Sie beinhaltet mal 10 und mal 11 Zahlen, die durch Schrägstriche in 3 Teile zerlegt wird. 
 		
 		
-		LOG.info("getIssueDateAsTimestamp:"+co.getIssueDateAsTimestamp());
+		LOG.info("getIssueDateAsTimestamp:"+co.getIssueDateAsTimestamp()
+			+ " dtDATETIME:"+DateTimeFormats.tsTodtDATETIME(co.getIssueDateAsTimestamp()).substring(0,19)
+			);
 		// 2009-05-13 07:20:00.0 test ohne Time:
+		String expDate = "2009-05-13";
+		Timestamp expTS = Timestamp.valueOf(expDate+" 07:20:00");
 		assertEquals("20090513", DateTimeFormats.tsToCCYYMMDD(co.getIssueDateAsTimestamp()));
-		assertEquals("2009-05-13T07:20:00+02:00", DateTimeFormats.tsTodtDATETIME(co.getIssueDateAsTimestamp()));
+		// die Zeitzoone auf dem github CI-Rechner ist anders (nicht +02)
+//		assertEquals("2009-05-13T07:20:00+02:00", DateTimeFormats.tsTodtDATETIME(co.getIssueDateAsTimestamp()));
+		assertEquals("2009-05-13T07:20:00+02:00".substring(0,19), DateTimeFormats.tsTodtDATETIME(co.getIssueDateAsTimestamp()).substring(0,19));
+		assertEquals(expTS, co.getIssueDateAsTimestamp());
+		
 		assertNotNull(co.getDeliveryDateAsTimestamp());
 		assertEquals("20090520", DateTimeFormats.tsToCCYYMMDD(co.getDeliveryDateAsTimestamp()));
 		
