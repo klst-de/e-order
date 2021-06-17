@@ -46,18 +46,6 @@ public class SCopyCtor {
     private static final String CLASS_CodeType = ".CodeType";
     private static final String CLASS_DocumentCodeType = ".DocumentCodeType";
     
-//    private static final Class<?> loadType(String clazz) {
-//		Class<?> type = null;
-//		try {
-//			// dynamisch die Klasse laden
-//			type = Class.forName(clazz);
-//		} catch (ClassNotFoundException e) {
-//			LOG.warning(e.getMessage());
-//			return null;
-//		}
-//    	return type;
-//    }
-
 	Map<String, String> getterFieldMap = new HashMap<String, String>();
     Class<?> typeQDT_DocumentCode = null; // wg. enum DocumentNameCode
     Class<?> type_Code = null; // wg. enum DocumentNameCode
@@ -513,8 +501,11 @@ public class SCopyCtor {
 		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
 		while(valueSuperType.getPackage()!=packageCCTSM) {
 			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
-			LOG.config("search for proper package to "+valueSuperType.getCanonicalName());
+			LOG.info("search for proper package to "+valueSuperType.getCanonicalName());
 			valueSuperType = valueSuperType.getSuperclass();
+			if(valueSuperType==null) {
+				throw new IllegalArgumentException("Object '"+value+"' is not AmountType but "+value.getClass());
+			}
 		}
 
 		if(type_Amount==valueSuperType) {
@@ -635,7 +626,7 @@ mapQuantity: kopiere nur value und unitCode (die anderen werden nicht genutzt)
 			uncheckedAdd(listObject, fo);
 			return fo;
 		} catch (NoSuchMethodException e) {
-			LOG.config(methodName + "() not defined for " + fo.getClass().getSimpleName() + " and arg value:"+value);
+			LOG.config(methodName + "() not defined for type " + fo.getClass().getSimpleName() + " and arg value:"+value);
 		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 			LOG.warning(fo.getClass().getSimpleName() +"."+"id" + ": Exception:"+e);
 			e.printStackTrace();
@@ -655,8 +646,41 @@ mapQuantity: kopiere nur value und unitCode (die anderen werden nicht genutzt)
 			e.printStackTrace();
 		} catch (IllegalArgumentException | InvocationTargetException e) {
 			// invoke throws this
-			e.printStackTrace();
+//			e.printStackTrace();
+			LOG.config("Cannot apply mapAmount for type " + fo.getClass().getSimpleName() + " and arg value:"+value);
 		}
+		
+		// TODO Baustelle
+		methodName = METHOD_SETVALUE;
+		try { // "setValue" existiert ? ==> ausführen
+			Method setValue = fieldType.getDeclaredMethod(methodName, value.getClass());
+			setValue.invoke(fo, value.getClass().cast(value));
+			LOG.config(methodName + " with "+value);
+			uncheckedAdd(listObject, fo);
+			return fo;
+		} catch (NoSuchMethodException e) {
+			LOG.config(methodName + "() not defined in type " + fo.getClass().getSimpleName() + " and arg value:"+value);
+		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+			LOG.warning(fo.getClass().getSimpleName() +"."+"id" + ": Exception:"+e);
+			e.printStackTrace();
+			return null;
+		}
+		try { // "setValue" existiert in Oberklassen von fo ? ==> ausführen
+			Method setValue = fieldType.getSuperclass().getDeclaredMethod(methodName, value.getClass());
+			LOG.config(methodName + "() defined in type " + fieldType.getSuperclass().getSimpleName() + " and arg value:"+value);
+			setValue.invoke(fo, value.getClass().cast(value));
+			LOG.config("done "+methodName + " with "+value);
+			uncheckedAdd(listObject, fo);
+			return fo;
+		} catch (NoSuchMethodException e) {
+			LOG.config(methodName + "() not defined for type " + fo.getClass().getSimpleName() + " and arg value:"+value);
+		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+			LOG.warning(fo.getClass().getSimpleName() +"."+"id" + ": Exception:"+e);
+			e.printStackTrace();
+			return null;
+		}
+
+		LOG.warning("cannot add");
 		return null;		
 	}
 	
