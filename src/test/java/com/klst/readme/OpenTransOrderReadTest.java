@@ -17,7 +17,6 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -512,21 +511,11 @@ public class OpenTransOrderReadTest extends Constants {
 			);
 		// 2009-05-13 07:20:00.0 test ohne Time:
 		String expDate = "2009-05-13";
-		String expDateTime = expDate + " 05:20:00"; // GMT
-		String expDT_ISO = expDate + "T05:20:00Z"; // ISO-8601 
-		Timestamp expTS = Timestamp.valueOf(expDateTime);
-		// DateTimeFormatter.BASIC_ISO_DATE
-		TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT.parse(expDT_ISO);
+		String expDT_ISO = expDate + "T05:20:00Z"; // GMT ISO-8601 
+
 		assertEquals("20090513", DateTimeFormats.tsToCCYYMMDD(co.getIssueDateAsTimestamp()));
-		// das Format 2009/05/13 und die Zeitzoone auf dem github CI-Rechner ist anders (nicht +02)
-		// für Berlin:
-//		assertEquals("2009-05-13T07:20:00+02:00", DateTimeFormats.tsTodtDATETIME(co.getIssueDateAsTimestamp()));
-		// für github CI-Rechner:
-//		assertEquals("200905130520", DateTimeFormats.tsToCCYYMMDDHHMM(co.getIssueDateAsTimestamp()));
-		
-//		LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
-//		ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
-		assertEquals(Instant.from(temporalAccessor), co.getIssueDateAsTimestamp().toInstant());
+		assertEquals(Instant.from(DateTimeFormatter.ISO_INSTANT.parse(expDT_ISO)), 
+				co.getIssueDateAsTimestamp().toInstant());
 		
 		assertNotNull(co.getDeliveryDateAsTimestamp());
 		assertEquals("20090520", DateTimeFormats.tsToCCYYMMDD(co.getDeliveryDateAsTimestamp()));
