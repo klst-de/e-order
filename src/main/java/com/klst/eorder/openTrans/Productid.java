@@ -14,7 +14,6 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.IdentifierExt;
 import com.klst.eorder.api.BG31_ItemInformation;
-import com.klst.eorder.openTrans.reflection.Mapper;
 
 /* Kandidat für
 BG-31 ++ 1..1 ITEM INFORMATION            ------> ram:SpecifiedTradeProduct
@@ -67,7 +66,7 @@ public class Productid extends PRODUCTID implements BG31_ItemInformation {
 	
 	// BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) {
-		Mapper.add(getDESCRIPTIONSHORT(), new DESCRIPTIONSHORT(), text);
+		SCopyCtor.getInstance().add(getDESCRIPTIONSHORT(), new DESCRIPTIONSHORT(), text);
 	}
 	@Override
 	public String getItemName() {
@@ -77,7 +76,7 @@ public class Productid extends PRODUCTID implements BG31_ItemInformation {
 	// BG-31.BT-154 0..1 Item description
 	@Override
 	public void setDescription(String text) {
-		Mapper.add(getDESCRIPTIONLONG(), new DESCRIPTIONLONG(), text);
+		SCopyCtor.getInstance().add(getDESCRIPTIONLONG(), new DESCRIPTIONLONG(), text);
 	}
 	@Override
 	public String getDescription() {

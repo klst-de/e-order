@@ -13,7 +13,6 @@ import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.eorder.api.AllowancesAndCharges;
 import com.klst.eorder.api.ITaxCategory;
-import com.klst.eorder.openTrans.reflection.Mapper;
 
 /* implements BG-27 LINE ALLOWANCES, BG-28 LINE CHARGES
 
@@ -174,7 +173,7 @@ public class AllowOrCharge extends ALLOWORCHARGE implements AllowancesAndCharges
 	// Order-X-No: 898, 913, 325, 333, 169(Item price discount Reason)
 	@Override
 	public void setReasonText(String text) {
-		Mapper.add(super.getALLOWORCHARGEDESCR(), new ALLOWORCHARGEDESCR(), text);
+		SCopyCtor.getInstance().add(super.getALLOWORCHARGEDESCR(), new ALLOWORCHARGEDESCR(), text);
 	}
 
 	@Override

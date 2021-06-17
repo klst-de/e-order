@@ -12,7 +12,6 @@ import org.opentrans.xmlschema._2.ADDRESS;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
-import com.klst.eorder.openTrans.reflection.Mapper;
 
 /* aus Doku:
 	<PARTY>
@@ -106,18 +105,18 @@ public class Address extends ADDRESS implements PostalAddressExt, ContactInfo {
 	}
 	
 	private void setCity(String city) {
-		Mapper.add(super.getCITY(), new CITY(), city);
+		SCopyCtor.getInstance().add(super.getCITY(), new CITY(), city);
 	}
 	
 	private void setPostCode(String postCode) {
-		Mapper.add(super.getZIP(), new ZIP(), postCode);
+		SCopyCtor.getInstance().add(super.getZIP(), new ZIP(), postCode);
 	}
 	
 	@Override
 	public void setAddressLine1(String addressLine) {
 //		// das nachfolgende generisch:
 //		//     add(List list, Object objToAdd, Object value)
-		Mapper.add(super.getNAME(), new NAME(), addressLine);
+		SCopyCtor.getInstance().add(super.getNAME(), new NAME(), addressLine);
 //		NAME n = new NAME();
 //		n.setValue(addressLine);
 //		if(super.getNAME().isEmpty()) {
@@ -130,22 +129,22 @@ public class Address extends ADDRESS implements PostalAddressExt, ContactInfo {
 
 	@Override
 	public void setAddressLine2(String addressLine) {
-		Mapper.add(super.getNAME2(), new NAME2(), addressLine);
+		SCopyCtor.getInstance().add(super.getNAME2(), new NAME2(), addressLine);
 	}
 
 	@Override
 	public void setAddressLine3(String addressLine) {
-		Mapper.add(super.getNAME3(), new NAME3(), addressLine);
+		SCopyCtor.getInstance().add(super.getNAME3(), new NAME3(), addressLine);
 	}
 
 	@Override
 	public void setCountrySubdivision(String countrySubdivision) {
-		Mapper.add(super.getSTATE(), new STATE(), countrySubdivision);
+		SCopyCtor.getInstance().add(super.getSTATE(), new STATE(), countrySubdivision);
 	}
 
 	@Override
 	public void setStreet(String street) {
-		Mapper.add(super.getSTREET(), new STREET(), street);
+		SCopyCtor.getInstance().add(super.getSTREET(), new STREET(), street);
 	}
 
 	@Override
