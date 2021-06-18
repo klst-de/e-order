@@ -33,4 +33,4 @@ jobs:
         
       - name: Build with Gradle
         # see https://docs.gradle.org/current/userguide/logging.html#sec:choosing_a_log_level
-        run: ./gradlew --debug build
+        run: ./gradlew --info build
