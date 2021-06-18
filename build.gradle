@@ -136,11 +136,21 @@ jar {
     archiveAppendix = "impl"
     excludes = ["**/api/**"]
     
+// Test: (die Einstellung aus .gradle/gradle.properties wird ignoriert)
+logger.quiet('An info log message which is always logged.')
+logger.error('An error log message.')
+logger.warn('A warning log message.')
+logger.lifecycle('A lifecycle info log message.')
+logger.info('An info log message.')
+logger.debug('A debug log message.')
+logger.trace('A trace log message.') // Gradle never logs TRACE level logs
+
 	logger.info("impl jar: source.each:")
 	// direkt nach clean wird hier nur MANIFEST.MF ausgegeben, daher doLast ...
 	doLast {
 		source.each { src ->
-	        logger.info(src)
+	        logger.info(""+src)
+//	        println(src)
 		}
 	}
 //	tasks.each { task ->
