@@ -38,7 +38,6 @@ import com.klst.eorder.impl.ID;
 import com.klst.eorder.impl.Quantity;
 import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
 import com.klst.eorder.openTrans.Address;
-import com.klst.eorder.openTrans.DefaultOrder;
 import com.klst.eorder.openTrans.Order;
 import com.klst.eorder.openTrans.PartyID;
 import com.klst.eorder.openTrans.PostalAddressExt;

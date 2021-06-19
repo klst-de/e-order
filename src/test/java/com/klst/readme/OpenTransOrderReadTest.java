@@ -29,6 +29,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
@@ -296,9 +297,14 @@ public class OpenTransOrderReadTest extends Constants {
 		try {
 			InputStream is = new FileInputStream(testFile);
 			object = transformer.unmarshal(is);
-			LOG.info(">>>>"+object);
+			LOG.info("unmarshaled object:"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.OpenTransOrderTransformer.CONTENT_TYPE_NAME); // openTrans.Order aus jar laden
-			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
+			// castTo liefert Object, 
+			// aber vom typ CONTENT_TYPE_NAME openTrans.Order implements DefaultOrder extends CoreOrder,
+			// Daher kann ist cast auf Object coreOrder OK: (CoreOrder)coreOrder
+			Object coreOrder = SCopyCtor.getInstance().castTo(type, object);
+			LOG.info("casted coreOrder object:"+coreOrder);
+			return (CoreOrder)coreOrder;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			LOG.severe(ex.getMessage());
