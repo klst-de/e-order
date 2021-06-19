@@ -67,7 +67,7 @@ dependencies {
  */
 dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-	testImplementation('org.hamcrest:hamcrest:2.2')
+//	testImplementation('org.hamcrest:hamcrest:2.2')
     // Use JUnit test framework.
     testImplementation 'junit:junit:4.13'
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
@@ -87,12 +87,10 @@ dependencies {
 //sourceSets.main.java.srcDirs += ['e-doc-commons/src/main/java']
 sourceSets {
 
-//	println "compileClasspath=$compileClasspath"
-	println "configurations=$configurations"
-	println "project=$project"
-	
-//	println "FileCollection=${Project.files(project)}"
-	println "it=$it"
+// am Anfang bei Configure project
+	logger.info("configurations=$configurations") 
+	logger.info("project=$project")
+	logger.info("it=$it")
 
 	sourceSets.each { srcSet ->
         println "sourceSet ["+srcSet.name+"]"
@@ -131,19 +129,35 @@ task apiJar(type: Jar) {
     from sourceSets.main.output
 	// include / exclude patterns are relative to the root(s)
     includes = ["**/api/**"]
+    
+	doLast {
+		logger.info("api jar: source.each:")
+		source.each { src ->
+	        logger.info(""+src)
+		}
+	}
 }
 
-// TODO resources + "**/xsd/**"
 jar {
     archiveBaseName = JAR_BASENAME
     archiveAppendix = "impl"
-//    archiveVersion = JAR_VERSION
     excludes = ["**/api/**"]
-	println "impl jar: source.each:"
+    
 	// direkt nach clean wird hier nur MANIFEST.MF ausgegeben, daher doLast ...
 	doLast {
+		// Test: (die Einstellung aus .gradle/gradle.properties wird ignoriert)
+//		logger.quiet('An info log message which is always logged.')
+//		logger.error('An error log message.')
+//		logger.warn('A warning log message.')
+//		logger.lifecycle("A lifecycle info log message: logging.level=${logging.level}")
+//		logger.info('An info log message.')
+//		logger.debug('A debug log message.')
+//		logger.trace('A trace log message.') // Gradle never logs TRACE level logs
+	
+		logger.info("impl jar: source.each:")
 		source.each { src ->
-	        println "["+src+"]"
+	        logger.info(""+src)
+//	        println(src)
 		}
 	}
 //	tasks.each { task ->

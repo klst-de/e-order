@@ -12,6 +12,8 @@ import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.eorder.api.OrderNote;
 import com.klst.eorder.impl.UnitPriceAmount;
 
+import un.unece.uncefact.identifierlist.standard.iso.isotwo_lettercountrycode.secondedition2006.ISOTwoletterCountryCodeContentType;
+
 public class Constants {
 
 	static final String TESTDIR = "src/test/resources/";
@@ -19,13 +21,30 @@ public class Constants {
 
 	static final String _HMS = " 00:00:00"; // Timestamp suffix to get yyyy-[m]m-[d]d hh:mm:ss[.f...]
 
+	// countries + currency
+	static final String CH  = ISOTwoletterCountryCodeContentType.CH.toString();
+	static final String DE  = ISOTwoletterCountryCodeContentType.DE.toString();
+	static final String FR  = ISOTwoletterCountryCodeContentType.FR.toString();
+	static final String PL  = ISOTwoletterCountryCodeContentType.PL.toString();
+	static final String CHF = "CHF";
 	static final String EUR = "EUR";
+	
+	// UNTDID 7065 Package type description code verweist auf UN/ECE Recommendation 21, Annex V
+	static final String woodenCase = "7B"; 
 	static final String C62 = "C62";
 	static final String MTK = "MTK"; // m²
 	static final String MTR = "MTR"; // m Meter
 	static final String PRD = "PRD"; // UNTDID 4451: Product information
 	// UNTDID 4343 Response type code: Acknowledge - with detail and change; Acknowledge complete including changes.
 	static final String  AC =  "AC"; // to request an Order Response
+	// UNTDID 4053 + INCOTERMS DELIVERY CODE:
+	static final String FCA = "FCA"; // Free Carrier (insert named place of delivery)
+	// UNTDID 4055 DELIVERY MODE:
+	static final String COLLECTED_BY_CUSTOMER = "4";
+	static final String DELIVERED_BY_SUPPLIER = "7";
+	
+	// UNTDID 7143 Item type identification code
+	static final String EAN_UNTDID_7143 = "EN"; // International Article Numbering Association (EAN)
 
 	// Coding Systems aka ICD Schemas : 
 	// System Information et Repertoire des Entreprise et des Etablissements: SIRENE

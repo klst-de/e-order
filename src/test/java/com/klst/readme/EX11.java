@@ -236,7 +236,7 @@ public class EX11 extends Constants {
 		
 //		bp.zip = "44100";
 //		bp.city = "NANTES";
-		bp.pa = TradeAddress.create().createAddress("FR", "44100", "NANTES");
+		bp.pa = TradeAddress.create().createAddress(FR, "44100", "NANTES");
 		bp.al1 = "12 RUE DE LA FONTAINE SALEE";
 		
 		return bp;
@@ -250,7 +250,7 @@ public class EX11 extends Constants {
 		bp.vatId = "FR94572141885";
 		bp.uriId = new ID("alain.dupond@saint-gobain.com", "EM");
 		
-		bp.pa = TradeAddress.create().createAddress("FR", "01500", "Amberieu en bugey");
+		bp.pa = TradeAddress.create().createAddress(FR, "01500", "Amberieu en bugey");
 		bp.al1 = "Avenue Leon Blum";
 		bp.ci = TradeContact.create().createContactInfo("ALAIN DUPOND", "06 78 56 23 00", "alain.dupond@saint-gobain.com");
 		
@@ -312,7 +312,7 @@ public class EX11 extends Constants {
 		order.setIssueDate(DateTimeFormats.ymdToTs("20200109")); // 14: BT-2
 		order.setCopyIndicator(!CoreOrder.COPY);                 // 16:
 		order.setPurpose(MessageFunctionEnum.Original);          // 19: defined in UNTDID 1225
-		order.setRequestedResponse("AC");                        // 20: defined in UNTDID 4343
+		order.setRequestedResponse(AC);                          // 20: defined in UNTDID 4343
 
 		// calculate line 1 net amount:
 		UnitPriceAmount upa = new UnitPriceAmount(new BigDecimal(18.74));
@@ -361,7 +361,7 @@ public class EX11 extends Constants {
 		order.addLine(line3);
 
 		PostalAddress sellerAddress = TradeAddress.create().createAddress(
-			"FR", "44100", "NANTES");
+			FR, "44100", "NANTES");
 		sellerAddress.setAddressLine1("12 RUE DE LA FONTAINE SALEE");
 		String sellerName = "DMBP NANTES DISPANO ROUX - 1535"; // 349: BG-4.BT-27
 		BusinessParty seller = order.createParty(sellerName
@@ -374,7 +374,7 @@ public class EX11 extends Constants {
 		order.setSeller(seller);
 
 		PostalAddress buyerAddress = TradeAddress.create().createAddress(
-			"FR", "01500", "Amberieu en bugey");
+			FR, "01500", "Amberieu en bugey");
 		buyerAddress.setAddressLine1("Avenue Leon Blum");
 		ContactInfo contact = TradeContact.create().createContactInfo("ALAIN DUPOND"
 			, "06 78 56 23 00"
