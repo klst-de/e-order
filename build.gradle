@@ -129,6 +129,13 @@ task apiJar(type: Jar) {
     from sourceSets.main.output
 	// include / exclude patterns are relative to the root(s)
     includes = ["**/api/**"]
+    
+	doLast {
+		logger.info("api jar: source.each:")
+		source.each { src ->
+	        logger.info(""+src)
+		}
+	}
 }
 
 jar {
@@ -139,13 +146,13 @@ jar {
 	// direkt nach clean wird hier nur MANIFEST.MF ausgegeben, daher doLast ...
 	doLast {
 		// Test: (die Einstellung aus .gradle/gradle.properties wird ignoriert)
-		logger.quiet('An info log message which is always logged.')
-		logger.error('An error log message.')
-		logger.warn('A warning log message.')
-		logger.lifecycle("A lifecycle info log message: logging.level=${logging.level}")
-		logger.info('An info log message.')
-		logger.debug('A debug log message.')
-		logger.trace('A trace log message.') // Gradle never logs TRACE level logs
+//		logger.quiet('An info log message which is always logged.')
+//		logger.error('An error log message.')
+//		logger.warn('A warning log message.')
+//		logger.lifecycle("A lifecycle info log message: logging.level=${logging.level}")
+//		logger.info('An info log message.')
+//		logger.debug('A debug log message.')
+//		logger.trace('A trace log message.') // Gradle never logs TRACE level logs
 	
 		logger.info("impl jar: source.each:")
 		source.each { src ->

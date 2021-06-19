@@ -25,6 +25,7 @@ import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
@@ -50,7 +51,7 @@ import com.klst.eorder.impl.TradeParty;
 import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
 import com.klst.marshaller.CioTransformer;
 
-public class OrderTest {
+public class OrderTest extends Constants {
 	
 	private static final String LOG_PROPERTIES = "testLogging.properties";
 	private static LogManager logManager = LogManager.getLogManager(); // Singleton
@@ -73,11 +74,6 @@ public class OrderTest {
 	}
 //	private static final Logger LOG = Logger.getLogger(OrderTest.class.getName());
 
-	static final String EUR = "EUR";
-	static final String C62 = "C62";
-	static final String MTR = "MTR";
-	static final String GTIN = "0160"; // Global Trade Item Number (GTIN)
-	static final String TESTDIR = "src/test/resources/";
 	// file content: "Das könnte eine Anlage sein."
 	static final String PDF = "01_15_Anhang_01.pdf";
 	static final String MIME = "application/pdf";
@@ -132,7 +128,7 @@ public class OrderTest {
 		order.setIssueDate(DateTimeFormats.ymdToTs("2020-03-31"));
 		order.addLanguage("fr");                        // 18: Language
 		order.setPurpose(MessageFunctionEnum.Original); // 19: defined in UNTDID 1225
-		order.setRequestedResponse("AC");               // 20: defined in UNTDID 4343
+		order.setRequestedResponse(AC);                 // 20: defined in UNTDID 4343
 		
 		order.addNote( order.createNote("AAI", "Content of Note") );
 		
@@ -152,20 +148,20 @@ public class OrderTest {
 		assertNull(postalAddress.getAddressLine2());
 		
 		BusinessParty bp = TradeParty.create().createParty("Reg.Name", "Name", postalAddress, contact);
-		bp.setId("123654879","0088"); // 0088 : EAN // TODO EAN is veraltert ==> ???
+		bp.setId("123654879",GTIN); // 0088 : EAN is veraltert ==> GTIN
 		LOG.info("bp:"+bp);
 		
-		order.setDocumentCurrency("EUR");
+		order.setDocumentCurrency(EUR);
 		order.setBuyerReference("BUYER_REF_BU123");
 		// <ram:BuyerReference>BUYER_REF_BU123</ram:BuyerReference>
 		
-		PostalAddress address = order.createAddress("DE", "123", "Ort");
+		PostalAddress address = order.createAddress(DE, "123", "Ort");
 		ContactInfo icontact = order.createContactInfo("name", "tel", "mail");
 //		order.setSeller("SUPPLIER_ID_321654", address, icontact, null, null);
 		BusinessParty seller = order.createParty("SELLER_NAME", "SELLER_TRADING_NAME", postalAddress, contact);
 		seller.setId("SUPPLIER_ID_321654");
-		seller.addId("123456789", "0088");
-		seller.setCompanyId("123456789", "0002");
+		seller.addId("123456789", EAN_LOCO); // EAN Location Code
+		seller.setCompanyId("123456789", SIRENE);
 //		seller.setCompanyLegalForm("SUPPLIER_ID_321654"); // not defined
 		seller.setUriUniversalCommunication("sales@seller.com<", "EM");
 		seller.setVATRegistrationId("FR 32 123 456 789");
@@ -181,9 +177,9 @@ public class OrderTest {
 		
 		order.setBuyerAccountingReference(new ID("BUYER_ACCOUNT_REF"));
 		
-		order.setShipFrom("SHIP_FROM_NAME", order.createAddress("FR", "75003", "SHIP_FROM_CITY"), contact);
+		order.setShipFrom("SHIP_FROM_NAME", order.createAddress(FR, "75003", "SHIP_FROM_CITY"), contact);
 		
-		order.setDeliveryTerms("FCA", "7");
+		order.setDeliveryTerms(FCA, DELIVERED_BY_SUPPLIER); // Free Carrier, 7
 		order.setPurchaseOrderReference("PO123456789");
 		order.setContractReference("CONTRACT_2020-25987");
 		order.setPreviousOrderResponseReference("PREV_ORDER_R_ID");
@@ -241,14 +237,14 @@ public class OrderTest {
 		assertEquals(OBJECT_ID, order.getInvoicedObject());
 		
 		OrderLine line = order.createOrderLine("1"    // order line number
-				  , new Quantity("C62", new BigDecimal(6))              // one unit/C62
+				  , new Quantity(C62, new BigDecimal(6))                // one unit/C62
 				  , new Amount(EUR, new BigDecimal(60.00))				// line net amount
 				  , new UnitPriceAmount(EUR, new BigDecimal(10.00))	    // price
 				  , "Zeitschrift [...]"									// itemName
-				  , TaxCategoryCode.STANDARD_RATE, new BigDecimal(7)     // VAT category code, rate 7%
+				  , TaxCategoryCode.STANDARD_RATE, new BigDecimal(7)    // VAT category code, rate 7%
 				  );
 		line.addNote("AAI", "Content of Note");
-		line.setUnitPriceQuantity(new Quantity("C62", new BigDecimal(1))); // (optional) price base quantity
+		line.setUnitPriceQuantity(new Quantity(C62, new BigDecimal(1))); // (optional) price base quantity
 		line.setPartialDeliveryIndicator(true);
 		line.addStandardIdentifier("1234567890123", GTIN);
 		line.setSellerAssignedID("987654321");
@@ -257,29 +253,39 @@ public class OrderTest {
 		line.setStatus("Status");
 		line.setLineObjectID("id", "schemeID", "AWV"); // 154: BG.25.BT-128
 		line.setDescription("description"); // BG-31.BT-154
-		line.addClassificationIdentifier("4047247110051", "EN", null, null); // BG-31.BT-158
-		line.setCountryOfOrigin("FR"); // BG-31.BT-159
+		line.addClassificationIdentifier("4047247110051", EAN_UNTDID_7143, null, null); // BG-31.BT-158
+		line.setCountryOfOrigin(FR); // BG-31.BT-159
 		
 		// OrderLineID nicht mit ID verwechseln! 
 		// OrderLineID: der Verweis auf die ursprüngliche ID ist in CIO überflüssig, in CIOR/CIOC sinnvoll
 		line.setOrderLineID("id-1"); // warning expected
 		
-		// Order-X-No: 	68, Verpackung, ? für die 6 Zeitschriften
-		String woodenCase = "7B"; // UNTDID 7065 Package type description code verweist auf UN/ECE Recommendation 21, Annex V
+		/* Order-X-No: 	68, Verpackung, ? für die 6 Zeitschriften
+                <ram:ApplicableSupplyChainPackaging>
+                    <ram:TypeCode>7B</ram:TypeCode>
+                    <ram:LinearSpatialDimension>
+                        <ram:WidthMeasure unitCode="MTR">0.30</ram:WidthMeasure>
+                        <ram:LengthMeasure>0.50</ram:LengthMeasure>
+                    </ram:LinearSpatialDimension>
+                </ram:ApplicableSupplyChainPackaging>
+
+		 */
 		line.setPackaging(woodenCase                      // 69: type of packaging
 				                                          // 70: Dimension:
 				, new Measure(MTR, new BigDecimal(0.30))  // 72+71: width/Breite 
 				, new Measure(null, new BigDecimal(0.50)) // 73:length ohne 74:Einheit sollte nicht möglich sein
 				, null);                                  // 76+75: height 
 		assertEquals(woodenCase, line.getPackagingCode());
-		assertEquals(MTR, line.getPackagingWidth().getUnitCode());
 		LOG.info("Packaging Width:"+line.getPackagingWidth()
 			+ " Length:"+line.getPackagingLength()
 			+ " Height:"+line.getPackagingHeight()
 				);
-		// TODO Anders lösen wg. org.hamcrest jar macht diesses Assert immer Ärger
-//		assertThat(new BigDecimal(0.30),  Matchers.closeTo(line.getPackagingWidth().getValue(RoundingMode.HALF_UP), new BigDecimal(0.0001)));
-
+		// assert 0.3000 <> 0.30, aber mit compare to ==
+		IQuantity expW = new Quantity(MTR, new BigDecimal(0.30));
+		assertEquals(0, expW.getValue().compareTo(line.getPackagingWidth().getValue(RoundingMode.UNNECESSARY)));
+		assertEquals(                 MTR, line.getPackagingWidth().getUnitCode());
+		IQuantity expL = new Quantity(MTR, new BigDecimal(0.50));
+		assertEquals(0, expL.getValue().compareTo(line.getPackagingLength().getValue(RoundingMode.UNNECESSARY)));
 		assertNull(line.getPackagingLength().getUnitCode());
 		assertNull(line.getPackagingHeight());
 
@@ -351,7 +357,7 @@ public class OrderTest {
 		assertEquals(GTIN, line.getStandardIdentifier().get(0).getSchemeIdentifier());
 		
 		order.addLine("2"
-				, new Quantity("C62", new BigDecimal(10))
+				, new Quantity(C62, new BigDecimal(10))
 				, new Amount(new BigDecimal(100.00))
 				, new UnitPriceAmount(new BigDecimal(10.00))
 				, "Product Name"
