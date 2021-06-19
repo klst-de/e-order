@@ -88,8 +88,8 @@ public class Order extends ORDER implements DefaultOrder {
 	OrderHeader orderHeader;
 	OrderInfo orderInfo;
 
-	// ctor public, damit dynamisches cast im Test möglich ist
-	public Order(ORDER doc) {
+	// ctor
+	private Order(ORDER doc) {
 		SCopyCtor.getInstance().invokeCopy(this, doc);
 		
 		orderHeader = OrderHeader.create(super.getORDERHEADER(), this);

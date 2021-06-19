@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
@@ -83,8 +84,10 @@ public class PLD_1051712 extends Constants {
 			object = transformer.unmarshal(is);
 			LOG.info("unmarshaled object:"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.OpenTransOrderResponseTransformer.CONTENT_TYPE_NAME); // OT aus jar laden
-			// dynamisch, dazu muss der ctor public sein: public OrderResponse(ORDERRESPONSE doc):
-			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
+			// castTo liefert Object, aber vom typ CONTENT_TYPE_NAME OrderResponse:
+			Object coreOrder = SCopyCtor.getInstance().castTo(type, object);
+			LOG.info("casted coreOrder object:"+coreOrder);
+			return (CoreOrder)coreOrder;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			LOG.severe(ex.getMessage());

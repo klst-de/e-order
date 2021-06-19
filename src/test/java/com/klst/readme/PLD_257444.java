@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.untdid.DocumentNameCode;
@@ -37,6 +38,7 @@ import com.klst.eorder.impl.ID;
 import com.klst.eorder.impl.Quantity;
 import com.klst.eorder.impl.UnitPriceAmount;      // impl.jar
 import com.klst.eorder.openTrans.Address;
+import com.klst.eorder.openTrans.DefaultOrder;
 import com.klst.eorder.openTrans.Order;
 import com.klst.eorder.openTrans.PartyID;
 import com.klst.eorder.openTrans.PostalAddressExt;
@@ -87,8 +89,12 @@ public class PLD_257444 extends Constants {
 			object = transformer.unmarshal(is);
 			LOG.info("unmarshaled object:"+object);
 			Class<?> type = Class.forName(com.klst.marshaller.OpenTransOrderTransformer.CONTENT_TYPE_NAME); // OT aus jar laden
-			// dynamisch, dazu muss der ctor public sein: public OrderResponse(ORDERRESPONSE doc):
-			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
+			// castTo liefert Object, 
+			// aber vom typ CONTENT_TYPE_NAME openTrans.Order implements DefaultOrder extends CoreOrder,
+			// Daher kann ist cast auf Object coreOrder OK: (CoreOrder)coreOrder
+			Object coreOrder = SCopyCtor.getInstance().castTo(type, object);
+			LOG.info("casted coreOrder object:"+coreOrder);
+			return (CoreOrder)coreOrder;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			LOG.severe(ex.getMessage());

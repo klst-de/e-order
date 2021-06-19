@@ -64,8 +64,8 @@ public class OrderResponse extends ORDERRESPONSE implements DefaultOrder {
 	OrderResponseHeader orderHeader;
 	OrderResponseInfo orderInfo;
 
-	// ctor public, damit dynamisches cast im Test möglich ist
-	public OrderResponse(ORDERRESPONSE doc) {
+	// ctor
+	private OrderResponse(ORDERRESPONSE doc) {
 		SCopyCtor.getInstance().invokeCopy(this, doc);
 		
 		orderHeader = OrderResponseHeader.create(super.getORDERRESPONSEHEADER());
