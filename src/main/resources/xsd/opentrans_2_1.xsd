@@ -22,11 +22,21 @@ Fraunhofer IAO und Universität Duisburg-Essen BLI gewähren Ihnen hiermit das d
   e-mail contact: authors@opentrans.org
 
 
+remove xmlns:xsig="http://www.w3.org/2000/09/xmldsig#"
 -->
-<xsd:schema xmlns="http://www.opentrans.org/XMLSchema/2.1" xmlns:bmecat="http://www.bmecat.org/bmecat/2005" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsig="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.opentrans.org/XMLSchema/2.1" elementFormDefault="qualified">
+<xsd:schema 
+ xmlns="http://www.opentrans.org/XMLSchema/2.1" 
+ xmlns:bmecat="http://www.bmecat.org/bmecat/2005" 
+ xmlns:xmime="http://www.w3.org/2005/05/xmlmime" 
+  
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+ targetNamespace="http://www.opentrans.org/XMLSchema/2.1" 
+ elementFormDefault="qualified">
 	<xsd:import namespace="http://www.bmecat.org/bmecat/2005" schemaLocation="bmecat_2005.xsd"/>
 	<xsd:import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="xmlmime.xsd"/>
+<!-- Retrieving xmldsig-core-schema.xsd from the W3C site can take a long time, causing timeouts.
 	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+  -->
 	<xsd:element name="OPENTRANS">
 		<xsd:complexType>
 			<xsd:choice>
@@ -2798,7 +2808,7 @@ Fraunhofer IAO und Universität Duisburg-Essen BLI gewähren Ihnen hiermit das d
 			<xsd:choice>
 				<xsd:element ref="MIME"/>
 				<xsd:element ref="SIGNATURE_IN_ORIGINAL"/>
-				<xsd:element ref="XML_SIGNATURE"/>
+<!-- 				<xsd:element ref="XML_SIGNATURE"/>  -->
 			</xsd:choice>
 		</xsd:complexType>
 	</xsd:element>
@@ -2990,6 +3000,7 @@ Fraunhofer IAO und Universität Duisburg-Essen BLI gewähren Ihnen hiermit das d
 			</xsd:restriction>
 		</xsd:simpleType>
 	</xsd:element>
+<!--
 	<xsd:element name="XML_SIGNATURE">
 		<xsd:complexType>
 			<xsd:sequence>
@@ -2997,4 +3008,5 @@ Fraunhofer IAO und Universität Duisburg-Essen BLI gewähren Ihnen hiermit das d
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
+  -->	
 </xsd:schema>
