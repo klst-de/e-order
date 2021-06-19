@@ -78,8 +78,8 @@ public class Address extends ADDRESS implements PostalAddressExt, ContactInfo {
 
 //	private static final Logger LOG = Logger.getLogger(Address.class.getName());
 
-	// copy ctor
-	private Address(ADDRESS address) {
+	// copy ctor, public wg. AddressTest
+	public Address(ADDRESS address) {
 		SCopyCtor.getInstance().invokeCopy(this, address);
 	}
 	
@@ -149,7 +149,7 @@ public class Address extends ADDRESS implements PostalAddressExt, ContactInfo {
 
 	@Override
 	public String getStreet() {
-		return super.getSTREET().isEmpty() ? null : getNAME().get(0).getValue();
+		return super.getSTREET().isEmpty() ? null : getSTREET().get(0).getValue();
 	}
 
 	@Override
