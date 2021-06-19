@@ -57,6 +57,9 @@ public class Address extends ADDRESS implements PostalAddressExt, ContactInfo {
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
 		return create(countryCode, postalCode, city);
 	}
+//	public PostalAddress createAddress(ADDRESS object) {
+//		return Address.create(object);
+//	}
 	
 	static Address create(String countryCode, String postalCode, String city) {
 		return new Address(countryCode, postalCode, city, null);
@@ -78,8 +81,8 @@ public class Address extends ADDRESS implements PostalAddressExt, ContactInfo {
 
 //	private static final Logger LOG = Logger.getLogger(Address.class.getName());
 
-	// copy ctor, public wg. AddressTest
-	public Address(ADDRESS address) {
+	// copy ctor
+	private Address(ADDRESS address) {
 		SCopyCtor.getInstance().invokeCopy(this, address);
 	}
 	

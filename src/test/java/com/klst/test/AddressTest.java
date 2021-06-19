@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.eorder.api.AbstactTransformer;
 import com.klst.eorder.openTrans.Address;
@@ -64,10 +65,6 @@ public class AddressTest {
 			object = transformer.unmarshal(is);
 			LOG.info("unmarshaled object:"+object);
 			return object;
-//			Class<?> type = Class.forName("com.klst.eorder.openTrans.Address");
-//			// dynamisch, dazu muss der ctor public sein: public OrderResponse(ORDERRESPONSE doc):
-////			return CoreOrder.class.cast(type.getConstructor(object.getClass()).newInstance(object));
-//			return Address.class.cast(type.getConstructor(object.getClass()).newInstance(object));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			LOG.severe(ex.getMessage());
@@ -107,8 +104,12 @@ public class AddressTest {
 		Object o = marshal("Address-TestResult");
 		// o ist ADDRESS nach marshal to file und unmarshal zurück
 		try {
-			Address a = Address.class.cast(Address.class.getConstructor(o.getClass()).newInstance(o));
-			LOG.info("nach unmarshal:"+a);
+			Class<?> type = Class.forName("com.klst.eorder.openTrans.Address");
+//			LOG.info("Object (vor cast):"+o);
+			Object oa = SCopyCtor.getInstance().castTo(type, o);
+//			LOG.info("Object (nach cast):"+oa);
+			Address a = (Address)oa;
+			LOG.info("Address nach unmarshal:"+a);
 			assertEquals("CH", a.getCountryCode());
 			assertEquals("Zürcherstrasse 350", a.getStreet());
 		} catch (Exception ex) {
