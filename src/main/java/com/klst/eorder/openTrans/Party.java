@@ -308,7 +308,9 @@ BT-34 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des 
 		addId(name, schemeID);
 	}
 	
-	// BT-30 0..1 Seller legal registration identifier / Kennung der rechtlichen Registrierung des Verkäufers
+	// legal registration identifier / Kennung der rechtlichen Registrierung des Verkäufers
+	// 351 BG-4.BT-30  0..1 Seller legal registration identifier 
+	// 396 BG-7.BT-47  0..1  Buyer legal registration identifier
 	@Override
 	public String getCompanyId() {
 		Identifier identifier = getCompanyIdentifier();
@@ -322,7 +324,8 @@ BT-34 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse des 
 		if(super.getPARTYID().isEmpty()) return null;
 		List<Identifier> resList = new ArrayList<Identifier>(getPARTYID().size());
 		getPARTYID().forEach(id -> {
-			// Type numerisch 
+			// Type numerisch, z.B. 0204==Leitweg-ID
+			// oder 0199==LEI
 			String type = id.getType();
 			if(type!=null && isNumeric(type)) {
 				resList.add(new PartyID(id));

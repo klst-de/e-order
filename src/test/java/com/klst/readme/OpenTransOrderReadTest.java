@@ -497,7 +497,7 @@ public class OpenTransOrderReadTest extends Constants {
 		BusinessParty seller = co.getSeller();
 		LOG.info("seller:"+seller);
 		BusinessParty buyer = co.getBuyer();
-		LOG.info("buyer:"+buyer);
+		LOG.info("buyer:"+buyer + " CompanyId="+buyer.getCompanyId());	
 //	<ADDRESS>
 //		<bmecat:NAME>ADDRESS.NAME</bmecat:NAME>
 //		<bmecat:NAME2>ADDRESS.NAME2</bmecat:NAME2>

@@ -11,7 +11,15 @@ Component                 | Use         	Primitive Type | Example
 value                     : Mandatory 		String         | abc:123-DEF
 type                      : Conditional 	String         | GLN
 - nA -                    : Conditional 	String         | 1.0          // nicht in OT
- 
+
+Vordefinierte Werte für das Attribut "type" / aka schemeID:
+buyer_specific
+customer_specific
+iln : International Location Number 
+gln : Global Location Number, entspricht ICD 0209 : GS1 identification keys
+party_specific
+supplier_specific
+Benutzerdefinierter Wert, z.B. ICD 0204 für Leitweg-ID 
  */
 public class PartyID extends TypePARTYID implements Identifier, Reference {
 

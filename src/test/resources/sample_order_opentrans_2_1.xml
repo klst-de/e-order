@@ -58,6 +58,10 @@ Please note that only dummy-prices and units are used. No price-calculations wer
 			<PARTIES>
 				<PARTY>
 					<bmecat:PARTY_ID type="PredefinedOrCustomType">a</bmecat:PARTY_ID>
+<!-- 0199:LEI 549300PSYDO3VGELZK60 für Gerstl Weinselektionen AG
+	aus CH-8957 Spreitenbach
+-->					
+					<bmecat:PARTY_ID type="0199">549300PSYDO3VGELZK60</bmecat:PARTY_ID>
 					<PARTY_ROLE>buyer</PARTY_ROLE>
 					<ADDRESS>
 						<bmecat:NAME>ADDRESS.NAME</bmecat:NAME>
