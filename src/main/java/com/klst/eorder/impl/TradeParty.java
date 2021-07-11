@@ -227,7 +227,9 @@ BT-34 ++ 0..1 Seller electronic address ( mit Schema ) / Elektronische Adresse d
 //		super.getGlobalID().add(new ID(name, schemeID));
 	}
 	
-	// BT-30 ++ 0..1 Seller legal registration identifier     / Kennung der rechtlichen Registrierung des Verkäufers
+	// legal registration identifier / Kennung der rechtlichen Registrierung des Verkäufers
+	// 351 BG-4.BT-30  0..1 Seller legal registration identifier 
+	// 396 BG-7.BT-47  0..1  Buyer legal registration identifier
 	@Override
 	public String getCompanyId() {
 		IDType id = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getID();

@@ -46,14 +46,46 @@ public class Constants {
 	// UNTDID 7143 Item type identification code
 	static final String EAN_UNTDID_7143 = "EN"; // International Article Numbering Association (EAN)
 
-	// Coding Systems aka ICD Schemas : 
+	// Coding Systems aka ICD Schemas, https://en.wikipedia.org/wiki/ISO/IEC_6523 : 
 	// System Information et Repertoire des Entreprise et des Etablissements: SIRENE
 	static final String SIRENE 		= "0002"; // ICD Schema for SIRENE
-	static final String EAN_LOCO 	= "0088"; // ICD Schema for EAN Location Code
-	// Global Trade Item Number (GTIN), Alt. Names: EAN article number, UPC Code
-	static final String GTIN 		= "0160";
+	static final String EAN_LOCO 	= "0088"; // ICD Schema for EAN Location Code, to identify Parties and locations
+	
+	// Global Trade Item Number (GTIN), to identify Parties and locations:
+	// (Alt. Names: EAN article number, UPC Code)
 	// Bis 2009 hieß die GTIN noch europäische Artikelnummer EAN. 
 	// EAN und GTIN meinen also das Gleiche, es gibt aber kein ICD Schema für EAN
+	static final String GTIN 		= "0160";
+	
+	static final String LEI		 	= "0199"; // Legal Entity Identifier (LEI)
+	static final String DE_LWID 	= "0204";
+/* ICD >0189:
+0190	ICD	FALSE	1		Dutch Originator's Identification Number
+0191	ICD	FALSE	1		Centre of Registers and Information Systems of the Ministry of Justice
+0192	ICD	FALSE	1		Enhetsregisteret ved Bronnoysundregisterne 
+0193	ICD	FALSE	1		UBL.BE party identifier
+0194	ICD	FALSE	5		KOIOS Open Technical Dictionary
+0195	ICD	FALSE	1		Singapore UEN identifier
+0196	ICD	FALSE	1		Kennitala - Iceland legal id for individuals and legal entities
+0198	ICD	FALSE	2		ERSTORG
+0199	ICD	FALSE	2		Legal Entity Identifier (LEI)
+0200	ICD	FALSE	2		Legal entity code (Lithuania)
+0201	ICD	FALSE	3		Codice Univoco Unità Organizzativa iPA
+0202	ICD	FALSE	3		Indirizzo di Posta Elettronica Certificata
+0203	ICD	FALSE	4		eDelivery Network Participant identifier
+0204	ICD	FALSE	4		Leitweg-ID
+enum EPredefinedParticipantIdentifierScheme in com.helger.peppolid.peppol.pidscheme
+     String sSchemeID,
+              String sISO6523,
+                String sCountryCode,
+                               String sSchemeName,
+                                                   sIssuingAgency,
+                                                                                                             Version aSince,
+                                                                                                               boolean bDeprecated
+    DE_LWID("DE:LWID", "0204", "DE", "Leitweg-ID", "Koordinierungsstelle f\u00fcr IT-Standards (KoSIT)", Version.parse("6"), false),
+0208	ICD	FALSE	6		Numero d'entreprise / ondernemingsnummer / Unternehmensnummer
+0209	ICD	FALSE	7		GS1 identification keys
+ */
 	static final String EAN 		= "ean"; // used in OpenTrans
 	static final String GLN 		= "gln"; // Global Location Number used in OpenTrans
 	static final String ILN 		= "iln"; // International Location Number (alias to GLN) used in OpenTrans
