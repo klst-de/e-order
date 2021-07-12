@@ -57,11 +57,26 @@ public class Constants {
 	// EAN und GTIN meinen also das Gleiche, es gibt aber kein ICD Schema für EAN
 	static final String GTIN 		= "0160";
 	
+	/**
+	 * Registrikood (Estonian organisation registration code).
+	 *
+	 * All organisations are assigned a unique tax identification code from the
+	 * commercial register, from the state register or from the non-profit
+	 * associations and foundations register. The code consists of 8 digits.
+	 *
+	 * Commercial company numbers start with a 1, schools and government numbers
+	 * with a 7, non-profit organisations with an 8 and foundations with a 9. The
+	 * number uses the same check digit algorithm as the Isikukood although that
+	 * fact is undocumented.
+	 *
+	 * @see https://github.com/koblas/stdnum-js/blob/502530d08cddbf04872c1144abcfbe87872189fc/src/ee/registrikood.ts
+	 */
+	static final String EE_CC	 	= "0191";
 	static final String LEI		 	= "0199"; // Legal Entity Identifier (LEI)
 	static final String DE_LWID 	= "0204";
 /* ICD >0189:
 0190	ICD	FALSE	1		Dutch Originator's Identification Number
-0191	ICD	FALSE	1		Centre of Registers and Information Systems of the Ministry of Justice
+0191	ICD	FALSE	1		EE_CC: Centre of Registers and Information Systems of the Ministry of Justice
 0192	ICD	FALSE	1		Enhetsregisteret ved Bronnoysundregisterne 
 0193	ICD	FALSE	1		UBL.BE party identifier
 0194	ICD	FALSE	5		KOIOS Open Technical Dictionary
@@ -73,7 +88,7 @@ public class Constants {
 0201	ICD	FALSE	3		Codice Univoco Unità Organizzativa iPA
 0202	ICD	FALSE	3		Indirizzo di Posta Elettronica Certificata
 0203	ICD	FALSE	4		eDelivery Network Participant identifier
-0204	ICD	FALSE	4		Leitweg-ID
+0204	ICD	FALSE	4		DE_LWID: Leitweg-ID
 enum EPredefinedParticipantIdentifierScheme in com.helger.peppolid.peppol.pidscheme
      String sSchemeID,
               String sISO6523,
@@ -87,7 +102,7 @@ enum EPredefinedParticipantIdentifierScheme in com.helger.peppolid.peppol.pidsch
 0209	ICD	FALSE	7		GS1 identification keys
  */
 	static final String EAN 		= "ean"; // used in OpenTrans
-	static final String GLN 		= "gln"; // Global Location Number used in OpenTrans
+	static final String GLN 		= "gln"; // Global Location Number "0088" used in OpenTrans
 	static final String ILN 		= "iln"; // International Location Number (alias to GLN) used in OpenTrans
 
 	class ExpectedBP {
